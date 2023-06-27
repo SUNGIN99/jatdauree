@@ -16,7 +16,6 @@ import java.util.ArrayList;
 @RestController
 @RequestMapping("/prac")
 public class PracController {
-
     @Autowired
     private final PracService pracService;
 
@@ -47,17 +46,27 @@ public class PracController {
         }
     }
 
-    /*
+    @ResponseBody
+    @GetMapping("/item")
     // @RequestParam 사용하여 아이디를 이용하여 아이템을 조회하기
-    public BaseResponse<> outputItemsByParamId(){
+    public BaseResponse<GetItemRes> outputItemsByParamId(@RequestParam int id){
+        try{
+            GetItemRes postItemRes = pracService.outputItemsByParamId(id);
+            return new BaseResponse<>(postItemRes);
+        }catch (BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
     }
 
+    @ResponseBody
+    @GetMapping("/items/{id}")
     // @PathVariable 사용하여 아이디를 이용하여 아이템을 조회하기
-    public BaseResponse<> outputItemsPathId(){
-    }*/
-
-    @GetMapping("")
-    public int a(){
-        return 1;
+    public BaseResponse<GetItemRes> outputItemsPathId(@PathVariable int id){
+        try{
+            GetItemRes postItemRes = pracService.outputItemsByParamId(id);
+            return new BaseResponse<>(postItemRes);
+        }catch (BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
     }
 }

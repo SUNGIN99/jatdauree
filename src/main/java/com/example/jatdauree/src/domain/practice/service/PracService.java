@@ -21,9 +21,29 @@ public class PracService {
 
     public PostItemsRes inputItems(PostItemsReq postItemsReq) throws BaseException {
         return pracDao.inputItems(postItemsReq);
+
     }
 
-    public ArrayList<GetItemRes> outputItems() throws BaseException{
-        return pracDao.outputItems();
+    public ArrayList<GetItemRes> outputItems() throws BaseException {
+        ArrayList<PostItemsReq> itemArray = pracDao.outputItems();
+
+        ArrayList<GetItemRes> getItemRes = new ArrayList<>();
+        for (PostItemsReq item : itemArray) {
+            getItemRes.add(new GetItemRes(item.getItemIdx(), item.getTitle(), item.getContents()));
+        }
+
+        return getItemRes;
+
+    }
+
+    public GetItemRes outputItemsByParamId(int id) throws BaseException {
+        ArrayList<PostItemsReq> itemArray = pracDao.outputItems();
+
+        for (PostItemsReq item : itemArray) {
+            if (item.getItemIdx() == id) {
+                return new GetItemRes(item.getItemIdx(), item.getTitle(), item.getContents());
+            }
+        }
+        return null;
     }
 }

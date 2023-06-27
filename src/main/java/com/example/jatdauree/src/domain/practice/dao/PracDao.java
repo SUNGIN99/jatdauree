@@ -10,19 +10,15 @@ import java.util.ArrayList;
 @Repository
 public class PracDao {
 
-    ArrayList<PostItemsReq> itemArray = new ArrayList<>();
+    public ArrayList<PostItemsReq> itemArray = new ArrayList<>();
+
 
     public PostItemsRes inputItems(PostItemsReq postItemsReq) {
         itemArray.add(postItemsReq);
         return new PostItemsRes(itemArray.size(), postItemsReq.getItemIdx());
     }
 
-    public ArrayList<GetItemRes> outputItems() {
-        ArrayList<GetItemRes> getItemRes = new ArrayList<>();
-        for (PostItemsReq item : itemArray){
-            getItemRes.add(new GetItemRes(item.getItemIdx(), item.getTitle(), item.getContents()));
-        }
-
-        return getItemRes;
+    public ArrayList<PostItemsReq> outputItems() {
+        return itemArray;
     }
 }
