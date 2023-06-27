@@ -1,5 +1,6 @@
 package com.example.jatdauree.utils;
 
+import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.secret.Secret;
 import com.example.jatdauree.src.domain.user.service.UserService;
 import io.jsonwebtoken.Claims;
@@ -7,6 +8,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +22,7 @@ import java.util.Date;
  * 기본 필드 및 createJwt(), getUserId(), getAuthentication(), resolveToken(), validateToken() 등 기본함수 구현
  */
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class JwtTokenProvider {
@@ -29,6 +32,7 @@ public class JwtTokenProvider {
     private long tokenValidTime = 1*(1000*60*60*24*365);
 
     /*
+    //https://superbono-2020.tistory.com/186
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
@@ -49,6 +53,7 @@ public class JwtTokenProvider {
     // JWT 토큰에서 인증정보 조회
     public Authentication getAuthentication(String token){
         UserDetails userDetails = userService.loadUserByUserIdx(this.getUserId(token));
+        log.info("JwtTokenProvider : {}", userDetails.getUsername());
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
@@ -71,6 +76,7 @@ public class JwtTokenProvider {
             return false;
         }
     }
+
 }
 
 
