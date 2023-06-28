@@ -1,8 +1,7 @@
 package com.example.jatdauree.utils;
 
-import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.secret.Secret;
-import com.example.jatdauree.src.domain.user.service.UserService;
+import com.example.jatdauree.src.domain.seller.service.SellerService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -27,7 +26,7 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    private final UserService userService;
+    private final SellerService userService;
     // 23.06.27 나중에 토큰 유효시간 바꿀것
     private long tokenValidTime = 1*(1000*60*60*24*365);
 

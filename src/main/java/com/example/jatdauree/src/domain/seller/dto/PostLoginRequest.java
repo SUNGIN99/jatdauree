@@ -1,4 +1,4 @@
-package com.example.jatdauree.src.domain.user.dto;
+package com.example.jatdauree.src.domain.seller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

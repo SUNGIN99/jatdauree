@@ -1,4 +1,4 @@
-package com.example.jatdauree.src.domain.user.dto;
+package com.example.jatdauree.src.domain.seller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserAuthentication implements UserDetails {
+public class SellerAuthentication implements UserDetails {
 
     private Long sellerIdx;
     private String uid;
