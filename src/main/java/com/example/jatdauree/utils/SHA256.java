@@ -17,7 +17,7 @@ public class SHA256 {
         //SALT 생성
         String salt = new String(Base64.getEncoder().encode(bytes));
 
-        System.out.println("salt : " + salt);
+        //System.out.println("{SHA256.Class} salt : " + salt);
         return salt;
     }
 
@@ -26,18 +26,13 @@ public class SHA256 {
             // 1) 해시값 계산 MessageDigest , SHA 256 알고리즘 사용
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             String rawAndSalt = plainText + salt;
-            System.out.println("rawAndSalt : " + rawAndSalt);
+            //System.out.println("{SHA256.Class} rawAndSalt : " + rawAndSalt);
+
             // 2) MessageDigest.update() : 메소드 호출할 때 마다 객체 내에 저장된 digest 값이 계속해서 갱신
             md.update(rawAndSalt.getBytes());
 
             // 3) digest()메서드를 호출하여 객체내 digest 값 반환/ 바이트배열로 해쉬를 반환함, 패딩 등 최종 처리를하여 해시계산 완료
             byte[] byteData = md.digest(); // 1byte = 8bit
-
-            /*
-            StringBuffer sb = new StringBuffer();
-            for(int i = 0; i < byteData.length; ++i) {
-                sb.append(Integer.toString((byteData[i] & 255) + 256, 16).substring(1));
-            }*/
 
             // hash 값이 음수일 경우 양수로 변환하기위한 작업
             // 1byte = 8bit, 10진수 표현범위 = -128~127, 1111111(2진수) = -1(10진수) 2^7자리 비트는 양(0)/음수(1) 판별

@@ -2,12 +2,11 @@ package com.example.jatdauree.src.domain.seller.service;
 
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.src.domain.seller.dao.SellerDao;
-import com.example.jatdauree.src.domain.seller.dto.PostSignUpRes;
-import com.example.jatdauree.src.domain.seller.dto.PostSignUpReq;
-import com.example.jatdauree.src.domain.seller.dto.SellerAuthentication;
-import com.example.jatdauree.utils.JwtService;
+import com.example.jatdauree.src.domain.seller.dto.*;
+import com.example.jatdauree.utils.jwt.JwtTokenProvider;
 import com.example.jatdauree.utils.SHA256;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,17 +21,19 @@ public class SellerService {
 
 
     private final SellerDao sellerDao;
-    private final JwtService jwtService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    public SellerService(SellerDao sellerDao, JwtService jwtService) {
+    public SellerService(SellerDao sellerDao, @Lazy JwtTokenProvider jwtTokenProvider) {
         this.sellerDao = sellerDao;
-        this.jwtService = jwtService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     public UserDetails loadUserByUserIdx(Long userId) {
         return new SellerAuthentication(1L, "id", "pw", Collections.singletonList("ROLE"));
     }
+
+
 
     @Transactional
     public PostSignUpRes signUp(PostSignUpReq postSignUpReq) throws BaseException {
@@ -51,9 +52,9 @@ public class SellerService {
         if(sellerDao.checkUid(postSignUpReq.getUid()) == 1){
             throw new BaseException(POST_USERS_EXISTS_ID); // 2018 : 중복 아이디
         }
+        // 비밀번호 암호화
         try{
-            salt = SHA256.createSalt(postSignUpReq.getPassword());
-            // 비밀번호 암호화
+            salt = SHA256.createSalt(postSignUpReq.getPassword()); // 비밀번호를 이용하여 salt 생성
             String pwd = new SHA256().encrypt(postSignUpReq.getPassword(), salt); // 비밀번호 암호화
             postSignUpReq.setPassword(pwd);
         } catch (Exception ignored) {
@@ -69,6 +70,43 @@ public class SellerService {
             return postSignUpres;
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    @Transactional
+    public PostLoginRes login(PostLoginReq postLoginReq) throws BaseException{
+        if(postLoginReq.getUid().length() == 0 || postLoginReq.getPassword().length() == 0){
+            throw new BaseException(REQUEST_ERROR); // 2000 : 입력값 전체 빈 값일때
+        }
+
+        // 1) 아이디가 존재하는지 확인, 회원정보 우선 조회
+        Seller seller;
+        try{
+            seller = sellerDao.login(postLoginReq);
+        }catch(Exception exception){
+            throw new BaseException(FAILED_TO_LOGIN);
+        }
+
+        // 2) 비밀 번호 암호화
+        try{
+            String salt = seller.getSalt();
+            String pwd = new SHA256().encrypt(postLoginReq.getPassword(), salt);
+            System.out.println("{SellerService.Class} pwd : " + pwd);
+            if (postLoginReq.getUid().equals(seller.getUid()) && pwd.equals(seller.getPassword())){
+                String jwt = jwtTokenProvider.createJwt(seller.getSellerIdx());
+                return new PostLoginRes(jwt,
+                        seller.getSellerIdx(),
+                        seller.getName(),
+                        seller.getBirthday(),
+                        seller.getPhone(),
+                        seller.getEmail(),
+                        seller.getFirst_login());
+            }
+            else{
+                throw new BaseException(FAILED_TO_LOGIN);
+            }
+        }catch(Exception exception){
+            throw new BaseException(FAILED_TO_LOGIN);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.jatdauree.utils;
+package com.example.jatdauree.utils.jwt;
 
 import com.example.jatdauree.config.secret.Secret;
 import com.example.jatdauree.src.domain.seller.service.SellerService;
