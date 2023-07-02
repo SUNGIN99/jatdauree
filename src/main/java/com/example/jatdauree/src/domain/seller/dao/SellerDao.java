@@ -1,15 +1,13 @@
 package com.example.jatdauree.src.domain.seller.dao;
 
-import com.example.jatdauree.src.domain.seller.dto.PostLoginReq;
-import com.example.jatdauree.src.domain.seller.dto.PostSignUpReq;
-import com.example.jatdauree.src.domain.seller.dto.PostSignUpRes;
-import com.example.jatdauree.src.domain.seller.dto.Seller;
+import com.example.jatdauree.src.domain.seller.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 
 @Repository
@@ -40,8 +38,8 @@ public class SellerDao {
      */
     @Transactional
     public int signUp(PostSignUpReq postSignUpReq, String salt){
-        String query = "INSERT INTO Merchandisers(name, birthday, phone, uid, salt, password, email, first_login, service_check, personal_check, sms_check, email_check, call_check)\n" +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO Merchandisers(name, birthday, phone, uid, salt, password, email, first_login, service_check, personal_check, sms_check, email_check, call_check, role)\n" +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         Object[] params = new Object[]{
                 postSignUpReq.getName(),
                 postSignUpReq.getBirthday(),
@@ -55,7 +53,8 @@ public class SellerDao {
                 postSignUpReq.getPersonalCheck(),
                 postSignUpReq.getSmsCheck(),
                 postSignUpReq.getEmailCheck(),
-                postSignUpReq.getCallCheck()
+                postSignUpReq.getCallCheck(),
+                "ROLE_SELLER"
         };
 
         this.jdbcTemplate.update(query, params);
@@ -104,5 +103,86 @@ public class SellerDao {
                         rs.getString("email"),
                         rs.getInt("first_login")
                 ), postLoginReq.getUid());
+    }
+
+    /**
+     * sellerDao - 5
+     * 23.07.02 작성자 : 김성인
+     * 아이디 찾기할때 요청된 이름과 전화번호를 가진 사용자가 존재하는지?
+     */
+    public int validLoginInfo(SmsCertificateReq smsCertificateReq, String findType){
+        String query = "SELECT EXISTS(" +
+                "SELECT * FROM Merchandisers M " +
+                (findType.equals("I") ? "WHERE M.name = ? AND M.phone = ?)" : "WHERE M.uid = ? AND M.phone = ?)");
+
+        Object[] params = new Object[]{
+                (findType.equals("I") ?smsCertificateReq.getName() : smsCertificateReq.getUid()),
+                smsCertificateReq.getPhoneNum()
+        };
+        return this.jdbcTemplate.queryForObject(query, int.class, params);
+    }
+
+    /**
+     * sellerDao - 6
+     * 23.07.02 작성자 : 김성인
+     * 인증번호 확인, 아이디 찾기 완료
+     */
+    public List<ReceivedNumConfRes> idFind(ReceivedNumConfReq receivedNumConfReq) {
+        String query =
+                "SELECT\n" +
+                    "uid, DATE_FORMAT(created, '%Y.%m.%d.') as signUpDate\n" +
+                "FROM Merchandisers \n" +
+                        "WHERE phone = ? \n" +
+                        "AND name = ?;";
+
+        Object[] params = new Object[]{
+                receivedNumConfReq.getPhoneNum(),
+                receivedNumConfReq.getName()
+        };
+
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new ReceivedNumConfRes(
+                        rs.getString("uid"),
+                        rs.getString("signUpDate")
+                ),
+                params);
+    }
+
+    /**
+     * sellerDao - 7
+     * 23.07.02 작성자 : 김성인
+     * 비밀번호 찾기 전 인가된 접근을 위한 JWT발행 -> sellerIdx 반환
+     */
+    public int JwtForRestorePw(ReceivedNumConfReq receivedNumConfReq){
+        String query = "SELECT sellerIdx FROM Merchandisers\n" +
+                "WHERE uid = ? AND phone = ?";
+
+        Object[] params = new Object[]{
+                receivedNumConfReq.getUid(),
+                receivedNumConfReq.getPhoneNum()
+        };
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> rs.getInt("sellerIdx")
+                , params);
+    }
+
+    /**
+     * sellerDao - 8
+     * 23.07.02 작성자 : 김성인
+     * 비밀번호 재설정
+     */
+    public void pwRestore(int sellerIdx, String salt, String pwd) {
+        String query = "UPDATE Merchandisers\n" +
+                "SET salt = ? , password = ?\n" +
+                "WHERE sellerIdx = ?";
+
+        Object[] params = new Object[]{
+                salt,
+                pwd,
+                sellerIdx
+        };
+
+        this.jdbcTemplate.update(query, params);
     }
 }
