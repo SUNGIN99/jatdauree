@@ -138,7 +138,7 @@ public class SellerService {
         // 1) 올바른 바디 value로 요청되지 않았을때
         if(smsCertificateReq.getPhoneNum() == null &&
                 (smsCertificateReq.getName() == null|| smsCertificateReq.getUid() == null)){
-            throw new BaseException(REQUEST_ERROR);
+            throw new BaseException(REQUEST_ERROR); // 2000 : 입력값을 확인해주세요
         }
 
         // 2) 인증 타입 설정
@@ -150,13 +150,13 @@ public class SellerService {
             findType = "P"; // PW 찾기는 아이디 != null && 이름 == null
         }
         else{
-            throw new BaseException(REQUEST_ERROR);
+            throw new BaseException(REQUEST_ERROR); // 2000 : 입력값을 확인해주세요
         }
 
         // 3) 가입하지 않은 회원일때
         int sellerValidCheck = sellerDao.validLoginInfo(smsCertificateReq, findType);
         if (sellerValidCheck == 0){
-            throw new BaseException(POST_USERS_NOT_FOUND);
+            throw new BaseException(POST_USERS_NOT_FOUND); // 2021 : 가입되지 않은 회원입니다.
         }
 
         // 4) 랜덤 인증번호 생성 (번호)
@@ -184,7 +184,7 @@ public class SellerService {
 
             return smsSendRes;
         }catch(Exception exception){
-            throw new BaseException(COOLSMS_API_ERROR);
+            throw new BaseException(COOLSMS_API_ERROR); // 5010 : SMS 인증번호 발송을 실패하였습니다.
         }
     }
 
@@ -196,11 +196,11 @@ public class SellerService {
                 return sellerDao.idFind(receivedNumConfReq);
             }
             else{
-                throw new BaseException(SMS_CERTIFICATE_FAILED);
+                throw new BaseException(SMS_CERTIFICATE_FAILED); // 4022 : SMS 인증 실패
             }
 
         }catch(Exception exception){
-            throw new BaseException(SMS_DATA_FIND_ERROR);
+            throw new BaseException(SMS_DATA_FIND_ERROR); // 4021 : 유효하지 않은 SMS 인증번호 요청입니다.
         }
     }
 
@@ -214,16 +214,16 @@ public class SellerService {
                 return new ReceivedNumConfPwRes(jwt, receivedNumConfReq.getUid(), 1);
             }
             else{
-                throw new BaseException(SMS_CERTIFICATE_FAILED);
+                throw new BaseException(SMS_CERTIFICATE_FAILED); // 4021 : 비밀번호 암호화에 실패하였습니다
             }
         }catch(Exception exception){
-            throw new BaseException(SMS_DATA_FIND_ERROR);
+            throw new BaseException(SMS_DATA_FIND_ERROR); // 4022 : SMS 인증 실패
         }
     }
 
     public RestorePwRes pwRestore(RestorePwReq restorePwReq, int sellerIdx) throws BaseException{
         if (!restorePwReq.getPw().equals(restorePwReq.getPwCheck())){
-            throw new BaseException(MODIFY_FAIL_USERPASSWORD);
+            throw new BaseException(MODIFY_FAIL_USERPASSWORD); // 4015 : 유저 비밀번호 수정 실패
         }
 
         String pwd, salt;
@@ -231,14 +231,14 @@ public class SellerService {
             salt = SHA256.createSalt(restorePwReq.getPw()); // 비밀번호를 이용하여 salt 생성
             pwd = new SHA256().encrypt(restorePwReq.getPw(), salt); // 비밀번호 암호화
         }catch(Exception exception){
-            throw new BaseException(PASSWORD_ENCRYPTION_ERROR);
+            throw new BaseException(PASSWORD_ENCRYPTION_ERROR); // 4011 : 비밀번호 암호화에 실패하였습니다.
         }
 
         try{
             sellerDao.pwRestore(sellerIdx, salt, pwd);
             return new RestorePwRes(0,1);
         }catch(Exception exception){
-            throw new BaseException(MODIFY_FAIL_USERPASSWORD);
+            throw new BaseException(MODIFY_FAIL_USERPASSWORD); // 4015 : 유저 비밀번호 수정 실패
         }
     }
 }

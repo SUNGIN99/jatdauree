@@ -78,8 +78,6 @@ public enum BaseResponseStatus {
 
 
     // 6000 : 필요시 만들어서 쓰세요
-
-
     private final boolean isSuccess;
     private final int code;
     private final String message;

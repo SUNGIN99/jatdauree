@@ -12,6 +12,6 @@ import org.springframework.lang.Nullable;
 @NoArgsConstructor
 public class SmsCertificateReq {
     private String phoneNum;
-    private String name;
-    private String uid;
+    @Nullable private String name;
+    @Nullable private String uid;
 }
