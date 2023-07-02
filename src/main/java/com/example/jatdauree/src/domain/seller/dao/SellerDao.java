@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -20,6 +21,22 @@ public class SellerDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    /**
+     * sellerDao - 1
+     * 23.07.03 작성자 : 김성인
+     * JWT Role 추가하기 위한 유저 권한정보 등 조회
+     */
+    public SellerAuthentication loadUserByUserIdx(Long userId){
+        String query = "SELECT sellerIdx, uid, role FROM Merchandisers\n" +
+                "WHERE sellerIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new SellerAuthentication(
+                        Long.valueOf(rs.getInt("sellerIdx")),
+                        rs.getString("uid"),
+                        Collections.singletonList(rs.getString("role"))
+                ), userId);
+    }
 
     /**
      * sellerDao - 1

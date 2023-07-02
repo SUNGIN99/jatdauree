@@ -23,11 +23,9 @@ public class SellerAuthentication implements UserDetails {
 
     private Long sellerIdx;
     private String uid;
-    private String password;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    //@ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -38,7 +36,7 @@ public class SellerAuthentication implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return null;
     }
 
     @Override

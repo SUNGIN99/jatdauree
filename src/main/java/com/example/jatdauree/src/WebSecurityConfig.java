@@ -23,7 +23,7 @@ WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/jat/users/test").authenticated()
+                .antMatchers("/jat/sellers/test").hasRole("SELLER")
                 .anyRequest().permitAll()
                 .and()
                 .addFilterBefore(new JwtAuthenticateFilter(jwtTokenProvider),

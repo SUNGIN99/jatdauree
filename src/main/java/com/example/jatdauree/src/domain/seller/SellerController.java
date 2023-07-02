@@ -157,4 +157,10 @@ public class SellerController {
             return new BaseResponse<>(baseException.getStatus());
         }
     }
+
+    @GetMapping("/test")
+    public int a(){
+        return 123;
+    }
+
 }

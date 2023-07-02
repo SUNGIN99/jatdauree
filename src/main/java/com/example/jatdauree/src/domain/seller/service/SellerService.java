@@ -46,9 +46,8 @@ public class SellerService {
     }
 
     public UserDetails loadUserByUserIdx(Long userId) {
-        return new SellerAuthentication(1L, "id", "pw", Collections.singletonList("ROLE"));
+        return sellerDao.loadUserByUserIdx(userId);
     }
-
 
     @Transactional
     public PostSignUpRes signUp(PostSignUpReq postSignUpReq) throws BaseException {
