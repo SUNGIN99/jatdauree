@@ -1,4 +1,4 @@
-package com.example.jatdauree.src.domain.user.dto;
+package com.example.jatdauree.src.domain.seller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostLoginRequest {
-    private String uid;
-    private String password;
+public class RestorePwRes {
+    int sellerIdx;
+    int pwRestoreComplete;
 }

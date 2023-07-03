@@ -1,7 +1,7 @@
 package com.example.jatdauree.src;
 
-import com.example.jatdauree.utils.JwtAuthenticateFilter;
-import com.example.jatdauree.utils.JwtTokenProvider;
+import com.example.jatdauree.utils.jwt.JwtAuthenticateFilter;
+import com.example.jatdauree.utils.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,6 +22,10 @@ WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/jat/sellers/test").hasRole("SELLER")
+                .anyRequest().permitAll()
+                .and()
                 .addFilterBefore(new JwtAuthenticateFilter(jwtTokenProvider),
                         UsernamePasswordAuthenticationFilter.class);
 

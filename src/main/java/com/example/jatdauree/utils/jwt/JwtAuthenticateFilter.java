@@ -1,4 +1,4 @@
-package com.example.jatdauree.utils;
+package com.example.jatdauree.utils.jwt;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;

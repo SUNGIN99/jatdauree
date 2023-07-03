@@ -12,7 +12,6 @@ public enum BaseResponseStatus {
      */
     SUCCESS(true, 1000, "요청에 성공하였습니다."),
 
-
     /**
      * 2000 : Request 오류
      */
@@ -64,13 +63,21 @@ public enum BaseResponseStatus {
     MODIFY_FAIL_USERSTATUS_OFF(false,4016,"회원탈퇴 실패"),
     MODIFY_FAIL_USERSTATUS_ON(false,4017,"로그인 실패"),
     PASSWORD_ENCRYPTION_ERROR(false, 4011, "비밀번호 암호화에 실패하였습니다."),
-    PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다.");
+    PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다."),
+
+    // SMS
+    SMS_DATA_SAVE_ERROR(false, 4020, "SMS전송 데이터 저장 실패하였습니다."),
+    SMS_DATA_FIND_ERROR(false, 4021, "유효하지 않은 SMS 인증번호 요청입니다."),
+    SMS_CERTIFICATE_FAILED(false, 4022, "SMS 인증 실패"),
 
 
-    // 5000 : 필요시 만들어서 쓰세요
+    /**
+     * 5000 : 외부 API 오류
+     */
+    COOLSMS_API_ERROR(false, 5010, "SMS 인증번호 발송을 실패하였습니다.");
+
+
     // 6000 : 필요시 만들어서 쓰세요
-
-
     private final boolean isSuccess;
     private final int code;
     private final String message;
