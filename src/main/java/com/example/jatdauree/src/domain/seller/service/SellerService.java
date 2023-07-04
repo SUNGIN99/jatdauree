@@ -28,9 +28,7 @@ import static com.example.jatdauree.utils.ValidationRegex.*;
 
 @Slf4j
 @Service
-public class
-
-SellerService {
+public class SellerService {
 
 
     private final SellerDao sellerDao;

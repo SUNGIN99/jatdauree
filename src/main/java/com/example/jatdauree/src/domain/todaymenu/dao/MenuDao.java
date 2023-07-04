@@ -25,20 +25,26 @@ public class MenuDao {
      * 가게 idx로 가게에 등록된 메뉴 조회
      */
 
-    public ArrayList<GetMenusSearchRes> Search(int SellerIdx){
+    public ArrayList<GetMenusSearchRes> Search(int storeIdx){
         String query = "SELECT menuIdx,storeIdx,menu_name,price,status\n" +
-                "FROM Menu WHERE (SELECT storeIdx FROM Stores WHERE sellerIdx = ?)";
+                "FROM Menu WHERE storeIdx = ?";
 
-        List<GetMenusSearchRes> orderList = this.jdbcTemplate.query(query, new Object[]{SellerIdx},
+        List<GetMenusSearchRes> orderList = this.jdbcTemplate.query(query,
                 (rs, rowNum) -> new GetMenusSearchRes(
                         rs.getInt("menuIdx"),
                         rs.getInt("storeIdx"),
                         rs.getString("menu_name"),
                         rs.getInt("price"),
                         rs.getString("status")
-                ));
+                ), storeIdx);
 
         return new ArrayList<>(orderList);
+    }
+
+    public int getStroeIdxbySellerIdx (int sellerIdx){
+        String query = "SELECT storeIdx FROM Stores WHERE sellerIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query, int.class, sellerIdx);
     }
 }
 

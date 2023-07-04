@@ -3,7 +3,7 @@ package com.example.jatdauree.src.domain.todaymenu;
 
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.BaseResponse;
-import com.example.jatdauree.src.domain.todaymenu.Service.TodaymenuService;
+import com.example.jatdauree.src.domain.todaymenu.service.TodaymenuService;
 import com.example.jatdauree.src.domain.todaymenu.dto.GetMenusSearchRes;
 import com.example.jatdauree.utils.jwt.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 
 @RestController
-@RequestMapping("/jat")
+@RequestMapping("/jat/menus")
 public class TodayManuController {
 
     private final TodaymenuService todaymenuService;
@@ -29,16 +29,16 @@ public class TodayManuController {
     /**
      * 23.07.04 작성자 : 정주현
      * 등록된 메뉴 조회
-     * Post /jat/menus
+     * GET /jat/menus
      * @param
      * @return BaseResponse<menusSeachRes></menusSeachRes>
      */
-
     @ResponseBody
-    @GetMapping("/menus")
-    public BaseResponse<ArrayList<GetMenusSearchRes>> Search(@RequestParam int SellerIdx){
+    @GetMapping("")
+    public BaseResponse<ArrayList<GetMenusSearchRes>> Search(){
         try{
-            ArrayList<GetMenusSearchRes> getMenusSearchRes = todaymenuService.Search(SellerIdx);
+            int sellerIdx = jwtService.getUserIdx();
+            ArrayList<GetMenusSearchRes> getMenusSearchRes = todaymenuService.search(sellerIdx);
             return new BaseResponse<>(getMenusSearchRes);
         }catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());
