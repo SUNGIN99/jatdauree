@@ -18,13 +18,5 @@ public class JatdaureeApplication {
 		long heapSize = Runtime.getRuntime().totalMemory();
 		System.out.println("HEAP Size(M) : "+ heapSize / (1024*1024) + " MB");
 	}
-	@Bean
-	public WebMvcConfigurer corsConfigurer() {
-		return new WebMvcConfigurer() {
-			@Override
-			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedOrigins("https://www.insung.shop");
-			}
-		};
-	}
+
 }

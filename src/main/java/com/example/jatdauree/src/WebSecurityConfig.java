@@ -29,7 +29,7 @@ WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new JwtAuthenticateFilter(jwtTokenProvider),
                         UsernamePasswordAuthenticationFilter.class);
 
-        http.cors();
+        //http.cors();
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
