@@ -104,7 +104,7 @@ public class SellerService {
         // 2) 회원가입후 가게 승인 및 메뉴등록이 모두 마쳐진 유저 일 경우우
        String storeName = "";
         try{
-            if(seller.getFirst_login() == 0 && seller.getMenu_register()== 1){
+            if(seller.getFirst_login() == 0 && seller.getMenu_register()== 0){
                 storeName = "가게이름가져오기미완성";
                 // storeName from menuDao
             }
@@ -124,7 +124,7 @@ public class SellerService {
                         seller.getName(),
                         seller.getFirst_login(),
                         seller.getMenu_register(),
-                        seller.getFirst_login() == 0 && seller.getMenu_register()== 1 ? storeName: "");
+                        seller.getFirst_login() == 0 && seller.getMenu_register()== 0 ? storeName: "");
             }
             else{
                 throw new BaseException(FAILED_TO_LOGIN);
