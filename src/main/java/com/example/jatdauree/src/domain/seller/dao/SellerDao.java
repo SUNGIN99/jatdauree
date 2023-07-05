@@ -118,7 +118,9 @@ public class SellerDao {
                         rs.getString("salt"),
                         rs.getString("password"),
                         rs.getString("email"),
-                        rs.getInt("first_login")
+                        rs.getInt("first_login"),
+                        rs.getInt("menu_register"),
+                        null
                 ), postLoginReq.getUid());
     }
 
