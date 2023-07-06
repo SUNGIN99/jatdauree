@@ -74,8 +74,11 @@ public enum BaseResponseStatus {
     /**
      * 5000 : 외부 API 오류
      */
-    COOLSMS_API_ERROR(false, 5010, "SMS 인증번호 발송을 실패하였습니다.");
+    // SMS
+    COOLSMS_API_ERROR(false, 5010, "SMS 인증번호 발송을 실패하였습니다."),
 
+    // 결제
+    BILLING_API_ERROR(false,5020, "결제 실패입니다.");
 
     // 6000 : 필요시 만들어서 쓰세요
     private final boolean isSuccess;
