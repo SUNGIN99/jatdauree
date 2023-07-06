@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetMenusSearchRes {
+
     private int menuIdx;
     private int storeIdx;
     private String menu_name;

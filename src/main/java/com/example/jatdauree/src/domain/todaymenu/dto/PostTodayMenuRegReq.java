@@ -5,14 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostTodayMenuRegReq {
-    private int menuIdx;
-    private int storeIdx;
-    private int discount;
-    private int remain;
-    private String status;
+    private Long storeIdx;
+    private String date;
+    private ArrayList<PostTodayMenuListItem> todayMenuListItems;
+
 }
