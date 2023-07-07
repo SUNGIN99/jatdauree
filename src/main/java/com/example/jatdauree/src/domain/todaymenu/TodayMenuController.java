@@ -28,16 +28,16 @@ public class TodayMenuController {
     }
 
      /**
-     * 23.07.06 작성자 : 정주현
+     * 23.07.07 작성자 : 정주현, 김성인
      * 오늘의 떨이 메뉴 등록
-     * Post /jat/menus/today
+     * Post /jat/today
      */
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<ArrayList<PostTodayMenuRegRes>> registerTodayMenu(@RequestBody PostTodayMenuRegReq postTodayMenuRegReq) {
+    public BaseResponse<PostTodayMenuRegRes> registerTodayMenu(@RequestBody PostTodayMenuRegReq postTodayMenuRegReq) {
         try {
             int sellerIdx = jwtService.getUserIdx();
-            ArrayList<PostTodayMenuRegRes> postTodayMenuRegRes = todaymenuService.registerTodayMenu(postTodayMenuRegReq);
+            PostTodayMenuRegRes postTodayMenuRegRes = todaymenuService.registerTodayMenu(sellerIdx, postTodayMenuRegReq);
             return new BaseResponse<>(postTodayMenuRegRes);
         } catch (BaseException baseException) {
             return new BaseResponse<>(baseException.getStatus());

@@ -10,13 +10,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostTodayMenuRegRes {
-    private Long todaymenuIdx;
+    private int storeIdx;
     private String date;
-    private Long storeIdx;
-    private Long menuIdx;
-    private int price;
-    private int discount;
-    private int remain;
-    private String status;
-    
+    private int mainTodayMenuItemCount;
+    private int sideTodayMenuItemCount;
 }

@@ -39,8 +39,15 @@ public enum BaseResponseStatus {
     // 시험과제게시판 수정
     PATCH_EXAM_SUB_TITLE_ISEMPTY(false,2023,"제목을 등록해주세요."),
 
-    // 가게관련
+    // 2030~) 가게관련 및 메인메뉴/원산지 등록
     POST_STORES_NOT_REGISTERD(false, 2030, "사용자의 가게가 등록되어있지 않습니다."),
+    STORE_MAINMENU_DATA_UNVALID(false, 2031, "메인 메뉴 등록 정보가 올바르지 않습니다."),
+    STORE_SIDEMENU_DATA_UNVALID(false, 2032, "사이드 메뉴 등록 정보가 올바르지 않습니다."),
+    STORE_INGREDIENT_DATA_UNVALID(false, 2033, "원산지 등록 정보가 올바르지 않습니다."),
+
+    // 2040~) 오늘의 떨이메뉴 등록 요청
+    POST_TODAY_MAINMENU_DATA_UNVALID(false, 2041, "오늘의 떨이메뉴(메인) 등록 정보가 올바르지 않습니다."),
+    POST_TODAY_SIDEMENU_DATA_UNVALID(false, 2042, "오늘의 떨이메뉴(사이드) 등록 정보가 올바르지 않습니다."),
     /**
      * 3000 : Response 오류
      */
@@ -71,13 +78,17 @@ public enum BaseResponseStatus {
     SMS_DATA_FIND_ERROR(false, 4021, "유효하지 않은 SMS 인증번호 요청입니다."),
     SMS_CERTIFICATE_FAILED(false, 4022, "SMS 인증 실패"),
 
-    // 가게 메뉴 등록, 원산지 등록
+    // 4030~) 가게 메뉴 등록, 원산지 등록
     SELLER_ALL_REGISTER_COMPLETE_ERROR(false, 4030, "판매자의 최초로그인, 메뉴/원산지 등록이 완료되지 못하였습니다."),
     STORE_MAINMENU_SAVE_ERROR(false, 4031, "메인메뉴 등록에 실패하였습니다."),
     STORE_SIDEMENU_SAVE_ERROR(false, 4032, "사이드메뉴 등록에 실패하였습니다."),
     STORE_INGREDIENT_SAVE_ERROR(false, 4033, "원산지 등록에 실패하였습니다."),
     STORE_MENU_ALREADY_SAVED(false, 4034, "메뉴등록이 이미 이루어진 판매자입니다."),
     STORE_REGISTER_NOT_PERMITTED(false, 4035, "관리자에게 가게 승인되지 않은 판매자 계정입니다."),
+
+    // 4040~) 오늘의 떨이메뉴 등록
+    POST_TODAY_MAINMENU_SAVE_ERROR(false, 4041, "오늘의 떨이메뉴(메인) 등록에 실패하였습니다."),
+    POST_TODAY_SIDEMENU_SAVE_ERROR(false, 4042, "오늘의 떨이메뉴(사이드) 등록에 실패하였습니다."),
 
     /**
      * 5000 : 외부 API 오류

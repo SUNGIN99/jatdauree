@@ -9,12 +9,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostTodayMenuListItem {
-
-    private Long menuIdx;
-    private String menu_name;
-    private int discount;
+public class PostTodayMenuItem {
+    private int menuIdx;
     private int discountPrice;
+    private int discount;
     private int remain;
-    private String status;
 }

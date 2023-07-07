@@ -12,7 +12,6 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostTodayMenuRegReq {
-    private Long storeIdx;
-    private ArrayList<PostTodayMenuListItem> todayMenuListItems;
-
+    private ArrayList<PostTodayMenuItem> todayMenuListMain;
+    private ArrayList<PostTodayMenuItem> todayMenuListSide;
 }

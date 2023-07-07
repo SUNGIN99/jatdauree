@@ -48,23 +48,32 @@ public class MenuService {
         } catch (Exception e) {
             throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
+
         // 2) 가게 메뉴/원산지 등록
         int mainMenuItemCount = 0, sideMenuItemCount = 0, ingredientCount = 0;
         try { // 2-1) 메인 메뉴 등록
             if (postMenuReq.getPostMenuItems() != null && postMenuReq.getPostMenuItems().size() != 0)
                 mainMenuItemCount =  menuDao.mainMenuRegister(storeIdx, postMenuReq.getPostMenuItems());
+            else
+                throw new BaseException(STORE_MAINMENU_DATA_UNVALID); // 2031 : 메인 메뉴 등록 정보가 올바르지 않습니다.
         } catch (Exception e) {
             throw new BaseException(STORE_MAINMENU_SAVE_ERROR); // 4031 : 메인메뉴 등록에 실패하였습니다.
         }
+
         try { // 2-2) 사이드 메뉴 등록
             if (postMenuReq.getPostSideMenuItems() != null && postMenuReq.getPostSideMenuItems().size() != 0)
                 sideMenuItemCount = menuDao.sideMenuRegister(storeIdx, postMenuReq.getPostSideMenuItems());
+            else
+                throw new BaseException(STORE_SIDEMENU_DATA_UNVALID); // 2032 : 사이드 메뉴 등록 정보가 올바르지 않습니다.
         } catch (Exception e) {
             throw new BaseException(STORE_SIDEMENU_SAVE_ERROR); // 4032: 사이드메뉴 등록에 실패하였습니다.
         }
+
         try { // 2-3) 원산지 등록
             if (postMenuReq.getPostIngredientItems() != null && postMenuReq.getPostIngredientItems().size() != 0)
                 ingredientCount = menuDao.ingredientRegister(storeIdx, postMenuReq.getPostIngredientItems());
+            else
+                throw new BaseException(STORE_INGREDIENT_DATA_UNVALID); // 2033 : 원산지 등록 정보가 올바르지 않습니다.
         } catch (Exception e) {
             throw new BaseException(STORE_INGREDIENT_SAVE_ERROR); // 4033 : 원산지 등록에 실패하였습니다.
         }
