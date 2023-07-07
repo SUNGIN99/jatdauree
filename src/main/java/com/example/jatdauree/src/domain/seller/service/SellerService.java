@@ -101,7 +101,18 @@ public class SellerService {
             throw new BaseException(FAILED_TO_LOGIN);
         }
 
-        // 2) 비밀 번호 암호화
+        // 2) 회원가입후 가게 승인 및 메뉴등록이 모두 마쳐진 유저 일 경우우
+       String storeName = "";
+        try{
+            if(seller.getFirst_login() == 0 && seller.getMenu_register()== 0){
+                storeName = "가게이름가져오기미완성";
+                // storeName from menuDao
+            }
+        }catch(Exception exception){
+            throw new BaseException(FAILED_TO_LOGIN);
+        }
+
+        // 3) 비밀 번호 암호화
         try{
             String salt = seller.getSalt();
             String pwd = new SHA256().encrypt(postLoginReq.getPassword(), salt);
@@ -111,10 +122,9 @@ public class SellerService {
                 return new PostLoginRes(jwt,
                         seller.getSellerIdx(),
                         seller.getName(),
-                        seller.getBirthday(),
-                        seller.getPhone(),
-                        seller.getEmail(),
-                        seller.getFirst_login());
+                        seller.getFirst_login(),
+                        seller.getMenu_register(),
+                        seller.getFirst_login() == 0 && seller.getMenu_register()== 0 ? storeName: "");
             }
             else{
                 throw new BaseException(FAILED_TO_LOGIN);

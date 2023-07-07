@@ -1,7 +1,7 @@
 package com.example.jatdauree.utils.jwt;
 
 import com.example.jatdauree.config.BaseException;
-import com.example.jatdauree.config.secret.Secret;
+import com.example.jatdauree.config.secret.JwtSecret;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -31,7 +31,7 @@ public class JwtService {
                 .claim("userIdx",userIdx)
                 .setIssuedAt(now)
                 .setExpiration(new Date(System.currentTimeMillis()+1*(1000*60*60*24*365)))
-                .signWith(SignatureAlgorithm.HS256, Secret.JWT_SECRET_KEY)
+                .signWith(SignatureAlgorithm.HS256, JwtSecret.JWT_SECRET_KEY)
                 .compact();
     }
 
@@ -60,7 +60,7 @@ public class JwtService {
         Jws<Claims> claims;
         try{
             claims = Jwts.parser()
-                    .setSigningKey(Secret.JWT_SECRET_KEY)
+                    .setSigningKey(JwtSecret.JWT_SECRET_KEY)
                     .parseClaimsJws(accessToken);
         } catch (Exception ignored) {
             throw new BaseException(INVALID_JWT);
