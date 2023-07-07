@@ -18,8 +18,4 @@ public class PostStoreUpdateReq {
     private String storePhone;
     private String storeLogoUrl;
     private String signUrl;
-    private long sellerIdx;
-    private long storeIdx;
-
-
 }

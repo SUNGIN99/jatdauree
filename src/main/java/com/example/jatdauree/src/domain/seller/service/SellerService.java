@@ -51,7 +51,7 @@ public class SellerService {
         return sellerDao.loadUserByUserIdx(userId);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = BaseException.class)
     public PostSignUpRes signUp(PostSignUpReq postSignUpReq) throws BaseException {
         String salt;
         // 아이디, 비밀번호, 닉네임 정규식 처리
@@ -89,7 +89,7 @@ public class SellerService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = BaseException.class)
     public PostLoginRes login(PostLoginReq postLoginReq) throws BaseException{
         if(postLoginReq.getUid().length() == 0 || postLoginReq.getPassword().length() == 0){
             throw new BaseException(REQUEST_ERROR); // 2000 : 입력값 전체 빈 값일때
@@ -145,7 +145,7 @@ public class SellerService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = BaseException.class)
     public int lostIdAndPw(SmsCertificateReq smsCertificateReq) throws BaseException {
         // 1) 올바른 바디 value로 요청되지 않았을때
         if(smsCertificateReq.getPhoneNum() == null &&
@@ -233,6 +233,7 @@ public class SellerService {
         }
     }
 
+    @Transactional(rollbackFor = BaseException.class)
     public RestorePwRes pwRestore(RestorePwReq restorePwReq, int sellerIdx) throws BaseException{
         if (!restorePwReq.getPw().equals(restorePwReq.getPwCheck())){
             throw new BaseException(MODIFY_FAIL_USERPASSWORD); // 4015 : 유저 비밀번호 수정 실패

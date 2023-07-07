@@ -7,48 +7,61 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-import static com.example.jatdauree.config.BaseResponseStatus.DATABASE_ERROR;
-import static com.example.jatdauree.config.BaseResponseStatus.RESPONSE_ERROR;
+import static com.example.jatdauree.config.BaseResponseStatus.*;
 
 
 @Service
 public class StoreService {
-    private StoreDao storesDao;
+    private StoreDao storeDao;
     @Autowired
-    public StoreService(StoreDao storesDao) {
-        this.storesDao = storesDao;
+    public StoreService(StoreDao storeDao) {
+        this.storeDao = storeDao;
     }
 
 
-    @Transactional
+    @Transactional(rollbackFor = BaseException.class)
     public PostStoreRes storeRegister(int sellerIdx, PostStoreReq postStoreReq) throws BaseException {
         try{
-           return new PostStoreRes(storesDao.storeRegister(sellerIdx, postStoreReq));
+           return new PostStoreRes(storeDao.storeRegister(sellerIdx, postStoreReq));
         } catch (Exception e){
-            System.out.println(e);
             throw new BaseException(DATABASE_ERROR);
         }
     }
 
-    public PostStoreUpdateRes storeUpdate(PostStoreUpdateReq postStoreUpdateReq) throws BaseException {
-        try {
-            return new PostStoreUpdateRes(storesDao.storeUpdate(postStoreUpdateReq));
+    public GetStoreInfoRes getStoreInfo(int sellerIdx) throws BaseException{
+        // 1) 사용자 가게 조회
+        int storeIdx;
+        try{
+            storeIdx = storeDao.storeIdxBySellerIdx(sellerIdx);
         } catch (Exception e) {
+            throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
 
-            throw new BaseException(RESPONSE_ERROR);
+        // 2) 판매자의 가게 Idx로 가게 기본정보 조회
+        try{
+            return storeDao.getStoreInfo(storeIdx);
+        }catch (Exception e){
+            throw new BaseException(DATABASE_ERROR);
         }
     }
 
-
-    /*public List<PostStoreModifyRes> storeModify(int storeIdx) throws BaseException {
-        try {
-            return storesDao.storeModifyDao(storeIdx);
+    @Transactional(rollbackFor = BaseException.class)
+    public PatchStoreInfoRes storeUpdate(int sellerIdx, PatchStoreInfoReq patchStoreInfoReq) throws BaseException {
+        // 1) 사용자 가게 조회
+        int storeIdx;
+        try{
+            storeIdx = storeDao.storeIdxBySellerIdx(sellerIdx);
         } catch (Exception e) {
-            System.out.println(e);
-            throw new BaseException(RESPONSE_ERROR);
+            throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
-    }*/
+
+        // 2) 가게 정보 수정
+        try {
+            storeDao.storeUpdate(storeIdx, patchStoreInfoReq);
+            return new PatchStoreInfoRes(storeIdx);
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
 }

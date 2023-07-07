@@ -1,5 +1,7 @@
 package com.example.jatdauree.src.domain.store.dao;
 
+import com.example.jatdauree.src.domain.store.dto.GetStoreInfoRes;
+import com.example.jatdauree.src.domain.store.dto.PatchStoreInfoReq;
 import com.example.jatdauree.src.domain.store.dto.PostStoreReq;
 import com.example.jatdauree.src.domain.store.dto.PostStoreUpdateReq;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,30 +105,62 @@ public class StoreDao {
 
     /**
      * storeDao - 2
-     * 23.07.06 작성자 : 이윤채
-     * storeUpdate 가게수정
+     * 23.07.07 작성자 : 김성인
+     * 가게정보 조회
      */
-    public int storeUpdate(PostStoreUpdateReq postStoreUpdateReq){
-        String query= "UPDATE Stores SET store_name =?,business_phone =?,business_email=?,breakday =?,store_open=?,store_close=?,store_phone=?,store_logo_url=?,sign_url=? WHERE sellerIdx=? AND storeIdx=?;";
+    public GetStoreInfoRes getStoreInfo(int storeIdx) {
+        String query = "SELECT\n" +
+                "    store_name, business_phone, business_email, breakday, " +
+                "DATE_FORMAT(store_open, '%H:%i') as store_open, " +
+                "DATE_FORMAT(store_close, '%H:%i') as store_close, " +
+                "store_phone, store_logo_url, sign_url\n" +
+                "FROM Stores\n" +
+                "WHERE storeIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new GetStoreInfoRes(
+                        rs.getString("store_name"),
+                        rs.getString("business_phone"),
+                        rs.getString("business_email"),
+                        rs.getString("breakday"),
+                        rs.getString("store_open"),
+                        rs.getString("store_close"),
+                        rs.getString("store_phone"),
+                        rs.getString("store_logo_url") == null ? "" : rs.getString("store_logo_url"),
+                        rs.getString("sign_url") == null ? "" : rs.getString("sign_url")
+                ), storeIdx);
+    }
+
+    /**
+     * storeDao - 3
+     * 23.07.07 작성자 : 이윤채, 김성인
+     * 가게수정
+     */
+    public void storeUpdate(int storeIdx, PatchStoreInfoReq patchStoreInfoReq){
+        String query= "UPDATE Stores " +
+                "SET store_name = ?," +
+                "business_phone = ?," +
+                "business_email = ?," +
+                "breakday = ?," +
+                "store_open = ?," +
+                "store_close = ?," +
+                "store_phone = ? ," +
+                "store_logo_url = ?," +
+                "sign_url = ? " +
+                "WHERE storeIdx = ?;";
         Object[] params = new Object[]{
-
-                postStoreUpdateReq.getStoreName(),
-                postStoreUpdateReq.getBusinessPhone(),
-                postStoreUpdateReq.getBusinessEmail(),
-                postStoreUpdateReq.getBreakDay(),
-                postStoreUpdateReq.getStoreOpen(),
-                postStoreUpdateReq.getStoreClose(),
-                postStoreUpdateReq.getStorePhone(),
-                postStoreUpdateReq.getStoreLogoUrl(),
-                postStoreUpdateReq.getSignUrl(),
-                postStoreUpdateReq.getSellerIdx(),
-                postStoreUpdateReq.getStoreIdx()
-
+                patchStoreInfoReq.getStoreName(),
+                patchStoreInfoReq.getBusinessPhone(),
+                patchStoreInfoReq.getBusinessEmail(),
+                patchStoreInfoReq.getBreakDay(),
+                patchStoreInfoReq.getStoreOpen(),
+                patchStoreInfoReq.getStoreClose(),
+                patchStoreInfoReq.getStorePhone(),
+                patchStoreInfoReq.getStoreLogoUrl(),
+                patchStoreInfoReq.getSignUrl(),
+                storeIdx
         };
-        return this.jdbcTemplate.update(query, params);
-
-        //String lastInsertIdQuery = "SELECT LAST_INSERT_ID();";
-        // return this.jdbcTemplate.queryForObject(lastInsertIdQuery,int.class);
+        this.jdbcTemplate.update(query, params);
     }
 
 

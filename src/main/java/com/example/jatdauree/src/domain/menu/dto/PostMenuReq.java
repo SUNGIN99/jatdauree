@@ -14,7 +14,7 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostMenuReq implements Serializable {
-    private ArrayList<MainMenuItem> mainMenuItems;
-    @Nullable private ArrayList<SideMenuItem> sideMenuItems;
-    private ArrayList<IngredientItem> ingredientItems;
+    private ArrayList<PostMenuItem> postMenuItems;
+    @Nullable private ArrayList<PostMenuItem> postSideMenuItems;
+    private ArrayList<PostIngredientItem> postIngredientItems;
 }

@@ -3,7 +3,6 @@ package com.example.jatdauree.src.domain.todaymenu;
 
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.BaseResponse;
-import com.example.jatdauree.src.domain.todaymenu.dto.GetMenusSearchRes;
 import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuRegReq;
 import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuRegRes;
 import com.example.jatdauree.src.domain.todaymenu.service.TodayMenuService;

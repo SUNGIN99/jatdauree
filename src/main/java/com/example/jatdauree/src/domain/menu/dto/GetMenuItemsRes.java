@@ -6,15 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MainMenuItem implements Serializable {
-    private String menuName;
-    private int price;
-    private String composition;
-    private String description;
-    private String menuUrl;
+public class GetMenuItemsRes implements Serializable {
+    private int storeIdx;
+    private List<GetMenuItem> mainMenuList;
+    private List<GetMenuItem> sideMenuList;
 }

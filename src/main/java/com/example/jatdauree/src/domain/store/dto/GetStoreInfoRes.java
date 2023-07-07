@@ -1,4 +1,5 @@
 package com.example.jatdauree.src.domain.store.dto;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,9 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostStoreModifyReq {
-
-
+public class GetStoreInfoRes {
     private String storeName;
     private String businessPhone;
     private String businessEmail;
