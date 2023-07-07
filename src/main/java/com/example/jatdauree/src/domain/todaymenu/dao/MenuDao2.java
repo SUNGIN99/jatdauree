@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class MenuDao {
+public class MenuDao2 {
 
     private JdbcTemplate jdbcTemplate;
 

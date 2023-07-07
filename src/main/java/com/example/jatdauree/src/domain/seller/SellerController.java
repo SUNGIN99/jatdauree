@@ -148,7 +148,7 @@ public class SellerController {
      * @return BaseResponse<RestorePwRes>
      */
     @ResponseBody
-    @PostMapping("/pw-restore")
+    @PatchMapping("/pw-restore")
     public BaseResponse<RestorePwRes> pwRestore(@RequestBody RestorePwReq restorePwReq){
         try{
             int sellerIdx = jwtService.getUserIdx();

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 
 @RestController
-@RequestMapping("/jat/menus")
+@RequestMapping("/jat/today")
 public class TodayMenuController {
 
     private final TodayMenuService todaymenuService;
@@ -28,34 +28,13 @@ public class TodayMenuController {
         this.jwtService = jwtService;
     }
 
-    /**
-     * 23.07.04 작성자 : 정주현
-     * 등록된 메뉴 조회
-     * GET /jat/menus
-     * @return BaseResponse<ArrayList<GetMenusSearchRes>> </ArrayList<GetMenusSearchRes>>
-     */
-    @ResponseBody
-    @GetMapping("")
-    public BaseResponse<ArrayList<GetMenusSearchRes>> searchMenu(){
-        try{
-            int sellerIdx = jwtService.getUserIdx();
-            System.out.println("jwt SellerIdx : " + sellerIdx);
-            ArrayList<GetMenusSearchRes> getMenusSearchRes = todaymenuService.searchMenu(sellerIdx);
-            return new BaseResponse<>(getMenusSearchRes);
-        }catch (BaseException baseException){
-            return new BaseResponse<>(baseException.getStatus());
-        }
-    }
-
-
-
      /**
      * 23.07.06 작성자 : 정주현
      * 오늘의 떨이 메뉴 등록
      * Post /jat/menus/today
      */
     @ResponseBody
-    @PostMapping("/today")
+    @PostMapping("")
     public BaseResponse<ArrayList<PostTodayMenuRegRes>> registerTodayMenu(@RequestBody PostTodayMenuRegReq postTodayMenuRegReq) {
         try {
             int sellerIdx = jwtService.getUserIdx();

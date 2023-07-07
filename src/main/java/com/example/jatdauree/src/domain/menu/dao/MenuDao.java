@@ -1,19 +1,20 @@
 package com.example.jatdauree.src.domain.menu.dao;
 
-import com.example.jatdauree.src.domain.menu.dto.PostIngredientReq;
-import com.example.jatdauree.src.domain.menu.dto.PostMenuReq;
-import com.example.jatdauree.src.domain.menu.dto.PostMenuUpReq;
-import com.example.jatdauree.src.domain.menu.dto.PostStatusUpReq;
+import com.example.jatdauree.src.domain.menu.dto.*;
+import com.example.jatdauree.src.domain.todaymenu.dto.GetMenusSearchRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
-
+import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 public class MenuDao {
+
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -24,54 +25,117 @@ public class MenuDao {
     //메뉴등록
     /**
      * menuDao - 1
-     * 23.07.06 작성자 : 이윤채
-     * menuRegiste 메뉴등록
+     * 23.07.07 작성자 : 이윤채, 김성인
+     * Main menuRegister 메인 메뉴등록
+     * 반환 정보 : 메인 메뉴 등록 개수
      */
-    @Transactional
-    public int menuRegisterDao(PostMenuReq postMenuReq)  {
-        String query = "INSERT INTO Menu (storeIdx,menu_name,price,composition,description,menu_url,status)\n" +
-                "VALUE (?,?,?,?,?,?,?);";
-        Object[] params = new Object[]{
-                postMenuReq.getStoreIdx(),
-                postMenuReq.getMenuName(),
-                postMenuReq.getPrice(),
-                postMenuReq.getComposition(),
-                postMenuReq.getDescription(),
-                postMenuReq.getMenuUrl(),
-                postMenuReq.getStatus(),
-        };
-            this.jdbcTemplate.update(query, params);
+    public int mainMenuRegister(int storeIdx, ArrayList<MainMenuItem> mainMenuList)  {
+        String query = "INSERT INTO Menu (" +
+                "storeIdx, " +
+                "menu_name, " +
+                "price, " +
+                "composition," +
+                "description," +
+                "menu_url," +
+                "status)\n" +
+                "VALUES (?,?,?,?,?,?,'M');";
 
-        String lastInsertIdQuery = "SELECT LAST_INSERT_ID();";
-        return this.jdbcTemplate.queryForObject(lastInsertIdQuery,int.class);
+            this.jdbcTemplate.batchUpdate(query,
+                    mainMenuList,
+                    mainMenuList.size(),
+                    (PreparedStatement ps, MainMenuItem menuItem) ->{
+                        ps.setInt(1, storeIdx);
+                        ps.setString(2, menuItem.getMenuName());
+                        ps.setInt(3, menuItem.getPrice());
+                        ps.setString(4, menuItem.getComposition());
+                        ps.setString(5, menuItem.getDescription());
+                        ps.setString(6, menuItem.getMenuUrl());
+                    });
+
+        return mainMenuList.size();
     }
 
-    //원산지
     /**
      * menuDao - 2
-     * 23.07.06 작성자 : 이윤채
-     * ingredientDao 원산지등록
+     * 23.07.07 작성자 : 이윤채, 김성인
+     * Main menuRegister 사이드 메뉴등록
+     * 반환 정보 : 사이드 메뉴 등록 개수
      */
+    public int sideMenuRegister(int storeIdx, ArrayList<SideMenuItem> sideMenuList)  {
+        String query = "INSERT INTO Menu (" +
+                "storeIdx, " +
+                "menu_name, " +
+                "price, " +
+                "composition," +
+                "description," +
+                "menu_url," +
+                "status)\n" +
+                "VALUES (?,?,?,?,?,?,'S');";
 
-    public int ingredientDao(PostIngredientReq postIngredientReq){
-        String query ="INSERT INTO Ingredients (storeIdx, ingredient_name, origin, menu_names, status)\n" +
-                "VALUES (?,?,?,?,?);";
-        Object[] params = new Object[]{
-                postIngredientReq.getStoreIdx(),
-                postIngredientReq.getIngredientName(),
-                postIngredientReq.getOrigin(),
-                postIngredientReq.getMenuName(),
-                postIngredientReq.getStatus()
-        };
-        this.jdbcTemplate.update(query, params);
+        this.jdbcTemplate.batchUpdate(query,
+                sideMenuList,
+                sideMenuList.size(),
+                (PreparedStatement ps, SideMenuItem menuItem) ->{
+                    ps.setInt(1, storeIdx);
+                    ps.setString(2, menuItem.getMenuName());
+                    ps.setInt(3, menuItem.getPrice());
+                    ps.setString(4, menuItem.getComposition());
+                    ps.setString(5, menuItem.getDescription());
+                    ps.setString(6, menuItem.getMenuUrl());
+                });
 
-        String lastInsertIdQuery = "SELECT LAST_INSERT_ID();";
-        return this.jdbcTemplate.queryForObject(lastInsertIdQuery,int.class);
-
+        return sideMenuList.size();
     }
 
-    //원산지 등록 후 판매자 테이블의 최초로그인 상태와 가게등록 상태 값이 0,0이 되게끔 update
-    //String query = "UPDATE Merchandisers SET store_register = 0, first_login = 0 WHERE sellerIdx = ?";
+    /**
+     * menuDao - 3
+     * 23.07.07 작성자 : 김성인
+     * 원산지 등록
+     * 반환 정보 : 원산지 등록 개수
+     */
+    public int ingredientRegister(int storeIdx, ArrayList<IngredientItem> ingredientList)  {
+        String query ="INSERT INTO Ingredients (storeIdx, ingredient_name, origin, menu_names)\n" +
+                "VALUES (?,?,?,?);";
+
+        this.jdbcTemplate.batchUpdate(query,
+                ingredientList,
+                ingredientList.size(),
+                (PreparedStatement ps, IngredientItem ingredientItem) ->{
+                    ps.setInt(1, storeIdx);
+                    ps.setString(2, ingredientItem.getIngredientName());
+                    ps.setString(3, ingredientItem.getOrigin());
+                    ps.setString(4, ingredientItem.getMenuName());
+                });
+
+        return ingredientList.size();
+    }
+
+    /**
+     * MenuDao - 2
+     * 23.07.04 작성자 : 정주현, 김성인
+     * 가게 idx로 가게에 등록된 메뉴 조회
+     */
+    public ArrayList<GetMenusSearchRes> searchMenu(int storeIdx) {
+        String query = "SELECT menuIdx,storeIdx,menu_name,price,status\n" +
+                "FROM Menu WHERE storeIdx = ?";
+
+        List<GetMenusSearchRes> orderList = this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new GetMenusSearchRes(
+                        rs.getInt("menuIdx"),
+                        rs.getInt("storeIdx"),
+                        rs.getString("menu_name"),
+                        rs.getInt("price"),
+                        rs.getString("status")
+                ), storeIdx);
+
+        return new ArrayList<>(orderList);
+    }
+
+    public int getStroeIdxbySellerIdx(int sellerIdx) {
+        String query = "SELECT storeIdx FROM Stores WHERE sellerIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query, int.class, sellerIdx);
+    }
 
     /**
      * menuDao - 3
@@ -110,8 +174,6 @@ public class MenuDao {
 
         };
         return this.jdbcTemplate.update(query, params);
-
-
     }
 
 

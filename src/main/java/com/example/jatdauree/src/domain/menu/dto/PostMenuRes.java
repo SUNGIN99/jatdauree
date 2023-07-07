@@ -10,8 +10,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostMenuRes {
-
-    private long storeIdx;
-
-
+    private int storeIdx;
+    private int mainMenuItemCount;
+    private int sideMenuItemCount;
+    private int ingredientCount;
 }

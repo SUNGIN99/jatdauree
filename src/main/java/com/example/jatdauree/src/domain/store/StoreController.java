@@ -7,25 +7,29 @@ import com.example.jatdauree.src.domain.store.dto.PostStoreRes;
 import com.example.jatdauree.src.domain.store.dto.PostStoreUpdateReq;
 import com.example.jatdauree.src.domain.store.dto.PostStoreUpdateRes;
 import com.example.jatdauree.src.domain.store.service.StoreService;
+import com.example.jatdauree.utils.jwt.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/jat/stores")
 public class StoreController {
+
+    private final JwtService jwtService;
     private final StoreService storeService;
 
     @Autowired
-    public StoreController(StoreService storeService) {
+    public StoreController(JwtService jwtService, StoreService storeService) {
+        this.jwtService = jwtService;
         this.storeService = storeService;
     }
 
 
     /**
      * StoreController - 1
-     * 23.07.06 작성자 : 이윤채
+     * 23.07.06 작성자 : 이윤채, 김성인
      * storeRegister 가게등록  POST
-     * POST/jat/menu/menuUpdate
+     * POST/jat/stores
      * @param @RequestBody PostStoreReq
      * @return BaseResponse<postStoreRes>
      */
@@ -34,14 +38,15 @@ public class StoreController {
     @PostMapping("")
     public BaseResponse<PostStoreRes> storeRegister(@RequestBody PostStoreReq postStoreReq) {
         try {
-             PostStoreRes postStoreRes = storeService.storeRegister(postStoreReq);
+            int sellerIdx = jwtService.getUserIdx();
+             PostStoreRes postStoreRes = storeService.storeRegister(sellerIdx, postStoreReq);
+
             return new BaseResponse<>(postStoreRes);
 
         } catch (BaseException baseException) {
             return new BaseResponse<>(baseException.getStatus());
         }
     }
-
 
     /**
      * StoreController - 2

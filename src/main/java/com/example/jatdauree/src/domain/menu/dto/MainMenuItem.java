@@ -5,16 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostIngredientReq {
-
-
-    private long storeIdx;
-    private String ingredientName;
-    private String origin;
+public class MainMenuItem implements Serializable {
     private String menuName;
-    private String status;
+    private int price;
+    private String composition;
+    private String description;
+    private String menuUrl;
 }

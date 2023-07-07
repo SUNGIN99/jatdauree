@@ -204,4 +204,16 @@ public class SellerDao {
 
         this.jdbcTemplate.update(query, params);
     }
+
+    /**
+     * sellerDao - 9
+     * 23.07.02 작성자 : 김성인
+     * 판매자 메뉴 및 원산지 등록 완료
+     */
+    public void registerMenuNIngredient(int sellerIdx){
+        String query = "UPDATE Merchandisers\n" +
+                "SET menu_register = 0\n" +
+                "WHERE sellerIdx = ?";
+        this.jdbcTemplate.update(query, sellerIdx);
+    }
 }

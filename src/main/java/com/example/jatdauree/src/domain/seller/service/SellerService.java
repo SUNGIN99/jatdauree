@@ -5,6 +5,7 @@ import com.example.jatdauree.config.secret.SmsSecret;
 import com.example.jatdauree.src.domain.seller.dao.SellerDao;
 import com.example.jatdauree.src.domain.seller.dto.*;
 import com.example.jatdauree.src.domain.sms.dao.SmsDao;
+import com.example.jatdauree.src.domain.store.dao.StoreDao;
 import com.example.jatdauree.utils.jwt.JwtTokenProvider;
 import com.example.jatdauree.utils.SHA256;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -33,14 +33,16 @@ public class SellerService {
 
     private final SellerDao sellerDao;
     private final SmsDao smsDao;
+    private final StoreDao storeDao;
 
     private final JwtTokenProvider jwtTokenProvider;
     private final DefaultMessageService messageService;
 
     @Autowired
-    public SellerService(SellerDao sellerDao, SmsDao smsDao, @Lazy JwtTokenProvider jwtTokenProvider) {
+    public SellerService(SellerDao sellerDao, SmsDao smsDao, StoreDao storeDao, @Lazy JwtTokenProvider jwtTokenProvider) {
         this.sellerDao = sellerDao;
         this.smsDao = smsDao;
+        this.storeDao = storeDao;
         this.jwtTokenProvider = jwtTokenProvider;
         this.messageService = NurigoApp.INSTANCE.initialize(SmsSecret.APIKey, SmsSecret.Secret, "https://api.coolsms.co.kr");
     }
@@ -105,8 +107,8 @@ public class SellerService {
        String storeName = "";
         try{
             if(seller.getFirst_login() == 0 && seller.getMenu_register()== 0){
-                storeName = "가게이름가져오기미완성";
-                // storeName from menuDao
+                // storeName from storeDao
+                storeName = storeDao.storeNameBySellerIdx(seller.getSellerIdx());
             }
         }catch(Exception exception){
             throw new BaseException(FAILED_TO_LOGIN);

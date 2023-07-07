@@ -15,15 +15,17 @@ import java.util.List;
 @Service
 public class OrderService {
 
-    private final OrderDao ordersDao;
+    private final OrderDao orderDao;
 
     @Autowired
-    public OrderService(OrderDao ordersDao) {this.ordersDao = ordersDao;}
+    public OrderService(OrderDao orderDao) {
+        this.orderDao = orderDao;
+    }
 
     public List<GetOrderRes> getOrdersBySellerId(int sellerIdx)throws BaseException {
         try {
-            int storeIdx = ordersDao.getStoreIdxBySellerIdx(sellerIdx);
-            List<GetOrderRes> getOrdersResList = ordersDao.getOrdersByStoreIdx(storeIdx);
+            int storeIdx = orderDao.getStoreIdxBySellerIdx(sellerIdx);
+            List<GetOrderRes> getOrdersResList = orderDao.getOrdersByStoreIdx(storeIdx);
             return getOrdersResList;
         }
         catch (Exception exception){
@@ -34,8 +36,8 @@ public class OrderService {
 
     public void postOrderBySellerId(int sellerIdx, PostOrderCancelReq postOrderCancelReq) throws BaseException{
         try {
-            int storeIdx = ordersDao.getStoreIdxBySellerIdx(sellerIdx);
-            ordersDao.updateOrderStatus(storeIdx, postOrderCancelReq.getOrderIdx(), postOrderCancelReq.getStatus());
+            int storeIdx = orderDao.getStoreIdxBySellerIdx(sellerIdx);
+            orderDao.updateOrderStatus(storeIdx, postOrderCancelReq.getOrderIdx(), postOrderCancelReq.getStatus());
         }
         catch (Exception exception){
             throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);
@@ -44,8 +46,8 @@ public class OrderService {
 
     public List<GetOrderProRes> getOrderProBySellerIdx(int sellerIdx)throws BaseException {
         try {
-            int storeIdx = ordersDao.getStoreIdxBySellerIdx(sellerIdx);
-            List<GetOrderProRes> getOrderProResList = ordersDao.getOrderProByStoreIdx(storeIdx);
+            int storeIdx = orderDao.getStoreIdxBySellerIdx(sellerIdx);
+            List<GetOrderProRes> getOrderProResList = orderDao.getOrderProByStoreIdx(storeIdx);
             return getOrderProResList;
         }
         catch (Exception exception){
@@ -55,8 +57,8 @@ public class OrderService {
 
     public void postPickupBysellerIdx(int sellerIdx, PostPickupReq postPickupReq) throws BaseException {
         try{
-            int storeIdx = ordersDao.getStoreIdxBySellerIdx(sellerIdx);
-            ordersDao.updateOrderPickup(storeIdx, postPickupReq.getOrderIdx(), postPickupReq.getStatus());
+            int storeIdx = orderDao.getStoreIdxBySellerIdx(sellerIdx);
+            orderDao.updateOrderPickup(storeIdx, postPickupReq.getOrderIdx(), postPickupReq.getStatus());
         }
         catch(Exception exception){
             throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);

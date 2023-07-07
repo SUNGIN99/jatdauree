@@ -19,6 +19,32 @@ public class StoreDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+
+    /**
+     * storeDao - 0 - 1
+     * 23.07.06 작성자 : 김성인
+     * 등록된 판매자 가게 조회
+     */
+    public String storeNameBySellerIdx(int sellerIdx){
+        String query = "SELECT store_name FROM Stores WHERE sellerIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> rs.getString("store_name"), sellerIdx);
+    }
+
+    /**
+     * storeDao - 0 - 2
+     * 23.07.06 작성자 : 김성인
+     * 등록된 판매자 가게 Idx 조회
+     */
+    public int storeIdxBySellerIdx(int sellerIdx){
+        String query = "SELECT storeIdx FROM Stores WHERE sellerIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> rs.getInt("storeIdx"), sellerIdx);
+    }
+
+
     /**
      * storeDao - 1
      * 23.07.06 작성자 : 이윤채
@@ -26,15 +52,30 @@ public class StoreDao {
      */
     //가게등록
     @Transactional
-    public int storeRegister(PostStoreReq postStoresReq) { //여기의 type을 PostStoreReq로 했었음 왜? --> PostStoreReq이 값을 storeRegister가
+    public int storeRegister(int sellerIdx, PostStoreReq postStoresReq) {
 
-        String query = "INSERT INTO Stores (sellerIdx,categoryIdx,city,local,town,since_year,store_name, business_phone, business_email, business_certificate_url, seller_certificate_url, copyaccount_url, breakday, store_open, store_close, store_phone, store_address, store_logo_url, sign_url)\n" +
-                "VALUES (?,?,?,?,?,now(),?,?,?,?,?,?,?,?,?,?,?,?,?);";
-
+        String query = "INSERT INTO Stores (sellerIdx,\n" +
+                "                    categoryIdx,\n" +
+                "                    city,\n" +
+                "                    local,\n" +
+                "                    town,\n" +
+                "                    store_name,\n" +
+                "                    business_phone,\n" +
+                "                    business_email,\n" +
+                "                    business_certificate_url,\n" +
+                "                    seller_certificate_url,\n" +
+                "                    copyaccount_url,\n" +
+                "                    breakday,\n" +
+                "                    store_open,\n" +
+                "                    store_close,\n" +
+                "                    store_phone,\n" +
+                "                    store_address,\n" +
+                "                    store_logo_url,\n" +
+                "                    sign_url)\n" +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 
         Object[] params = new Object[]{
-
-                postStoresReq.getSellerIdx(),
+                sellerIdx,
                 postStoresReq.getCategoryIdx(),
                 postStoresReq.getCity(),
                 postStoresReq.getLocal(),

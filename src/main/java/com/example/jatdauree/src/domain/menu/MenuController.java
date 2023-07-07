@@ -4,27 +4,33 @@ import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.BaseResponse;
 import com.example.jatdauree.src.domain.menu.dto.*;
 import com.example.jatdauree.src.domain.menu.service.MenuService;
+import com.example.jatdauree.src.domain.todaymenu.dto.GetMenusSearchRes;
+import com.example.jatdauree.utils.jwt.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/jat/menus")
 public class MenuController {
     private final MenuService menuService;
+    private final JwtService jwtService;
+
 
     @Autowired
-    public MenuController(MenuService menuService) {
+    public MenuController(MenuService menuService, JwtService jwtService) {
         this.menuService = menuService;
+        this.jwtService = jwtService;
     }
 
-
-    //메뉴등록(메인:status "M", 서브:status "S") //메뉴등록 할때 원산지도 같이
-    // /jat/menus
     /**
      * MenuController - 1
-     * 23.07.06 작성자 : 이윤채
+     * 23.07.07 작성자 : 이윤채, 김성인
      * menuRegiste 메뉴등록 POST
-     * post/jat/menus
+     * 메뉴등록(메인:status "M", 서브:status "S") //메뉴등록 할때 원산지도 같이
+     *
+     * Post /jat/menus
      * @param @RequestBody PostMenuReq
      * @return BaseResponse<PostMenuRes>
      */
@@ -32,30 +38,29 @@ public class MenuController {
     @PostMapping("")
     public BaseResponse<PostMenuRes> menuRegister(@RequestBody PostMenuReq postMenuReq) {
         try {
-            PostMenuRes postMenuRes = menuService.menuRegister(postMenuReq);
-            return new BaseResponse<>(postMenuRes);
+            int sellerIdx = jwtService.getUserIdx();
 
+            PostMenuRes postMenuRes = menuService.menuRegister(sellerIdx, postMenuReq);
+            return new BaseResponse<>(postMenuRes);
         } catch (BaseException baseException) {
             return new BaseResponse<>(baseException.getStatus());
         }
     }
 
-    //원산지 등록
-    // /jat/menus/ingredient
     /**
-     * MenuController - 2
-     * 23.07.06 작성자 : 이윤채
-     * ingredientRegister 원산지 등록 POST
-     * POST/jat/menus/ingrdient
-     * @param @RequestBody PostIngredientReq
-     *  @return BaseResponse<PostIngredientRes>
+     * 23.07.07 작성자 : 정주현, 김성인
+     * 등록된 메뉴 조회
+     * GET /jat/menus
+     * @return BaseResponse<ArrayList<GetMenusSearchRes>> </ArrayList<GetMenusSearchRes>>
      */
     @ResponseBody
-    @PostMapping("/ingredient")
-    public BaseResponse<PostIngredientRes> ingredientRegister(@RequestBody PostIngredientReq postIngredientReq){
-        try {
-            PostIngredientRes postIngredientRes =menuService.ingredientRegister(postIngredientReq);
-            return new BaseResponse<>(postIngredientRes);
+    @GetMapping("")
+    public BaseResponse<ArrayList<GetMenusSearchRes>> searchMenu(){
+        try{
+            int sellerIdx = jwtService.getUserIdx();
+
+            ArrayList<GetMenusSearchRes> getMenusSearchRes = menuService.searchMenu(sellerIdx);
+            return new BaseResponse<>(getMenusSearchRes);
         }catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());
         }

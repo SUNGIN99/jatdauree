@@ -1,7 +1,7 @@
 package com.example.jatdauree.src.domain.todaymenu.service;
 
 import com.example.jatdauree.config.BaseException;
-import com.example.jatdauree.src.domain.todaymenu.dao.MenuDao;
+import com.example.jatdauree.src.domain.todaymenu.dao.MenuDao2;
 import com.example.jatdauree.src.domain.todaymenu.dao.TodayMenuDao;
 import com.example.jatdauree.src.domain.todaymenu.dto.GetMenusSearchRes;
 import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuListItem;
@@ -18,21 +18,14 @@ import java.util.Date;
 @Service
 public class TodayMenuService {
 
-    private final MenuDao menuDao;
+    private final MenuDao2 menuDao2;
     private final TodayMenuDao todayMenuDao;
 
 
     @Autowired
-    public TodayMenuService(MenuDao menuDao, TodayMenuDao todayMenuDao) {
-        this.menuDao = menuDao;
+    public TodayMenuService(MenuDao2 menuDao2, TodayMenuDao todayMenuDao) {
+        this.menuDao2 = menuDao2;
         this.todayMenuDao = todayMenuDao;
-    }
-
-    //떨이 메뉴 조회
-    public ArrayList<GetMenusSearchRes> searchMenu(int sellerIdx) throws BaseException {
-        int storeIdx = menuDao.getStroeIdxbySellerIdx(sellerIdx);
-
-        return menuDao.searchMenu(storeIdx);
     }
 
 

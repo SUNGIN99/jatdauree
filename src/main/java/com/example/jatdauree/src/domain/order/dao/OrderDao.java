@@ -4,10 +4,12 @@ import com.example.jatdauree.src.domain.order.dto.GetOrderProRes;
 import com.example.jatdauree.src.domain.order.dto.GetOrderRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.List;
 
+@Repository
 public class OrderDao {
     private JdbcTemplate jdbcTemplate;
 

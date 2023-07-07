@@ -4,28 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.Serializable;
+import java.util.ArrayList;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostMenuReq {
-
-    private long storeIdx;
-
-    private String menuName;
-
-    private int price;
-
-    private String composition;
-
-    private String description;
-
-    private String menuUrl;
-
-    private String status;
-
-
+public class PostMenuReq implements Serializable {
+    private ArrayList<MainMenuItem> mainMenuItems;
+    @Nullable private ArrayList<SideMenuItem> sideMenuItems;
+    private ArrayList<IngredientItem> ingredientItems;
 }
-//PostMenuReq DTO 클래스의 필드명과 MenuDao의 SQL 쿼리에서 사용하는 컬럼명이 일치시켜야 함
-//menu_name,price,composition,description,menu_url
