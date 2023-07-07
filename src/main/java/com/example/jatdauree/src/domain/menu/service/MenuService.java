@@ -30,6 +30,17 @@ public class MenuService {
     // 초기 메뉴 등록
     @Transactional(rollbackFor = BaseException.class)
     public PostMenuRes menuRegister(int sellerIdx, PostMenuReq postMenuReq) throws BaseException {
+        // 0) 사용자 메뉴 등록 여부 확인
+        // (index)  0 :first_login, 1: menu_register
+        int[] loginStatus = sellerDao.checkRegisterd(sellerIdx);
+        if(loginStatus[0] == 0 && loginStatus[1] == 0){
+            throw new BaseException(STORE_MENU_ALREADY_SAVED); // 4034 : 메뉴 등록이 이미 이루어진 판매자 입니다.
+        }
+        if(loginStatus[0] == 1){
+            throw new BaseException(STORE_REGISTER_NOT_PERMITTED); // 4035 : 관리자에게 가게 승인되지 않은 판매자 계정입니다.
+        }
+        // first_login == 1, menu_register == 0 일때 메뉴등록가능
+
         // 1)사용자 가게 조회
         int storeIdx;
         try{

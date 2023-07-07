@@ -216,4 +216,21 @@ public class SellerDao {
                 "WHERE sellerIdx = ?";
         this.jdbcTemplate.update(query, sellerIdx);
     }
+
+    /**
+     * sellerDao - 10
+     * 23.07.02 작성자 : 김성인
+     * 판매자 가게 및 메뉴/원산지 등록 여부 확인
+     */
+    public int[] checkRegisterd(int sellerIdx) {
+        String query = "SELECT " +
+                "first_login, menu_register " +
+                "FROM Merchandisers " +
+                "WHERE sellerIdx = ?";
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new int[]{
+                        rs.getInt("first_login"),
+                        rs.getInt("menu_register")}
+        , sellerIdx);
+    }
 }
