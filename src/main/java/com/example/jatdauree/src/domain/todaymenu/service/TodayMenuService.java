@@ -41,9 +41,9 @@ public class TodayMenuService {
             if(postTodayMenuRegReq.getTodayMenuListMain() != null && postTodayMenuRegReq.getTodayMenuListMain().size() != 0)
                 mainTodayMenuItemCount = todayMenuDao.registerTodayMenu(storeIdx, postTodayMenuRegReq.getTodayMenuListMain(), "M");
             else
-                throw new BaseException(POST_TODAY_MAINMENU_DATA_UNVALID);
+                throw new BaseException(POST_TODAY_MAINMENU_DATA_UNVALID); // 2041 : 오늘의 떨이메뉴(메인) 등록 정보가 올바르지 않습니다.
         }catch (Exception e) {
-            throw new BaseException(POST_TODAY_MAINMENU_SAVE_ERROR); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+            throw new BaseException(POST_TODAY_MAINMENU_SAVE_ERROR); // 4041 : 오늘의 떨이메뉴(메인) 등록에 실패하였습니다.
         }
 
         // 2) 떨이 사이드 메뉴 등록
@@ -51,9 +51,9 @@ public class TodayMenuService {
             if(postTodayMenuRegReq.getTodayMenuListSide() != null && postTodayMenuRegReq.getTodayMenuListSide().size() != 0)
                 sideTodayMenuItemCount = todayMenuDao.registerTodayMenu(storeIdx, postTodayMenuRegReq.getTodayMenuListSide(), "S");
             else
-            throw new BaseException(POST_TODAY_SIDEMENU_DATA_UNVALID);
+            throw new BaseException(POST_TODAY_SIDEMENU_DATA_UNVALID); // 2042 : 오늘의 떨이메뉴(사이드) 등록 정보가 올바르지 않습니다.
         }catch (Exception e) {
-            throw new BaseException(POST_TODAY_SIDEMENU_SAVE_ERROR); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+            throw new BaseException(POST_TODAY_SIDEMENU_SAVE_ERROR); // 4042 : 오늘의 떨이메뉴(사이드) 등록에 실패하였습니다.
         }
 
         String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
