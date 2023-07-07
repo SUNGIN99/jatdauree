@@ -16,4 +16,5 @@ public class PostTodayMenuListItem {
     private int discount;
     private int discountPrice;
     private int remain;
+    private String status;
 }

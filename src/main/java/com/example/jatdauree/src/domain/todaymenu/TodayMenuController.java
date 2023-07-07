@@ -6,7 +6,7 @@ import com.example.jatdauree.config.BaseResponse;
 import com.example.jatdauree.src.domain.todaymenu.dto.GetMenusSearchRes;
 import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuRegReq;
 import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuRegRes;
-import com.example.jatdauree.src.domain.todaymenu.service.TodaymenuService;
+import com.example.jatdauree.src.domain.todaymenu.service.TodayMenuService;
 import com.example.jatdauree.utils.jwt.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +17,12 @@ import java.util.ArrayList;
 @RequestMapping("/jat/menus")
 public class TodayMenuController {
 
-    private final TodaymenuService todaymenuService;
+    private final TodayMenuService todaymenuService;
 
     private final JwtService jwtService;
 
     @Autowired
-    public TodayMenuController(TodaymenuService todaymenuService, JwtService jwtService)
+    public TodayMenuController(TodayMenuService todaymenuService, JwtService jwtService)
     {
         this.todaymenuService = todaymenuService;
         this.jwtService = jwtService;
@@ -36,11 +36,11 @@ public class TodayMenuController {
      */
     @ResponseBody
     @GetMapping("")
-    public BaseResponse<ArrayList<GetMenusSearchRes>> search(){
+    public BaseResponse<ArrayList<GetMenusSearchRes>> searchMenu(){
         try{
             int sellerIdx = jwtService.getUserIdx();
             System.out.println("jwt SellerIdx : " + sellerIdx);
-            ArrayList<GetMenusSearchRes> getMenusSearchRes = todaymenuService.search(sellerIdx);
+            ArrayList<GetMenusSearchRes> getMenusSearchRes = todaymenuService.searchMenu(sellerIdx);
             return new BaseResponse<>(getMenusSearchRes);
         }catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());
@@ -56,9 +56,9 @@ public class TodayMenuController {
      */
     @ResponseBody
     @PostMapping("/today")
-    public BaseResponse<ArrayList<PostTodayMenuRegRes>> registerTodaymenu(@RequestBody PostTodayMenuRegReq postTodayMenuRegReq) {
+    public BaseResponse<ArrayList<PostTodayMenuRegRes>> registerTodayMenu(@RequestBody PostTodayMenuRegReq postTodayMenuRegReq) {
         try {
-           // int sellerIdx = jwtService.getUserIdx();
+            int sellerIdx = jwtService.getUserIdx();
             ArrayList<PostTodayMenuRegRes> postTodayMenuRegRes = todaymenuService.registerTodayMenu(postTodayMenuRegReq);
             return new BaseResponse<>(postTodayMenuRegRes);
         } catch (BaseException baseException) {

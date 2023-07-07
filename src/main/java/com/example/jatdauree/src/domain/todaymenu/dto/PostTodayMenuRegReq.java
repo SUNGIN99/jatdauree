@@ -13,7 +13,6 @@ import java.util.ArrayList;
 @NoArgsConstructor
 public class PostTodayMenuRegReq {
     private Long storeIdx;
-    private String date;
     private ArrayList<PostTodayMenuListItem> todayMenuListItems;
 
 }

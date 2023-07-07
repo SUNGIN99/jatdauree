@@ -17,5 +17,6 @@ public class PostTodayMenuRegRes {
     private int price;
     private int discount;
     private int remain;
+    private String status;
     
 }

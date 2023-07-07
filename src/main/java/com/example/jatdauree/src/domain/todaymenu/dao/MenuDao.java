@@ -14,6 +14,7 @@ public class MenuDao {
 
     private JdbcTemplate jdbcTemplate;
 
+
     @Autowired
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -25,7 +26,7 @@ public class MenuDao {
      * 가게 idx로 가게에 등록된 메뉴 조회
      */
 
-    public ArrayList<GetMenusSearchRes> Search(int storeIdx) {
+    public ArrayList<GetMenusSearchRes> searchMenu(int storeIdx) {
         String query = "SELECT menuIdx,storeIdx,menu_name,price,status\n" +
                 "FROM Menu WHERE storeIdx = ?";
 

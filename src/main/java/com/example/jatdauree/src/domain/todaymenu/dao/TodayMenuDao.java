@@ -1,7 +1,6 @@
 package com.example.jatdauree.src.domain.todaymenu.dao;
 
 import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuListItem;
-import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuRegReq;
 import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuRegRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,6 +15,7 @@ public class TodayMenuDao {
 
     private JdbcTemplate jdbcTemplate;
 
+
     @Autowired
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -27,19 +27,17 @@ public class TodayMenuDao {
      * 떨이상품 등록 INSERT 쿼리
      */
 
-    public int RegisterTodayMenu(PostTodayMenuRegReq postTodayMenuRegReq) {
-        String query = "INSERT INTO TodayMenu(date, storeIdx, menuIdx, price, discount, remain)\n" +
-                "VALUE(?,?,?,?,?,?)";
+    public int RegisterTodayMenu(String date, Long storeIdx, PostTodayMenuListItem item) {
+        String query = "INSERT INTO TodayMenu(date, storeIdx, menuIdx, price, discount, remain,status)\n" +
+                "VALUE(?,?,?,?,?,?,?)";
 
-        for (PostTodayMenuListItem item : postTodayMenuRegReq.getTodayMenuListItems()) {
-            jdbcTemplate.update(query,postTodayMenuRegReq.getDate(), postTodayMenuRegReq.getStoreIdx(), item.getMenuIdx(),
-                    item.getDiscountPrice(), item.getDiscount(), item.getRemain());
-        }//서비스
+        this.jdbcTemplate.update(query, date, storeIdx, item.getMenuIdx(), item.getDiscountPrice(), item.getDiscount(), item.getRemain(),item.getStatus());
 
-        String lastInsertIdQuery = "SELECT LAST_INSERT_ID()";
-        return jdbcTemplate.queryForObject(lastInsertIdQuery, int.class);
-
+        String selectLastInsertIdQuery = "SELECT LAST_INSERT_ID()";
+        return jdbcTemplate.queryForObject(selectLastInsertIdQuery, int.class);
     }
+
+
 
     /**
      * TodayMenuDao - 2
@@ -49,7 +47,9 @@ public class TodayMenuDao {
 
 
     public ArrayList<PostTodayMenuRegRes> searchTodayMenuTable(int todaymenuIdx){
-        String query = "SELECT * FROM TodayMenu WHERE (date,storeIdx) IN ( SELECT date,storeIdx FROM TodayMenu WHERE todaymenuIdx = ?)";
+        String query = "SELECT * FROM TodayMenu\n" +
+                "WHERE storeIdx = (SELECT storeIdx FROM TodayMenu WHERE todaymenuIdx = ?)\n" +
+                "AND status <> 'D'";
 
         List<PostTodayMenuRegRes> postTodayMenuRegResList = this.jdbcTemplate.query(query,
                 (rs, rowNum) -> new PostTodayMenuRegRes(
@@ -59,7 +59,8 @@ public class TodayMenuDao {
                         rs.getLong("menuIdx"),
                         rs.getInt("price"),
                         rs.getInt("discount"),
-                        rs.getInt("remain")
+                        rs.getInt("remain"),
+                        rs.getString("status")
                 ), todaymenuIdx);
 
         return new ArrayList<>(postTodayMenuRegResList);
