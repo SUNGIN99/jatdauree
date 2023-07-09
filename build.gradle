@@ -56,6 +56,11 @@ dependencies {
 	implementation 'com.squareup.retrofit2:converter-gson:2.7.2'
 	implementation 'com.squareup.okhttp3:logging-interceptor:4.10.0'
 
+	// aws cloud s3
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	implementation 'org.springframework.cloud:spring-cloud-aws-context:2.2.6.RELEASE'
+	implementation 'org.springframework.cloud:spring-cloud-aws-autoconfigure:2.2.6.RELEASE'
+
 	// spring boot
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-web-services'
