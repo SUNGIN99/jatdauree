@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
 
 
 @Repository
@@ -54,7 +55,7 @@ public class StoreDao {
      */
     //가게등록
     @Transactional
-    public int storeRegister(int sellerIdx, PostStoreReq postStoresReq) {
+    public int storeRegister(int sellerIdx, PostStoreReq postStoresReq, ArrayList<String> urls) {
 
         String query = "INSERT INTO Stores (sellerIdx,\n" +
                 "                    categoryIdx,\n" +
@@ -85,16 +86,16 @@ public class StoreDao {
                 postStoresReq.getStoreName(),
                 postStoresReq.getBusinessPhone(),
                 postStoresReq.getBusinessEmail(),
-                postStoresReq.getBusinessCertificateUrl(),
-                postStoresReq.getSellerCertificateUrl(),
-                postStoresReq.getCopyAccountUrl(),
+                urls.get(0),
+                urls.get(1),
+                urls.get(2),
                 postStoresReq.getBreakDay(),
                 postStoresReq.getStoreOpen(),
                 postStoresReq.getStoreClose(),
                 postStoresReq.getStorePhone(),
                 postStoresReq.getStoreAddress(),
-                postStoresReq.getStoreLogoUrl(),
-                postStoresReq.getSignUrl(),
+                urls.get(3),
+                urls.get(4),
         };
 
         this.jdbcTemplate.update(query, params);
@@ -164,5 +165,10 @@ public class StoreDao {
     }
 
 
+    public int storeAlreadyRegister(int sellerIdx) {
+        String query = "SELECT EXISTS(SELECT * FROM Stores WHERE sellerIdx = ? AND status = 'W')";
+
+        return this.jdbcTemplate.queryForObject(query, int.class, sellerIdx);
+    }
 }
 
