@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static com.example.jatdauree.config.BaseResponseStatus.*;
 
@@ -36,41 +37,53 @@ public class StoreService {
 
     @Transactional(rollbackFor = BaseException.class)
     public PostStoreRes storeRegister(int sellerIdx, PostStoreReq postStoreReq) throws BaseException, IOException {
-        try{
+        try{ // 0) 가게 중복 등록 방지
             int storeRegistredCheck = storeDao.storeAlreadyRegister(sellerIdx);
             if (storeRegistredCheck == 1){
                 throw new BaseException(DATABASE_ERROR);
             }
         }catch (Exception e){
-            System.out.println("1: "+ e);
             throw new BaseException(DATABASE_ERROR);
         }
 
-        ArrayList<String> urls = new ArrayList<>(), fileNames = new ArrayList<>();
+        // 1) 가게 이미지 등록정보 URL 발생
+        ArrayList<String> fileNames = new ArrayList<>();
         ArrayList<File> files = new ArrayList<>();
+        HashMap<String, File> fileHash = new HashMap<>();
         try{
             String absolutePath = "/home/ubuntu/s3tempImg/";
-            fileNames.add(postStoreReq.getBusinessCertificateFile().getOriginalFilename());
-            fileNames.add(postStoreReq.getSellerCertificateFile().getOriginalFilename());
-            fileNames.add(postStoreReq.getCopyAccountFile().getOriginalFilename());
-            fileNames.add(postStoreReq.getStoreLogoFile().getOriginalFilename());
-            fileNames.add(postStoreReq.getSignFile().getOriginalFilename());
-
-            for (int i = 0; i< 5; i++){
-                files.add( new File(absolutePath + fileNames.get(i)));
+            String fileNameTemp;
+            if (postStoreReq.getBusinessCertificateFile() != null) {//사업자 등록증 이미지파일
+                fileNameTemp = postStoreReq.getBusinessCertificateFile().getOriginalFilename();
+                fileHash.put(fileNameTemp, new File(absolutePath + fileNameTemp));
+                postStoreReq.getBusinessCertificateFile().transferTo(fileHash.get(fileNameTemp));
             }
-
-            postStoreReq.getBusinessCertificateFile().transferTo(files.get(0));
-            postStoreReq.getSellerCertificateFile().transferTo(files.get(1));
-            postStoreReq.getCopyAccountFile().transferTo(files.get(2));
-            postStoreReq.getStoreLogoFile().transferTo(files.get(3));
-            postStoreReq.getSignFile().transferTo(files.get(4));
+            if (postStoreReq.getSellerCertificateFile() != null) {// 영업자 등록증 이미지 파일
+                fileNameTemp = postStoreReq.getSellerCertificateFile().getOriginalFilename();
+                fileHash.put(fileNameTemp, new File(absolutePath + fileNameTemp));
+                postStoreReq.getSellerCertificateFile().transferTo(fileHash.get(fileNameTemp));
+            }
+            if (postStoreReq.getCopyAccountFile() != null) {// 통장 사본 이미지 파일
+                fileNameTemp = postStoreReq.getCopyAccountFile().getOriginalFilename();
+                fileHash.put(fileNameTemp, new File(absolutePath + fileNameTemp));
+                postStoreReq.getCopyAccountFile().transferTo(fileHash.get(fileNameTemp));
+            }
+            if (postStoreReq.getStoreLogoFile() != null) {// 가게로고 이미지파일
+                fileNameTemp = postStoreReq.getStoreLogoFile().getOriginalFilename();
+                fileHash.put(fileNameTemp, new File(absolutePath + fileNameTemp));
+                postStoreReq.getStoreLogoFile().transferTo(fileHash.get(fileNameTemp));
+            }
+            if (postStoreReq.getSignFile() != null) {// 가게 간판 이미지 파일
+                fileNameTemp = postStoreReq.getSignFile().getOriginalFilename();
+                fileHash.put(fileNameTemp, new File(absolutePath + fileNameTemp));
+                postStoreReq.getSignFile().transferTo(fileHash.get(fileNameTemp));
+            }
         }catch (Exception e){
-            System.out.println("2: "+ e);
             throw new BaseException(DATABASE_ERROR);
         }
 
-        // 1) 가게 등록에 필요한 각 이미지 url 생성
+        // 2) 가게 등록에 필요한 각 이미지 url 생성
+        ArrayList<String> urls = new ArrayList<>();
         try{
             for (int i = 0; i<5; i++){
                 s3Client.putObject(new PutObjectRequest(bucketName, fileNames.get(i), files.get(i)));

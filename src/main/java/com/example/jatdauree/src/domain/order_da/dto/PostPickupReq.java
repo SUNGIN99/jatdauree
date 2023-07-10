@@ -1,4 +1,4 @@
-package com.example.jatdauree.src.domain.order.dto;
+package com.example.jatdauree.src.domain.order_da.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostOrderCancelReq {
+public class PostPickupReq {
     private String uid;
     private String password;
     private int orderIdx;

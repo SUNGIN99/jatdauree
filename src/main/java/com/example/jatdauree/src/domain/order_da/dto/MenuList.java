@@ -1,4 +1,4 @@
-package com.example.jatdauree.src.domain.order.dto;
+package com.example.jatdauree.src.domain.order_da.dto;
 
 
 import lombok.AllArgsConstructor;
