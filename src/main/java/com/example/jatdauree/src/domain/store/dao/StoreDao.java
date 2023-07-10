@@ -55,7 +55,7 @@ public class StoreDao {
      */
     //가게등록
     @Transactional
-    public int storeRegister(int sellerIdx, PostStoreReq postStoresReq, ArrayList<String> urls) {
+    public int storeRegister(int sellerIdx, PostStoreReq postStoresReq, String[] urls) {
 
         String query = "INSERT INTO Stores (sellerIdx,\n" +
                 "                    categoryIdx,\n" +
@@ -86,16 +86,16 @@ public class StoreDao {
                 postStoresReq.getStoreName(),
                 postStoresReq.getBusinessPhone(),
                 postStoresReq.getBusinessEmail(),
-                urls.get(0),
-                urls.get(1),
-                urls.get(2),
+                urls[0] != null ? urls[0] : "",
+                urls[1] != null ? urls[1] : "",
+                urls[2] != null ? urls[2] : "",
                 postStoresReq.getBreakDay(),
                 postStoresReq.getStoreOpen(),
                 postStoresReq.getStoreClose(),
                 postStoresReq.getStorePhone(),
                 postStoresReq.getStoreAddress(),
-                urls.get(3),
-                urls.get(4),
+                urls[3] != null ? urls[3] : "",
+                urls[4] != null ? urls[4] : ""
         };
 
         this.jdbcTemplate.update(query, params);
@@ -166,9 +166,17 @@ public class StoreDao {
 
 
     public int storeAlreadyRegister(int sellerIdx) {
-        String query = "SELECT EXISTS(SELECT * FROM Stores WHERE sellerIdx = ? AND status = 'W')";
+        String query = "SELECT EXISTS(SELECT * FROM Stores WHERE sellerIdx = ? AND (status = 'W' OR status = 'A'))";
 
         return this.jdbcTemplate.queryForObject(query, int.class, sellerIdx);
+    }
+
+    public void convertStoreOpen(int storeIdx) {
+        String query ="UPDATE Stores\n" +
+                "SET status = 'A'\n" +
+                "WHERE storeIdx = ?";
+
+        this.jdbcTemplate.update(query, storeIdx);
     }
 }
 

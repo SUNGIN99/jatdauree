@@ -1,9 +1,9 @@
-package com.example.jatdauree.src.domain.order_chae;
+package com.example.jatdauree.src.domain.order;
 
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.BaseResponse;
-import com.example.jatdauree.src.domain.order_da.dto.*;
-import com.example.jatdauree.src.domain.order_da.service.OrderService;
+import com.example.jatdauree.src.domain.order.dto.*;
+import com.example.jatdauree.src.domain.order.service.OrderService;
 import com.example.jatdauree.utils.jwt.JwtService;
 import com.example.jatdauree.utils.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
