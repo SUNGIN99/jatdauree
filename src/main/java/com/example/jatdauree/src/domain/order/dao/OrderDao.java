@@ -33,18 +33,20 @@ public class OrderDao {
      * storeIdx로 상태가 'W'인 Orders 조회하기
      */
     public List<GetOrderRes> getOrdersByStoreIdx(int storeIdx){
-        String OrdersQuery ="SELECT O.orderIdx, S.store_name,C.uid, DATE_FORMAT(O.order_time, '%H:%i') AS order_time,COUNT(OL.orderIdx) AS total_menu, SUM(OL.cnt * M.price) AS total_price,\n" +
-                "      M.menu_name, OL.cnt,\n" +
-                "        DATE_FORMAT(O.pickup_time, '%H:%i') AS pickup_time,O.request,O.payment_status,O.status\n" +
+        String OrdersQuery ="SELECT\n" +
+                "    *\n" +
+                "FROM(SELECT O.orderIdx,S.store_name,C.uid,O.order_time,OL.cnt, SUM(OL.cnt * M.price) AS total_price,\n" +
+                "      M.menu_name,OL.cnt,\n" +
+                "       O.pickup_time,O.request,O.payment_status,O.status\n" +
                 "FROM OrderLists OL\n" +
                 "LEFT JOIN Orders O on OL.orderIdx = O.orderIdx\n" +
                 "LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
                 "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
                 "LEFT JOIN Stores S on O.storeIdx = S.storeIdx\n" +
                 "LEFT JOIN Customers C on O.customerIdx = C.customerIdx\n" +
-                "WHERE O.storeIdx = ? and O.status = 'W'"+
-                "GROUP BY OL.orderlistIdx\n"+
-                "ORDER BY O.order_time;";
+                "WHERE sellerIdx = ? AND O.status = 'W'\n" +
+                "GROUP BY O.orderIdx, OL.orderlistIdx) R\n" +
+                "ORDER BY R.order_time;";
         return this.jdbcTemplate.query(OrdersQuery,
                 (rs, rowNum) -> new GetOrderRes(
                         rs.getInt("orderIdx"),

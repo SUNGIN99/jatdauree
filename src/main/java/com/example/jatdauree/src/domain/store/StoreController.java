@@ -8,6 +8,8 @@ import com.example.jatdauree.utils.jwt.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/jat/stores")
 public class StoreController {
@@ -32,15 +34,17 @@ public class StoreController {
     //가게정보등록
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<PostStoreRes> storeRegister(@RequestBody PostStoreReq postStoreReq) {
+    public BaseResponse<PostStoreRes> storeRegister(PostStoreReq postStoreReq) {
         try {
             int sellerIdx = jwtService.getUserIdx();
              PostStoreRes postStoreRes = storeService.storeRegister(sellerIdx, postStoreReq);
 
             return new BaseResponse<>(postStoreRes);
 
-        } catch (BaseException baseException) {
+        } catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

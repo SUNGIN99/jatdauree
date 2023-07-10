@@ -52,7 +52,7 @@ public class OrderController {
     /**
      * OrderController-2
      * 23.07.06 작성자 : 윤다은
-     * 주문화면 - 주문취소/ 처리 중
+     * 주문화면 - 주문취소/처리 중
      * Post /jat/orders/cancel
      * JWT 적용해서 sellerIdx 가져오고 UPDATE를 통해서 status 수정하기
      */

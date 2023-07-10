@@ -7,24 +7,36 @@ import com.example.jatdauree.src.domain.order.dto.GetOrderProRes;
 import com.example.jatdauree.src.domain.order.dto.GetOrderRes;
 import com.example.jatdauree.src.domain.order.dto.PostOrderCancelReq;
 import com.example.jatdauree.src.domain.order.dto.PostPickupReq;
+import com.example.jatdauree.src.domain.store.dao.StoreDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.example.jatdauree.config.BaseResponseStatus.POST_STORES_NOT_REGISTERD;
+
 @Service
 public class OrderService {
 
     private final OrderDao orderDao;
+    private final StoreDao storeDao;
 
     @Autowired
-    public OrderService(OrderDao orderDao) {
+    public OrderService(OrderDao orderDao, StoreDao storeDao) {
         this.orderDao = orderDao;
+        this.storeDao = storeDao;
     }
 
     public List<GetOrderRes> getOrdersBySellerId(int sellerIdx)throws BaseException {
+        // 1) 사용자 가게 조회
+        int storeIdx;
+        try{
+            storeIdx = storeDao.storeIdxBySellerIdx(sellerIdx);
+        } catch (Exception e) {
+            throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
+
         try {
-            int storeIdx = orderDao.getStoreIdxBySellerIdx(sellerIdx);
             List<GetOrderRes> getOrdersResList = orderDao.getOrdersByStoreIdx(storeIdx);
             return getOrdersResList;
         }
