@@ -1,9 +1,6 @@
 package com.example.jatdauree.src.domain.store.dao;
 
-import com.example.jatdauree.src.domain.store.dto.GetStoreInfoRes;
-import com.example.jatdauree.src.domain.store.dto.PatchStoreInfoReq;
-import com.example.jatdauree.src.domain.store.dto.PostStoreReq;
-import com.example.jatdauree.src.domain.store.dto.PostStoreUpdateReq;
+import com.example.jatdauree.src.domain.store.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -177,6 +174,20 @@ public class StoreDao {
                 "WHERE storeIdx = ?";
 
         this.jdbcTemplate.update(query, storeIdx);
+    }
+
+    public StoreStartClose getStoreOpenNClose(int storeIdx) {
+        String query = "SELECT\n" +
+                "    DATE_FORMAT(store_open,  '%H:%i') as store_open,\n" +
+                "    DATE_FORMAT(store_close,  '%H:%i') as store_close\n" +
+                "FROM Stores\n" +
+                "WHERE storeIdx = ?\n";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new StoreStartClose(
+                        rs.getString("store_open"),
+                        rs.getString("store_close")
+                ), storeIdx);
     }
 }
 
