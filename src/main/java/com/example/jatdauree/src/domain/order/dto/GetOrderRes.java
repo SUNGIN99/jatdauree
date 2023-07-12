@@ -1,4 +1,4 @@
-package com.example.jatdauree.src.domain.order_da.dto;
+package com.example.jatdauree.src.domain.order.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,9 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetOrderProRes {
+public class GetOrderRes {
 
-    //private int OrderNumber;
     private int orderIdx;
     private String store_name;
     private String uid;
@@ -24,7 +23,7 @@ public class GetOrderProRes {
     private String request;
     private String payment_status;
     private String status;
-
+    //ArrayList<MenuList> menuLists;
 
 
 }

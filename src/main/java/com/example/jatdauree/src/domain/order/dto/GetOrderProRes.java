@@ -1,4 +1,4 @@
-package com.example.jatdauree.src.domain.order_chae.dto;
+package com.example.jatdauree.src.domain.order.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
