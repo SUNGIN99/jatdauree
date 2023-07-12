@@ -4,6 +4,7 @@ package com.example.jatdauree.src.domain.sales;
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.BaseResponse;
 import com.example.jatdauree.src.domain.sales.dto.TodayTotalSalesRes;
+import com.example.jatdauree.src.domain.sales.dto.YtoTWeekSalesRes;
 import com.example.jatdauree.src.domain.sales.dto.YtoTdaySalesRes;
 import com.example.jatdauree.src.domain.sales.service.SalesService;
 import com.example.jatdauree.utils.jwt.JwtService;
@@ -39,13 +40,26 @@ public class SalesController {
     }
 
     @ResponseBody
-    @GetMapping("/weekend/by-time")
+    @GetMapping("/yesterday")
     public BaseResponse<YtoTdaySalesRes> getFromYtoTdaySales(){
         try{
             int sellerIdx = jwtService.getUserIdx();
 
             YtoTdaySalesRes ytoTdaySalesRes = salesService.getFromYtoTdaySales(sellerIdx);
             return new BaseResponse<>(ytoTdaySalesRes);
+        }catch (BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/weekday")
+    public BaseResponse<YtoTWeekSalesRes> getFromLtoTWeekSales(){
+        try{
+            int sellerIdx = jwtService.getUserIdx();
+            System.out.println(sellerIdx);
+            YtoTWeekSalesRes ytoTWeekSalesRes = salesService.getFromLtoTWeekSales(sellerIdx);
+            return new BaseResponse<>(ytoTWeekSalesRes);
         }catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());
         }

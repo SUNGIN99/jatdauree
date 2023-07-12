@@ -5,14 +5,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
+import java.io.Serializable;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class YtoTdaySalesRes {
+public class YtoTdaySalesRes implements Serializable {
     private int storeIdx;
-    private ArrayList<salesByTime> salesToday;
-    private ArrayList<salesByTime> salesYesterday;
+    private String storeOpen;
+    private String storeClose;
+    private List<SalesByTime> salesToday;
+    private List<SalesByTime> salesYesterday;
 }
