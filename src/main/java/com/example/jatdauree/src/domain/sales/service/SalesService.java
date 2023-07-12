@@ -217,4 +217,102 @@ public class SalesService {
 
         return new YtoTWeekSalesRes(storeIdx, thisWeek, lastWeek);
     }
+
+
+    private class CompareItem{
+        int totalSales;
+        ItemSalesReOrNew itemSalesReOrNew;
+
+        public CompareItem(int totalSales, ItemSalesReOrNew itemSalesReOrNew) {
+            this.totalSales = totalSales;
+            this.itemSalesReOrNew = itemSalesReOrNew;
+        }
+
+        public ItemSalesReOrNew getItemSalesReOrNew() {
+            return itemSalesReOrNew;
+        }
+    }
+
+    public List<ItemSalesReOrNew> sortHashValues(ArrayList<CompareItem> compItems){
+        PriorityQueue<CompareItem> queue = new PriorityQueue<>(
+                new Comparator<CompareItem>() {
+                    @Override
+                    public int compare(CompareItem o1, CompareItem o2) {
+                        return o2.totalSales - o1.totalSales;
+                    }
+                }
+        );
+
+        queue.addAll(compItems);
+
+        List<ItemSalesReOrNew> sortedSales = new ArrayList<>();
+        while(!queue.isEmpty()){
+            CompareItem temp = queue.poll();
+            sortedSales.add(temp.getItemSalesReOrNew());
+        }
+
+        return sortedSales;
+
+    }
+
+    public MonthlyMenuSalesRes getMontlyMenuSales(int month, int sellerIdx) throws BaseException{
+        // 0) 사용자 가게 조회
+        int storeIdx;
+        try {
+            storeIdx = storeDao.storeIdxBySellerIdx(sellerIdx);
+        } catch (Exception e) {
+            throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
+
+        // 해시 테이블사용
+        HashMap<Integer, ItemSalesReOrNew> reOrderTables = new HashMap<>();
+        List<ItemSalesReOrNew> itemSalesReorder, itemSalesNeworder;
+        // 1) 가게 재 주문 조회
+        try{
+            itemSalesReorder =  salesDao.getMontlyMenuSales(month, storeIdx, 1);
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
+
+        // 1-2) 가게 재 주문 해시테이블에 입력
+        for (ItemSalesReOrNew items : itemSalesReorder){
+            items.setMenuTotalSales(items.getMenuReOrderPrice());
+            reOrderTables.put(items.getMenuIdx(), items);
+        }
+
+        // 2) 가게 재 주문 조회
+        try{
+            itemSalesNeworder =  salesDao.getMontlyMenuSales(month, storeIdx, 0);
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
+        System.out.println(itemSalesReorder.toString());
+        System.out.println(itemSalesNeworder.toString());
+
+        // 3) 메뉴 별 신규/재 주문 매출 현황 조합 (hashMap)
+        for (ItemSalesReOrNew item : itemSalesNeworder){
+            if(reOrderTables.get(item.getMenuIdx()) != null){
+                reOrderTables.get(item.getMenuIdx()).setMenuNewOrderCount(item.getMenuNewOrderCount());
+                reOrderTables.get(item.getMenuIdx()).setMenuNewOrderPrice(item.getMenuNewOrderPrice());
+
+                reOrderTables.get(item.getMenuIdx()). // 신규/재 주문 총 합산 매출
+                        setMenuTotalSales(
+                        item.getMenuNewOrderPrice() + reOrderTables.get(item.getMenuIdx()).getMenuTotalSales());
+            }
+            else{
+                item.setMenuTotalSales(item.getMenuNewOrderPrice());
+                reOrderTables.put(item.getMenuIdx(), item);
+            }
+        }
+
+        // 판매 매출 기준 정렬 높-> 낮은 순
+        ArrayList<CompareItem> compItems = new ArrayList<>();
+        for( ItemSalesReOrNew item : reOrderTables.values()){
+            compItems.add(new CompareItem(item.getMenuTotalSales(), item));
+        }
+
+        List<ItemSalesReOrNew> sortedItemSales = sortHashValues(compItems);
+
+        return new MonthlyMenuSalesRes(storeIdx, month, sortedItemSales);
+    }
 }

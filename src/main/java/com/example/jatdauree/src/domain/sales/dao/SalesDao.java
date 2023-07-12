@@ -1,8 +1,6 @@
 package com.example.jatdauree.src.domain.sales.dao;
 
-import com.example.jatdauree.src.domain.sales.dto.SalesByTime;
-import com.example.jatdauree.src.domain.sales.dto.SalesByWeekDay;
-import com.example.jatdauree.src.domain.sales.dto.TodayTotalSalesRes;
+import com.example.jatdauree.src.domain.sales.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -92,6 +90,39 @@ public class SalesDao {
                         rs.getString("weekDate"),
                         rs.getInt("weekDayId"),
                         rs.getInt("total_price_of_the_weekDay")
+                ), params);
+
+    }
+
+    public List<ItemSalesReOrNew> getMontlyMenuSales(int month, int storeIdx, int reOrder){
+        String query = "SELECT\n" +
+                "    DATE_FORMAT(O.created, '%Y-%c') as `month`,\n" +
+                "    M.menuIdx, M.menu_name,\n" +
+                "    COUNT(O.customerIdx) as reOrderCount,\n" +
+                "    SUM(TM.price * OL.cnt) as monthly_sales\n" +
+                "FROM Orders O\n" +
+                "LEFT JOIN OrderLists OL on O.orderIdx = OL.orderIdx\n" +
+                "LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
+                "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
+                "WHERE O.storeIdx = ?\n" +
+                "  AND O.status = 'A'\n" +
+                "  AND DATE_FORMAT(O.created, '%c') = ?\n" +
+                "GROUP BY `month`, M.menuIdx\n" +
+                "HAVING COUNT(O.customerIdx) " + (reOrder == 1 ? ">= 2" : "= 1");
+
+        Object[] params = new Object[]{
+                storeIdx, month
+        };
+
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new ItemSalesReOrNew(
+                        rs.getInt("menuIdx"),
+                        rs.getString("menu_name"),
+                        reOrder == 1 ? rs.getInt("reOrderCount") : 0, // 재주문 횟수
+                        reOrder == 1 ? rs.getInt("monthly_sales") : 0, // 재주문 매출
+                        reOrder == 0 ? rs.getInt("reOrderCount") : 0, // 신규주문 횟수
+                        reOrder == 0 ? rs.getInt("monthly_sales") : 0, // 신규주문 매출
+                        0
                 ), params);
 
     }
