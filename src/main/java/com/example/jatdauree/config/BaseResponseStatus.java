@@ -48,6 +48,13 @@ public enum BaseResponseStatus {
     // 2040~) 오늘의 떨이메뉴 등록 요청
     POST_TODAY_MAINMENU_DATA_UNVALID(false, 2041, "오늘의 떨이메뉴(메인) 등록 정보가 올바르지 않습니다."),
     POST_TODAY_SIDEMENU_DATA_UNVALID(false, 2042, "오늘의 떨이메뉴(사이드) 등록 정보가 올바르지 않습니다."),
+
+    // 리뷰 -> 가게에 해당 리뷰 존재하는지
+    POST_REVIEW_EXISTS_REVIEW(false,2050,"가게에 해당 리뷰가 존재하지 않습니다."),
+    //2050~) 리뷰 답글 등록
+    POST_REVIEW_COMMENT_DATA_UNVALID(false,2051,"리뷰 답글을 작성하지 않았습니다."),
+
+    //2050
     /**
      * 3000 : Response 오류
      */
@@ -89,6 +96,7 @@ public enum BaseResponseStatus {
     // 4040~) 오늘의 떨이메뉴 등록
     POST_TODAY_MAINMENU_SAVE_ERROR(false, 4041, "오늘의 떨이메뉴(메인) 등록에 실패하였습니다."),
     POST_TODAY_SIDEMENU_SAVE_ERROR(false, 4042, "오늘의 떨이메뉴(사이드) 등록에 실패하였습니다."),
+
 
     /**
      * 5000 : 외부 API 오류

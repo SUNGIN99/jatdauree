@@ -2,9 +2,7 @@ package com.example.jatdauree.src.domain.review;
 
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.BaseResponse;
-import com.example.jatdauree.src.domain.review.dto.GetReviewRes;
-import com.example.jatdauree.src.domain.review.dto.PostReviewAnswerReq;
-import com.example.jatdauree.src.domain.review.dto.PostReviewAnswerRes;
+import com.example.jatdauree.src.domain.review.dto.*;
 import com.example.jatdauree.src.domain.review.service.ReviewService;
 import com.example.jatdauree.src.domain.seller.dto.PostLoginReq;
 import com.example.jatdauree.src.domain.seller.dto.PostLoginRes;
@@ -50,22 +48,39 @@ public class ReviewController {
 
 
     /**
-     * 23.07.11 작성자 : 정주현
+     * 23.07.12 작성자 : 정주현
      * 리뷰 답글 달기
      * Post /jat/review/comment
      * @return BaseResponse<GetReviewRes>
      */
-    /*
     @ResponseBody
     @PostMapping("comment")
     public BaseResponse<PostReviewAnswerRes> reviewAnswer(@RequestBody PostReviewAnswerReq postReviewAnswerReq) throws BaseException {
         int sellerIdx = jwtService.getUserIdx();
         try{
-            PostReviewAnswerRes postReviewAnswerRes  = reviewService.postReviewAnswerReq(sellerIdx,postReviewAnswerReq);
+            PostReviewAnswerRes postReviewAnswerRes  = reviewService.reviewAnswer(sellerIdx,postReviewAnswerReq);
             return new BaseResponse<>(postReviewAnswerRes);
         }catch(BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());
         }
     }
-    */
+
+    /**
+     * 23.07.13 작성자 : 정주현
+     * 리뷰 답글 수정
+     * Post /jat/review/comment
+     * @return BaseResponse<GetReviewRes>
+     */
+    @ResponseBody
+    @PatchMapping("comment")
+    public BaseResponse<PatchReviewRes> reviewAnswer(@RequestBody PatchReviewReg patchReviewReg) throws BaseException {
+        int sellerIdx = jwtService.getUserIdx();
+        try{
+            PatchReviewRes patchReviewRes  = reviewService.reviewModify(sellerIdx,patchReviewReg);
+            return new BaseResponse<>(patchReviewRes);
+        }catch(BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
+
 }

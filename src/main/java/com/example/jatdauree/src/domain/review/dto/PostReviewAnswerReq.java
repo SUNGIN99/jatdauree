@@ -11,7 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PostReviewAnswerReq {
 
-    private int storeIdx;
     private int reviewIdx;
     private String comment;
 }
