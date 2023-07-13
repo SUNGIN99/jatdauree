@@ -18,6 +18,7 @@ public class ReviewItems implements Serializable {
     private String customerName;
     private int star;
     private String contents;
+    private String comment;
     private String review_url;
     private List<OrderTodayMenu> OrderTodayMenu;
 

@@ -42,36 +42,18 @@ public class ReviewController {
         }
     }
 
-
     /**
-     * 23.07.12 작성자 : 정주현
-     * 리뷰 답글 달기
-     * Post /jat/review/comment
-     * @return BaseResponse<ReviewAnswerRes>
-     */
-    @ResponseBody
-    @PostMapping("comment")
-    public BaseResponse<ReviewAnswerRes> reviewAnswer(@RequestBody ReviewAnswerReq reviewAnswerReq) throws BaseException {
-        int sellerIdx = jwtService.getUserIdx();
-        try{
-            ReviewAnswerRes reviewAnswerRes  = reviewService.reviewAnswer(sellerIdx,reviewAnswerReq);
-            return new BaseResponse<>(reviewAnswerRes);
-        }catch(BaseException baseException){
-            return new BaseResponse<>(baseException.getStatus());
-        }
-    }
-
-    /**
-     * 23.07.13 작성자 : 정주현
+     * 23.07.13 작성자 : 정주현, 김성인(service 조건문 수정)
      * 리뷰 답글 수정
      * Patch /jat/review/comment
      * @return BaseResponse<ReviewAnswerRes>
      */
     @ResponseBody
-    @PatchMapping("comment")
+    @PatchMapping("/comment")
     public BaseResponse<ReviewAnswerRes> reviewAnswerModify(@RequestBody ReviewAnswerReq reviewAnswerReq) throws BaseException {
-        int sellerIdx = jwtService.getUserIdx();
         try{
+            int sellerIdx = jwtService.getUserIdx();
+
             ReviewAnswerRes reviewAnswerRes  = reviewService.reviewAnswer(sellerIdx,reviewAnswerReq);
             return new BaseResponse<>(reviewAnswerRes);
         }catch(BaseException baseException){

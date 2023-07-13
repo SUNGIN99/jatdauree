@@ -39,10 +39,9 @@ public class ReviewService {
         try {
             reviewItems = reviewDao.reviewItems(storeIdx);
         } catch (Exception e) {
+            System.out.println("exception1: " + e);
             throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);    // 리뷰 조회에 실패하였습니다.
         }
-        //return new GetReviewRes(storeIdx,reviewItems);
-
 
         // 3) 리뷰 주문 내의 메뉴 목록 조회
         try {
@@ -51,6 +50,7 @@ public class ReviewService {
             }
             return new GetReviewRes(storeIdx, reviewItems);
         } catch (Exception e) {
+            System.out.println("exception2: " + e);
             throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);    // 리뷰 조회에 실패하였습니다.
         }
     }
@@ -68,28 +68,27 @@ public class ReviewService {
         }
 
         //2) 해당 가게에 해당 리뷰가 존재하는지 조회
+        int reviewIdxCheck;
         try{
-            int reviewIdxCheck = reviewDao.checkReviewIdx(storeIdx,reviewAnswerReq.getReviewIdx());
-            if (reviewIdxCheck == 0){
-                throw new BaseException(POST_REVIEW_EXISTS_REVIEW); //2050 : 가게에 해당 리뷰가 존재하지 않습니다.
-            }
-        } catch (BaseException e) {
-            throw e;
+            reviewIdxCheck = reviewDao.checkReviewIdx(storeIdx,reviewAnswerReq.getReviewIdx());
         } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(DATABASE_ERROR); // 가게의 리뷰 조회에 실패
+        }
+
+        // 3) 답글달 가게의 리뷰 존재여부
+        if (reviewIdxCheck == 0){
+            throw new BaseException(POST_REVIEW_EXISTS_REVIEW); //2050 : 가게에 해당 리뷰가 존재하지 않습니다.
+        }
+
+        // 4) 리뷰에 대한 입력값 수정
+        if (reviewAnswerReq.getComment() == null || reviewAnswerReq.getComment().length() == 0 ){
+            throw new BaseException(POST_REVIEW_COMMENT_DATA_UNVALID); // 2051 : 리뷰 답글을 작성하지 않았습니다.
         }
 
         //3) 해당 리뷰인덱스에 "comment" 넣기(등록,수정)
         try{
-            if(reviewAnswerReq.getComment() != null && reviewAnswerReq.getComment().length() != 0 ){ //"comment"가 null,빈 문자 x
-                reviewDao.reviewAnswer(reviewAnswerReq);
-                return new ReviewAnswerRes(storeIdx,reviewAnswerReq.getReviewIdx(),reviewAnswerReq.getComment());
-            }
-            else {
-                throw new BaseException(POST_REVIEW_COMMENT_DATA_UNVALID); // 2051 : 리뷰 답글을 작성하지 않았습니다.
-            }
-        } catch (BaseException e) {
-            throw e;
+            reviewDao.reviewAnswer(reviewAnswerReq);
+            return new ReviewAnswerRes(storeIdx, reviewAnswerReq.getReviewIdx(), reviewAnswerReq.getComment());
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }

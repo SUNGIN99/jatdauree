@@ -41,7 +41,7 @@ public class ReviewDao {
 
     //리뷰 정보 가져오기
     public List<ReviewItems> reviewItems(int storeIdx) {
-        String query = "SELECT O.orderIdx, R.reviewIds, C.name,R.star,R.contents, R.review_url\n" +
+        String query = "SELECT O.orderIdx, R.reviewIdx, C.name, R.star ,R.contents, R.comment, R.review_url\n" +
                 " FROM Orders O\n" +
                 "    JOIN Review R on O.orderIdx = R.orderIdx\n" +
                 "    JOIN Customers C ON R.customerIdx = C.customerIdx\n" +
@@ -55,28 +55,16 @@ public class ReviewDao {
                         rs.getString("name"),
                         rs.getInt("star"),
                         rs.getString("contents"),
-                        rs.getString("review_url"),
+                        rs.getString("comment") == null? "" : rs.getString("comment"),
+                        rs.getString("review_url") == null?"": rs.getString("review_url") ,
                         null
-                )
-
-                /*
-                    {int orderIdx = rs.getInt("orderIdx");
-                    int reviewIdx = rs.getInt("reviewIds");
-                    String customerName = rs.getString("name");
-                    int star = rs.getInt("star");
-                    String contents = rs.getString("contents");
-                    String reviewUrl = rs.getString("review_url");
-
-                    //List<OrderTodayMenu> orderTodayMenus = orderTodayMenus(storeIdx, orderIdx); //list 타입이라서 아예 list를 넣었음.
-
-                    return new ReviewItems(orderIdx, reviewIdx, customerName, star, contents, reviewUrl, null);}*/
-                , storeIdx);
+                ), storeIdx);
 
     }
 
     //해당 리뷰인덱스가 존재하는지 확인
     public int checkReviewIdx(int storeIdx,int reviewIdx) {
-        String query = "SELECT EXISTS (SELECT * FROM Review WHERE storeIdx=? AND reviewIdx= ? limit 1)";
+        String query = "SELECT EXISTS (SELECT * FROM Review WHERE storeIdx=? AND reviewIdx= ?)";
 
         Object[] params = new Object[]{storeIdx,reviewIdx};
         return this.jdbcTemplate.queryForObject(query, int.class, params);
