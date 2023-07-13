@@ -58,7 +58,7 @@ public class OrderController {
     public BaseResponse<PatchReceRes> patchRecBySellerIdx(@RequestBody PatchReceReq patchReceReq){
         try{
             int sellerIdx = jwtService.getUserIdx();
-            PatchReceRes patchReceRes =ordersService.patchRecBySellerIdx(sellerIdx,patchReceReq);
+            PatchReceRes patchReceRes = ordersService.patchRecBySellerIdx(sellerIdx,patchReceReq);
             return new BaseResponse<>(patchReceRes);
         }catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());
@@ -102,6 +102,13 @@ public class OrderController {
         }
     }
 
+
+    /**
+     * OrderController -4
+     * 23.07.14 작성자 : 이윤채
+     * 주문 처리 중 확인
+     * Patch /jat/orders/pickup
+     * */
     @ResponseBody
     @PatchMapping("/pickup")
     public BaseResponse<PatchPickupRes> pickupOrder(@RequestBody PatchPickupReq pathchPickupReq){
