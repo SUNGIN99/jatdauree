@@ -92,7 +92,10 @@ public class SellerDao {
                         rs.getString("uid"),
                         rs.getString("name"),
                         rs.getString("birthday"),
-                        rs.getString("phone"),
+                        rs.getString("p" +
+                                "" +
+                                "" +
+                                "hone"),
                         rs.getString("email"),
                         rs.getString("created"),
                         rs.getInt("sms_check"),
@@ -118,7 +121,9 @@ public class SellerDao {
                         rs.getString("salt"),
                         rs.getString("password"),
                         rs.getString("email"),
-                        rs.getInt("first_login")
+                        rs.getInt("first_login"),
+                        rs.getInt("menu_register"),
+                        null
                 ), postLoginReq.getUid());
     }
 
@@ -201,5 +206,34 @@ public class SellerDao {
         };
 
         this.jdbcTemplate.update(query, params);
+    }
+
+    /**
+     * sellerDao - 9
+     * 23.07.02 작성자 : 김성인
+     * 판매자 메뉴 및 원산지 등록 완료
+     */
+    public void registerMenuNIngredient(int sellerIdx){
+        String query = "UPDATE Merchandisers\n" +
+                "SET menu_register = 0\n" +
+                "WHERE sellerIdx = ?";
+        this.jdbcTemplate.update(query, sellerIdx);
+    }
+
+    /**
+     * sellerDao - 10
+     * 23.07.02 작성자 : 김성인
+     * 판매자 가게 및 메뉴/원산지 등록 여부 확인
+     */
+    public int[] checkRegisterd(int sellerIdx) {
+        String query = "SELECT " +
+                "first_login, menu_register " +
+                "FROM Merchandisers " +
+                "WHERE sellerIdx = ?";
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new int[]{
+                        rs.getInt("first_login"),
+                        rs.getInt("menu_register")}
+        , sellerIdx);
     }
 }

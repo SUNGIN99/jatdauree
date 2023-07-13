@@ -27,7 +27,6 @@ dependencies {
 	// DB
 	implementation group:'mysql', name:'mysql-connector-java', version:'8.0.32'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
 	// authenticate
@@ -43,7 +42,26 @@ dependencies {
 	// nurigo 문자인증
 	implementation 'net.nurigo:sdk:4.2.7'
 
-	//
+	// iamport 결제 연동
+	allprojects {
+		repositories {
+			//...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+	implementation 'com.github.iamport:iamport-rest-client-java:0.2.21'
+
+	// Retrofit2
+	implementation 'com.squareup.retrofit2:retrofit:2.7.2'
+	implementation 'com.squareup.retrofit2:converter-gson:2.7.2'
+	implementation 'com.squareup.okhttp3:logging-interceptor:4.10.0'
+
+	// aws cloud s3
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	implementation 'org.springframework.cloud:spring-cloud-aws-context:2.2.6.RELEASE'
+	implementation 'org.springframework.cloud:spring-cloud-aws-autoconfigure:2.2.6.RELEASE'
+
+	// spring boot
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-web-services'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

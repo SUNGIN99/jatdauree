@@ -19,4 +19,6 @@ public class Seller {
     private String password;
     private String email;
     private int first_login;
+    private int menu_register;
+    private String store_name;
 }

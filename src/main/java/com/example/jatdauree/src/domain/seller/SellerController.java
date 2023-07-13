@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+//@CrossOrigin(origins="*")
 @Slf4j
 @RestController
 @RequestMapping("/jat/sellers")
@@ -147,7 +148,7 @@ public class SellerController {
      * @return BaseResponse<RestorePwRes>
      */
     @ResponseBody
-    @PostMapping("/pw-restore")
+    @PatchMapping("/pw-restore")
     public BaseResponse<RestorePwRes> pwRestore(@RequestBody RestorePwReq restorePwReq){
         try{
             int sellerIdx = jwtService.getUserIdx();

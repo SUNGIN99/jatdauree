@@ -5,6 +5,7 @@ import com.example.jatdauree.config.secret.SmsSecret;
 import com.example.jatdauree.src.domain.seller.dao.SellerDao;
 import com.example.jatdauree.src.domain.seller.dto.*;
 import com.example.jatdauree.src.domain.sms.dao.SmsDao;
+import com.example.jatdauree.src.domain.store.dao.StoreDao;
 import com.example.jatdauree.utils.jwt.JwtTokenProvider;
 import com.example.jatdauree.utils.SHA256;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -33,14 +33,16 @@ public class SellerService {
 
     private final SellerDao sellerDao;
     private final SmsDao smsDao;
+    private final StoreDao storeDao;
 
     private final JwtTokenProvider jwtTokenProvider;
     private final DefaultMessageService messageService;
 
     @Autowired
-    public SellerService(SellerDao sellerDao, SmsDao smsDao, @Lazy JwtTokenProvider jwtTokenProvider) {
+    public SellerService(SellerDao sellerDao, SmsDao smsDao, StoreDao storeDao, @Lazy JwtTokenProvider jwtTokenProvider) {
         this.sellerDao = sellerDao;
         this.smsDao = smsDao;
+        this.storeDao = storeDao;
         this.jwtTokenProvider = jwtTokenProvider;
         this.messageService = NurigoApp.INSTANCE.initialize(SmsSecret.APIKey, SmsSecret.Secret, "https://api.coolsms.co.kr");
     }
@@ -49,7 +51,7 @@ public class SellerService {
         return sellerDao.loadUserByUserIdx(userId);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = BaseException.class)
     public PostSignUpRes signUp(PostSignUpReq postSignUpReq) throws BaseException {
         String salt;
         // 아이디, 비밀번호, 닉네임 정규식 처리
@@ -87,7 +89,7 @@ public class SellerService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = BaseException.class)
     public PostLoginRes login(PostLoginReq postLoginReq) throws BaseException{
         if(postLoginReq.getUid().length() == 0 || postLoginReq.getPassword().length() == 0){
             throw new BaseException(REQUEST_ERROR); // 2000 : 입력값 전체 빈 값일때
@@ -101,7 +103,18 @@ public class SellerService {
             throw new BaseException(FAILED_TO_LOGIN);
         }
 
-        // 2) 비밀 번호 암호화
+        // 2) 회원가입후 가게 승인 및 메뉴등록이 모두 마쳐진 유저일 경우
+       String storeName = "";
+        try{
+            if(seller.getFirst_login() == 0 && seller.getMenu_register()== 0){
+                // storeName from storeDao
+                storeName = storeDao.storeNameBySellerIdx(seller.getSellerIdx());
+            }
+        }catch(Exception exception){
+            throw new BaseException(FAILED_TO_LOGIN);
+        }
+
+        // 3) 비밀 번호 암호화
         try{
             String salt = seller.getSalt();
             String pwd = new SHA256().encrypt(postLoginReq.getPassword(), salt);
@@ -111,10 +124,9 @@ public class SellerService {
                 return new PostLoginRes(jwt,
                         seller.getSellerIdx(),
                         seller.getName(),
-                        seller.getBirthday(),
-                        seller.getPhone(),
-                        seller.getEmail(),
-                        seller.getFirst_login());
+                        seller.getFirst_login(),
+                        seller.getMenu_register(),
+                        seller.getFirst_login() == 0 && seller.getMenu_register()== 0 ? storeName: "");
             }
             else{
                 throw new BaseException(FAILED_TO_LOGIN);
@@ -133,7 +145,7 @@ public class SellerService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = BaseException.class)
     public int lostIdAndPw(SmsCertificateReq smsCertificateReq) throws BaseException {
         // 1) 올바른 바디 value로 요청되지 않았을때
         if(smsCertificateReq.getPhoneNum() == null &&
@@ -221,6 +233,7 @@ public class SellerService {
         }
     }
 
+    @Transactional(rollbackFor = BaseException.class)
     public RestorePwRes pwRestore(RestorePwReq restorePwReq, int sellerIdx) throws BaseException{
         if (!restorePwReq.getPw().equals(restorePwReq.getPwCheck())){
             throw new BaseException(MODIFY_FAIL_USERPASSWORD); // 4015 : 유저 비밀번호 수정 실패

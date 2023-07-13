@@ -38,8 +38,24 @@ public enum BaseResponseStatus {
     POST_EXAM_SUB_TITLE_ISEMPTY(false,2022,"제목을 등록해주세요."),
     // 시험과제게시판 수정
     PATCH_EXAM_SUB_TITLE_ISEMPTY(false,2023,"제목을 등록해주세요."),
-    // 강의 추가 중복 예외
-    POST_COURSE_EXISTS(false,2024,"이미 추가한 강의입니다."),
+
+    // 2030~) 가게관련 및 메인메뉴/원산지 등록
+    POST_STORES_NOT_REGISTERD(false, 2030, "사용자의 가게가 등록되어있지 않습니다."),
+    STORE_MAINMENU_DATA_UNVALID(false, 2031, "메인 메뉴 등록 정보가 올바르지 않습니다."),
+    STORE_SIDEMENU_DATA_UNVALID(false, 2032, "사이드 메뉴 등록 정보가 올바르지 않습니다."),
+    STORE_INGREDIENT_DATA_UNVALID(false, 2033, "원산지 등록 정보가 올바르지 않습니다."),
+    STORE_ALREADY_REGISTERD(false, 2034, "가게 등록 요청을 이미 하였습니다(메뉴 등록 또는 관리자의 승인을 기다리세요)."),
+
+    // 2040~) 오늘의 떨이메뉴 등록 요청
+    POST_TODAY_MAINMENU_DATA_UNVALID(false, 2041, "오늘의 떨이메뉴(메인) 등록 정보가 올바르지 않습니다."),
+    POST_TODAY_SIDEMENU_DATA_UNVALID(false, 2042, "오늘의 떨이메뉴(사이드) 등록 정보가 올바르지 않습니다."),
+
+    // 리뷰 -> 가게에 해당 리뷰 존재하는지
+    POST_REVIEW_EXISTS_REVIEW(false,2050,"가게에 해당 리뷰가 존재하지 않습니다."),
+    //2050~) 리뷰 답글 등록
+    POST_REVIEW_COMMENT_DATA_UNVALID(false,2051,"리뷰 답글을 작성하지 않았습니다."),
+
+    //2050
     /**
      * 3000 : Response 오류
      */
@@ -70,12 +86,31 @@ public enum BaseResponseStatus {
     SMS_DATA_FIND_ERROR(false, 4021, "유효하지 않은 SMS 인증번호 요청입니다."),
     SMS_CERTIFICATE_FAILED(false, 4022, "SMS 인증 실패"),
 
+    // 4030~) 가게 메뉴 등록, 원산지 등록
+    SELLER_ALL_REGISTER_COMPLETE_ERROR(false, 4030, "판매자의 최초로그인, 메뉴/원산지 등록이 완료되지 못하였습니다."),
+    STORE_MAINMENU_SAVE_ERROR(false, 4031, "메인메뉴 등록에 실패하였습니다."),
+    STORE_SIDEMENU_SAVE_ERROR(false, 4032, "사이드메뉴 등록에 실패하였습니다."),
+    STORE_INGREDIENT_SAVE_ERROR(false, 4033, "원산지 등록에 실패하였습니다."),
+    STORE_MENU_ALREADY_SAVED(false, 4034, "메뉴등록이 이미 이루어진 판매자입니다."),
+    STORE_REGISTER_NOT_PERMITTED(false, 4035, "관리자에게 가게 승인되지 않은 판매자 계정입니다."),
+    STORE_URL_POST_ERROR(false, 4034, "등록하는 이미지의 형태가 잘못 처리되었습니다."),
+
+    // 4040~) 오늘의 떨이메뉴 등록
+    POST_TODAY_MAINMENU_SAVE_ERROR(false, 4041, "오늘의 떨이메뉴(메인) 등록에 실패하였습니다."),
+    POST_TODAY_SIDEMENU_SAVE_ERROR(false, 4042, "오늘의 떨이메뉴(사이드) 등록에 실패하였습니다."),
+
 
     /**
      * 5000 : 외부 API 오류
      */
-    COOLSMS_API_ERROR(false, 5010, "SMS 인증번호 발송을 실패하였습니다.");
+    // SMS
+    COOLSMS_API_ERROR(false, 5010, "SMS 인증번호 발송을 실패하였습니다."),
 
+    // 결제
+    BILLING_API_ERROR(false,5020, "결제 실패입니다."),
+
+    // s3
+    S3_ACCESS_API_ERROR(false,5030, "이미지 url 생성에 실패하였습니다.");
 
     // 6000 : 필요시 만들어서 쓰세요
     private final boolean isSuccess;
