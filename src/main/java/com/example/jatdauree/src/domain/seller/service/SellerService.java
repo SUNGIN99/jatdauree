@@ -103,7 +103,7 @@ public class SellerService {
             throw new BaseException(FAILED_TO_LOGIN);
         }
 
-        // 2) 회원가입후 가게 승인 및 메뉴등록이 모두 마쳐진 유저 일 경우우
+        // 2) 회원가입후 가게 승인 및 메뉴등록이 모두 마쳐진 유저일 경우
        String storeName = "";
         try{
             if(seller.getFirst_login() == 0 && seller.getMenu_register()== 0){
