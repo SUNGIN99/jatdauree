@@ -9,8 +9,8 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostReviewAnswerReq {
-
+public class ReviewAnswerRes {
+    private int storeIdx;
     private int reviewIdx;
     private String comment;
 }

@@ -1,9 +1,6 @@
 package com.example.jatdauree.src.domain.review.dao;
 
-import com.example.jatdauree.src.domain.review.dto.OrderTodayMenu;
-import com.example.jatdauree.src.domain.review.dto.PostReviewAnswerReq;
-import com.example.jatdauree.src.domain.review.dto.PostReviewAnswerRes;
-import com.example.jatdauree.src.domain.review.dto.ReviewItems;
+import com.example.jatdauree.src.domain.review.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -54,7 +51,7 @@ public class ReviewDao {
         return this.jdbcTemplate.query(query,
                 (rs, rowNum) -> new ReviewItems(
                         rs.getInt("orderIdx"),
-                        rs.getInt("reviewIds"),
+                        rs.getInt("reviewIdx"),
                         rs.getString("name"),
                         rs.getInt("star"),
                         rs.getString("contents"),
@@ -77,20 +74,20 @@ public class ReviewDao {
 
     }
 
-    //리뷰인덱스가 존재하는지 확인
+    //해당 리뷰인덱스가 존재하는지 확인
     public int checkReviewIdx(int storeIdx,int reviewIdx) {
-        String query = "SELECT EXISTS (SELECT * FROM Review WHERE storeIdx=? AND reviewIds= ? limit 1)";
+        String query = "SELECT EXISTS (SELECT * FROM Review WHERE storeIdx=? AND reviewIdx= ? limit 1)";
 
         Object[] params = new Object[]{storeIdx,reviewIdx};
         return this.jdbcTemplate.queryForObject(query, int.class, params);
     }
 
 
-    //리뷰인덱스에 comment 넣기
-    public void reviewAnswer(PostReviewAnswerReq postReviewAnswerReq){
-        String query = "UPDATE Review SET comment = ? WHERE reviewIds= ?;";
+    //해당 리뷰인덱스에 comment 넣기(등록,수정)
+    public void reviewAnswer(ReviewAnswerReq reviewAnswerReq){
+        String query = "UPDATE Review SET comment = ? WHERE reviewIdx= ?;";
 
-        Object[] params = new Object[]{postReviewAnswerReq.getComment(),postReviewAnswerReq.getReviewIdx()};
+        Object[] params = new Object[]{reviewAnswerReq.getComment(),reviewAnswerReq.getReviewIdx()};
 
         this.jdbcTemplate.update(query,params);
     }
