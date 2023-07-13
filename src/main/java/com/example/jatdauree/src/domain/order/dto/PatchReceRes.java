@@ -4,15 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.io.Serializable;
-import java.util.List;
+import org.springframework.lang.Nullable;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetOrderProRes implements Serializable {
+public class PatchReceRes {
     private int storeIdx;
-    List<GetOrderItem> orderLists;
+    private int OrderNumber;
+
 }

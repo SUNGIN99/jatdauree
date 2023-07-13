@@ -78,9 +78,11 @@ public class MenuService {
             throw new BaseException(STORE_INGREDIENT_SAVE_ERROR); // 4033 : 원산지 등록에 실패하였습니다.
         }
 
-        // 3) 판매자 최초로그인, 가게등록여부 필드 변경 : 1, 1 -> 0, 0
+        // 3) 판매자 최초로그인,
+        // 판매자 가게등록여부 필드 변경 : 1, 1 -> 0, 0
         try {
             sellerDao.registerMenuNIngredient(sellerIdx);
+            storeDao.convertStoreOpen(storeIdx);
         } catch(Exception e){
             throw new BaseException(SELLER_ALL_REGISTER_COMPLETE_ERROR); // 4030 : 판매자의 최초로그인, 메뉴/원산지 등록이 완료되지 못하였습니다.
         }

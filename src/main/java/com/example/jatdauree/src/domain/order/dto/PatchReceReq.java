@@ -5,14 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetOrderProRes implements Serializable {
-    private int storeIdx;
-    List<GetOrderItem> orderLists;
+public class PatchReceReq {
+    private int orderIdx;
+    private String status;
+
 }

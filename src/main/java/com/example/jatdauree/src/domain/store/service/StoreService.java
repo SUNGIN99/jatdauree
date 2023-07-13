@@ -9,12 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.example.jatdauree.config.BaseResponseStatus.*;
 
@@ -34,73 +36,58 @@ public class StoreService {
         this.s3Client = s3Client;
     }
 
+    private String checkFileIsNull(MultipartFile files){
+        String absolutePath = "/home/ubuntu/s3tempImg/";
+
+        return files != null ? absolutePath + files.getOriginalFilename() : null;
+    }
 
     @Transactional(rollbackFor = BaseException.class)
     public PostStoreRes storeRegister(int sellerIdx, PostStoreReq postStoreReq) throws BaseException, IOException {
-        try{ // 0) 가게 중복 등록 방지
-            int storeRegistredCheck = storeDao.storeAlreadyRegister(sellerIdx);
-            if (storeRegistredCheck == 1){
-                throw new BaseException(DATABASE_ERROR);
-            }
-        }catch (Exception e){
-            throw new BaseException(DATABASE_ERROR);
+        //0) 가게 중복 등록 방지
+        int storeRegistredCheck = storeDao.storeAlreadyRegister(sellerIdx);
+        if (storeRegistredCheck == 1){
+            throw new BaseException(STORE_ALREADY_REGISTERD);
         }
 
         // 1) 가게 이미지 등록정보 URL 발생
-        ArrayList<String> fileNames = new ArrayList<>();
-        ArrayList<File> files = new ArrayList<>();
-        HashMap<String, File> fileHash = new HashMap<>();
+        String[] fileNames = new String[]{null, null, null, null, null};
+        File[] files = new File[]{null, null, null, null, null};
         try{
-            String absolutePath = "/home/ubuntu/s3tempImg/";
-            String fileNameTemp;
-            if (postStoreReq.getBusinessCertificateFile() != null) {//사업자 등록증 이미지파일
-                fileNameTemp = postStoreReq.getBusinessCertificateFile().getOriginalFilename();
-                fileHash.put(fileNameTemp, new File(absolutePath + fileNameTemp));
-                postStoreReq.getBusinessCertificateFile().transferTo(fileHash.get(fileNameTemp));
-            }
-            if (postStoreReq.getSellerCertificateFile() != null) {// 영업자 등록증 이미지 파일
-                fileNameTemp = postStoreReq.getSellerCertificateFile().getOriginalFilename();
-                fileHash.put(fileNameTemp, new File(absolutePath + fileNameTemp));
-                postStoreReq.getSellerCertificateFile().transferTo(fileHash.get(fileNameTemp));
-            }
-            if (postStoreReq.getCopyAccountFile() != null) {// 통장 사본 이미지 파일
-                fileNameTemp = postStoreReq.getCopyAccountFile().getOriginalFilename();
-                fileHash.put(fileNameTemp, new File(absolutePath + fileNameTemp));
-                postStoreReq.getCopyAccountFile().transferTo(fileHash.get(fileNameTemp));
-            }
-            if (postStoreReq.getStoreLogoFile() != null) {// 가게로고 이미지파일
-                fileNameTemp = postStoreReq.getStoreLogoFile().getOriginalFilename();
-                fileHash.put(fileNameTemp, new File(absolutePath + fileNameTemp));
-                postStoreReq.getStoreLogoFile().transferTo(fileHash.get(fileNameTemp));
-            }
-            if (postStoreReq.getSignFile() != null) {// 가게 간판 이미지 파일
-                fileNameTemp = postStoreReq.getSignFile().getOriginalFilename();
-                fileHash.put(fileNameTemp, new File(absolutePath + fileNameTemp));
-                postStoreReq.getSignFile().transferTo(fileHash.get(fileNameTemp));
-            }
+
+            fileNames[0] = checkFileIsNull(postStoreReq.getBusinessCertificateFile()); // 사업자 등록증 이미지파일
+            fileNames[1] = checkFileIsNull(postStoreReq.getSellerCertificateFile()); // 영업자 등록증 이미지 파일
+            fileNames[2] = checkFileIsNull(postStoreReq.getCopyAccountFile()); // 통장 사본 이미지 파일
+            fileNames[3] = checkFileIsNull(postStoreReq.getStoreLogoFile()); // 가게로고 이미지파일
+            fileNames[4] = checkFileIsNull(postStoreReq.getSignFile()); // 가게 간판 이미지 파일
+
+            // 보낼 이미지 생성
+            for (int i = 0; i<5 ; i++)
+                if (fileNames[i] != null)
+                    files[i] = new File(fileNames[i]);
+
         }catch (Exception e){
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(STORE_URL_POST_ERROR);
         }
 
         // 2) 가게 등록에 필요한 각 이미지 url 생성
-        ArrayList<String> urls = new ArrayList<>();
+        String[] urls = new String[]{null, null, null, null, null};
         try{
-            for (int i = 0; i<5; i++){
-                s3Client.putObject(new PutObjectRequest(bucketName, fileNames.get(i), files.get(i)));
-            }
-
-            for (int i = 0; i< 5; i++){
-                urls.add(""+s3Client.getUrl(bucketName, fileNames.get(i)));
+            for (int i = 0; i<5; i++) {
+                if (fileNames[i] != null) {
+                    s3Client.putObject(new PutObjectRequest(bucketName, fileNames[i], files[i]));
+                    urls[i] = "" + s3Client.getUrl(bucketName, fileNames[i]);
+                }
             }
 
         } catch (Exception e){
-            System.out.println("3: "+ e);
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(S3_ACCESS_API_ERROR);
         }
 
-        try{
+        try{ // url 저장
            return new PostStoreRes(storeDao.storeRegister(sellerIdx, postStoreReq, urls));
         } catch (Exception e){
+            System.out.println("2:" + e);
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -138,6 +125,29 @@ public class StoreService {
             return new PatchStoreInfoRes(storeIdx);
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    //가게영업종료
+    //1.등록된 가게가 맞는지 error ---> 2030 : 사용자의 가게가 등록되어있지 않습니다.
+    //(뺸 조건)가게 주인이 맞는지 ---> storeIdx로 sellerIdx를 조회해서 떨이 메뉴 테이블에서의 storeIdx와 동일한지 확인  error---> 사장님의 가게가 아닙니다. 다시 한번 선택한 가게를
+    //생각해보니 2번은 할 필요가 없는게 애초에 sellerIdx를 조회하면 storeIdx 조회 가능하니까 로그인한 사장님의 가게가 아닐 수 없음
+    //2.이미 영업종료가 됐는데 한번 더 눌렀을때--> 이미 영업 종료 되었습니다
+
+    public PatchStoreEndRes storeEnd(int sellerIdx) throws BaseException{
+        // 1) 사용자 가게 조회
+        int storeIdx;
+        try{
+            storeIdx = storeDao.storeIdxBySellerIdx(sellerIdx);
+        } catch (Exception e) {
+            throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
+
+        // 2) 가게에 등록된 오늘의 떨이 메뉴 모두 비활성화
+        try {
+            return new PatchStoreEndRes(storeDao.storeEnd(storeIdx));
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR); //값을 바꾸는데 실패
         }
     }
 

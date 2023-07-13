@@ -12,7 +12,13 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetOrderProRes implements Serializable {
+public class GetBillRes implements Serializable {
     private int storeIdx;
-    List<GetOrderItem> orderLists;
+    private int orderIdx;
+    private String orderDate;
+    private String paymentStatus;
+    private String pickUpTime;
+    private String request;
+    private List<OrderMenu> orderItem;
+
 }
