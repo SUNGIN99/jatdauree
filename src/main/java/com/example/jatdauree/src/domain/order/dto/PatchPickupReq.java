@@ -9,10 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostPickupReq {
-    private String uid;
-    private String password;
+public class PatchPickupReq {
     private int orderIdx;
-    private String status;
 
 }

@@ -91,6 +91,26 @@ public class StoreController {
         }
     }
 
+    /**
+     * 23.07.12 작성자 : 이윤채
+     * 가게 영업 종료
+     * Patch /jat/stores/end
+     * @param
+     * @return BaseResponse<patchStoreEndRes>
+     */
+    @ResponseBody
+    @PatchMapping ("/end")
+    public BaseResponse<PatchStoreEndRes> storeEnd() {
+        try {
+            int sellerIdx = jwtService.getUserIdx();
+            PatchStoreEndRes patchStoreEndRes = storeService.storeEnd(sellerIdx);    // 다오짜기
+            return new BaseResponse<>(patchStoreEndRes);
+        } catch (BaseException baseException){
+            //System.out.println(" RESPONSE_ERROR5 : " + baseException.getMessage());
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
+
 }
 
 

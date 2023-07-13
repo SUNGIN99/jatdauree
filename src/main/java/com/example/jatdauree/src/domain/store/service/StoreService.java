@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.example.jatdauree.config.BaseResponseStatus.*;
 
@@ -124,6 +125,29 @@ public class StoreService {
             return new PatchStoreInfoRes(storeIdx);
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    //가게영업종료
+    //1.등록된 가게가 맞는지 error ---> 2030 : 사용자의 가게가 등록되어있지 않습니다.
+    //(뺸 조건)가게 주인이 맞는지 ---> storeIdx로 sellerIdx를 조회해서 떨이 메뉴 테이블에서의 storeIdx와 동일한지 확인  error---> 사장님의 가게가 아닙니다. 다시 한번 선택한 가게를
+    //생각해보니 2번은 할 필요가 없는게 애초에 sellerIdx를 조회하면 storeIdx 조회 가능하니까 로그인한 사장님의 가게가 아닐 수 없음
+    //2.이미 영업종료가 됐는데 한번 더 눌렀을때--> 이미 영업 종료 되었습니다
+
+    public PatchStoreEndRes storeEnd(int sellerIdx) throws BaseException{
+        // 1) 사용자 가게 조회
+        int storeIdx;
+        try{
+            storeIdx = storeDao.storeIdxBySellerIdx(sellerIdx);
+        } catch (Exception e) {
+            throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
+
+        // 2) 가게에 등록된 오늘의 떨이 메뉴 모두 비활성화
+        try {
+            return new PatchStoreEndRes(storeDao.storeEnd(storeIdx));
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR); //값을 바꾸는데 실패
         }
     }
 

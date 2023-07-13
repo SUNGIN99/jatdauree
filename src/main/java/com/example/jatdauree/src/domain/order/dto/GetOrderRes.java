@@ -5,11 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetOrderRes {
+public class GetOrderRes implements Serializable {
 
     private int orderIdx;
     private String store_name;
@@ -23,7 +26,7 @@ public class GetOrderRes {
     private String request;
     private String payment_status;
     private String status;
-    //ArrayList<MenuList> menuLists;
+    private List<OrderMenu> menuLists;
 
 
 }

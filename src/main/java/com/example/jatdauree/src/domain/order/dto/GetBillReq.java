@@ -9,10 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostOrderCancelReq {
-    private String uid;
-    private String password;
-    private int orderIdx;
-    private String status;
-
+public class GetBillReq {
+    int orderIdx;
 }
