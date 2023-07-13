@@ -44,6 +44,7 @@ public enum BaseResponseStatus {
     STORE_MAINMENU_DATA_UNVALID(false, 2031, "메인 메뉴 등록 정보가 올바르지 않습니다."),
     STORE_SIDEMENU_DATA_UNVALID(false, 2032, "사이드 메뉴 등록 정보가 올바르지 않습니다."),
     STORE_INGREDIENT_DATA_UNVALID(false, 2033, "원산지 등록 정보가 올바르지 않습니다."),
+    STORE_ALREADY_REGISTERD(false, 2034, "가게 등록 요청을 이미 하였습니다(메뉴 등록 또는 관리자의 승인을 기다리세요)."),
 
     // 2040~) 오늘의 떨이메뉴 등록 요청
     POST_TODAY_MAINMENU_DATA_UNVALID(false, 2041, "오늘의 떨이메뉴(메인) 등록 정보가 올바르지 않습니다."),
@@ -85,6 +86,7 @@ public enum BaseResponseStatus {
     STORE_INGREDIENT_SAVE_ERROR(false, 4033, "원산지 등록에 실패하였습니다."),
     STORE_MENU_ALREADY_SAVED(false, 4034, "메뉴등록이 이미 이루어진 판매자입니다."),
     STORE_REGISTER_NOT_PERMITTED(false, 4035, "관리자에게 가게 승인되지 않은 판매자 계정입니다."),
+    STORE_URL_POST_ERROR(false, 4034, "등록하는 이미지의 형태가 잘못 처리되었습니다."),
 
     // 4040~) 오늘의 떨이메뉴 등록
     POST_TODAY_MAINMENU_SAVE_ERROR(false, 4041, "오늘의 떨이메뉴(메인) 등록에 실패하였습니다."),
@@ -97,7 +99,10 @@ public enum BaseResponseStatus {
     COOLSMS_API_ERROR(false, 5010, "SMS 인증번호 발송을 실패하였습니다."),
 
     // 결제
-    BILLING_API_ERROR(false,5020, "결제 실패입니다.");
+    BILLING_API_ERROR(false,5020, "결제 실패입니다."),
+
+    // s3
+    S3_ACCESS_API_ERROR(false,5030, "이미지 url 생성에 실패하였습니다.");
 
     // 6000 : 필요시 만들어서 쓰세요
     private final boolean isSuccess;

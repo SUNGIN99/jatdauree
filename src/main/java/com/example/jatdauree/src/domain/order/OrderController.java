@@ -1,9 +1,9 @@
-package com.example.jatdauree.src.domain.order_chae;
+package com.example.jatdauree.src.domain.order;
 
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.BaseResponse;
-import com.example.jatdauree.src.domain.order_da.dto.*;
-import com.example.jatdauree.src.domain.order_da.service.OrderService;
+import com.example.jatdauree.src.domain.order.dto.*;
+import com.example.jatdauree.src.domain.order.service.OrderService;
 import com.example.jatdauree.utils.jwt.JwtService;
 import com.example.jatdauree.utils.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,15 +18,12 @@ public class OrderController {
     @Autowired
     private final OrderService ordersService;
     @Autowired
-    private final JwtTokenProvider jwtTokenProvider;
-    @Autowired
     private final JwtService jwtService;
 
 
     @Autowired
-    public OrderController(OrderService ordersService, JwtTokenProvider jwtTokenProvider, JwtService jwtService){
+    public OrderController(OrderService ordersService, JwtService jwtService){
         this.ordersService = ordersService;
-        this.jwtTokenProvider = jwtTokenProvider;
         this.jwtService = jwtService;
     }
 
@@ -53,20 +50,39 @@ public class OrderController {
      * OrderController-2
      * 23.07.06 작성자 : 윤다은
      * 주문화면 - 주문취소/처리 중
-     * Post /jat/orders/cancel
+     * PATCH /jat/orders/receive
      * JWT 적용해서 sellerIdx 가져오고 UPDATE를 통해서 status 수정하기
      */
     @ResponseBody
-    @PostMapping("/cancel")
-    public BaseResponse<String>updateOrder(@RequestBody PostOrderCancelReq postOrderCancelReq){
+    @PatchMapping("/receive")
+    public BaseResponse<PatchReceRes> patchRecBySellerIdx(@RequestBody PatchReceReq patchReceReq){
         try{
             int sellerIdx = jwtService.getUserIdx();
-            ordersService.postOrderBySellerId(sellerIdx,postOrderCancelReq);
-            return new BaseResponse<>("Order update successfuly.");
+            PatchReceRes patchReceRes =ordersService.patchRecBySellerIdx(sellerIdx,patchReceReq);
+            return new BaseResponse<>(patchReceRes);
         }catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());
         }
     }
+
+    /**
+     * OrderController -3
+     * 23.07.11 작성자 : 윤다은
+     * 주문표 인쇄하기
+     * GET /jat/orders/bills
+     * */
+    @ResponseBody
+    @GetMapping("/bills")
+    public BaseResponse<GetBillRes> getBillsByOrderIdx(@RequestBody GetBillReq getBillReq){
+        try{
+            int sellerIdx = jwtService.getUserIdx();
+            GetBillRes getBillRes = ordersService.getBillsByOrderIdx(sellerIdx, getBillReq);
+            return new BaseResponse<>(getBillRes);
+        }catch (BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
+
 
     /**
      * OrderController -4
@@ -76,29 +92,24 @@ public class OrderController {
      * */
     @ResponseBody
     @GetMapping("/process")
-    public BaseResponse<List<GetOrderProRes>> outputProcess(@RequestBody GetOrderReq getOrderReq){
+    public BaseResponse<GetOrderProRes> getProcessOrder(){
         try{
             int sellerIdx = jwtService.getUserIdx();
-            List<GetOrderProRes> getOrderProRes = ordersService.getOrderProBySellerIdx(sellerIdx);
+            GetOrderProRes getOrderProRes = ordersService.getProcessOrder(sellerIdx);
             return new BaseResponse<>(getOrderProRes);
         }catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());
         }
     }
 
-    /**
-     * OrderController -5
-     * 23.07.07 작성자 : 윤다은
-     * 픽업 완료( main page -3 처리 중 상태를 픽업 완료)
-     * POST /jat/orders/pickup
-     */
     @ResponseBody
-    @PostMapping("/pickup")
-    public BaseResponse<String> pickupOrder(@RequestBody PostPickupReq postPickupReq){
+    @PatchMapping("/pickup")
+    public BaseResponse<PatchPickupRes> pickupOrder(@RequestBody PatchPickupReq pathchPickupReq){
         try{
             int sellerIdx = jwtService.getUserIdx();
-            ordersService.postPickupBysellerIdx(sellerIdx,postPickupReq);
-            return new BaseResponse<>("pickup successfuly");
+
+            PatchPickupRes patchPickupRes = ordersService.pickupOrder(sellerIdx,pathchPickupReq);
+            return new BaseResponse<>(patchPickupRes);
         }catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());
         }

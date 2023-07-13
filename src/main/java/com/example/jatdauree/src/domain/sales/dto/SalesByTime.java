@@ -1,4 +1,4 @@
-package com.example.jatdauree.src.domain.order_chae.dto;
+package com.example.jatdauree.src.domain.sales.dto;
 
 
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MenuList implements Serializable {
-    private String menu_name;
-    private String cnt;
+public class SalesByTime implements Serializable {
+    private String time;
+    private int totalSalesPriceInTime;
 }

@@ -1,5 +1,4 @@
-package com.example.jatdauree.src.domain.order_da.dto;
-
+package com.example.jatdauree.src.domain.order.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,12 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MenuList implements Serializable {
-    private String menu_name;
-    private String cnt;
+public class GetOrderProRes implements Serializable {
+    private int storeIdx;
+    List<GetOrderItem> orderLists;
 }

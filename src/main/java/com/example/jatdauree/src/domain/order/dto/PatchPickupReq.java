@@ -1,4 +1,4 @@
-package com.example.jatdauree.src.domain.order_da.dto;
+package com.example.jatdauree.src.domain.order.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,10 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostPickupReq {
-    private String uid;
-    private String password;
+public class PatchPickupReq {
     private int orderIdx;
-    private String status;
 
 }

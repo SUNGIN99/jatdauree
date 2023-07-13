@@ -1,17 +1,19 @@
-package com.example.jatdauree.src.domain.order_chae.dto;
+package com.example.jatdauree.src.domain.order.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetOrderProRes {
+public class GetOrderRes implements Serializable {
 
-    //private int OrderNumber;
     private int orderIdx;
     private String store_name;
     private String uid;
@@ -24,7 +26,7 @@ public class GetOrderProRes {
     private String request;
     private String payment_status;
     private String status;
-
+    private List<OrderMenu> menuLists;
 
 
 }

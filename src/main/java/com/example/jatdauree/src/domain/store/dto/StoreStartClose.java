@@ -1,4 +1,4 @@
-package com.example.jatdauree.src.domain.order_da.dto;
+package com.example.jatdauree.src.domain.store.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetOrderReq {
-    private String uid;
-    private String password;
-
+public class StoreStartClose {
+    private String store_open;
+    private String store_close;
 }
