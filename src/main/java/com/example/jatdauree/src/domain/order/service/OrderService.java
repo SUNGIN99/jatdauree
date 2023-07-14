@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.example.jatdauree.config.BaseResponseStatus.DATABASE_ERROR;
@@ -35,14 +37,54 @@ public class OrderService {
             throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
 
+        // 2) 주문관련된 정보 모두 가져오기
+        // 주문Idx, 주문/픽업 시간, 요청사항, 총 결제금액, 결제상태, 메뉴이름, 총 가격
+        List<GetOrderItemRes> getOrdersResList;
         try {
-            List<GetOrderRes> getOrdersResList = orderDao.getOrdersByStoreIdx(storeIdx);
-            return getOrdersResList;
+            getOrdersResList = orderDao.getOrdersByStoreIdx(storeIdx);
+        } catch (Exception e){
+            throw new BaseException(BaseResponseStatus.RESPONSE_ERROR); // 주문 대기 조회에 실패하였습니다.
         }
-        catch (Exception exception){
-            System.out.println(exception);
-            throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);
+
+        // 3) 주문관련 정보 조합하기
+        HashMap<Integer, GetOrderRes> orderHash = new HashMap<Integer, GetOrderRes>();
+        try{
+            for(GetOrderItemRes orders : getOrdersResList){
+                if (!orderHash.containsKey(orders.getOrderIdx())){
+                    GetOrderRes orderInfo = new GetOrderRes(
+                            orders.getOrderIdx(),
+                            orders.getOrderTime(),
+                            orders.getPickUpTime(),
+                            orders.getRequest(),
+                            1, // 주문당 메뉴 종류 개수 1 로 시작
+                            orders.getTotalPrice(),
+                            orders.getPayStatus(),
+                            new ArrayList<>()
+                    );
+                    // 메뉴 목록 리스트 추가
+                    orderInfo.getOrderItem().add(new OrderMenuCntPrirce(orders.getMenuName(), orders.getMenuCount(), orders.getDiscountedPrice()));
+
+                    orderHash.put(orders.getOrderIdx(), orderInfo);
+
+                }else{
+                    // 주문 내 메뉴 개수 1 증가
+                    orderHash.get(orders.getOrderIdx())
+                            .setMenuDiverse(orderHash.get(orders.getOrderIdx()).getMenuDiverse() + 1);
+
+                    // 총 주문 가격 합산
+                    orderHash.get(orders.getOrderIdx())
+                            .setTotalPrice(orderHash.get(orders.getOrderIdx()).getTotalPrice() + orders.getTotalPrice());
+
+                    // 메뉴 이름, 개수목록 추가
+                    orderHash.get(orders.getOrderIdx())
+                            .getOrderItem().add(new OrderMenuCntPrirce(orders.getMenuName(), orders.getMenuCount(), orders.getDiscountedPrice()));
+                }
+            }
+        }catch (Exception e){
+            throw new BaseException(BaseResponseStatus.RESPONSE_ERROR); // 주문 대기 목록을 처리하는데 실패하였습니다.
         }
+
+        return new ArrayList<>(orderHash.values());
     }
 
     @Transactional(rollbackFor = BaseException.class)

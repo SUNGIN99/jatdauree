@@ -40,6 +40,7 @@ public class OrderController {
         try{
             int sellerIdx = jwtService.getUserIdx();
             List<GetOrderRes> getOrdersRes = ordersService.getOrdersBySellerId(sellerIdx);
+            
             return new BaseResponse<>(getOrdersRes);
         }catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());

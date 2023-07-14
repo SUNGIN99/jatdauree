@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderMenu implements Serializable {
+public class OrderMenuCnt implements Serializable {
     private String menuName;
     private int menuCnt;
 }

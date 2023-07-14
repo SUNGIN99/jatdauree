@@ -12,14 +12,15 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetOrderRes implements Serializable {
+public class GetOrderItemRes implements Serializable {
 
     private int orderIdx;
     private String orderTime;
     private String pickUpTime;
     private String request;
-    private int menuDiverse;
     private int totalPrice;
     private String payStatus;
-    private List<OrderMenuCntPrirce> orderItem;
+    private String menuName;
+    private int menuCount;
+    private int discountedPrice;
 }

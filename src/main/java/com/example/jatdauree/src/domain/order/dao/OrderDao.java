@@ -21,36 +21,39 @@ public class OrderDao {
      * 23.07.06 작성자 : 윤다은
      * storeIdx로 상태가 'W'인 Orders 조회하기
      */
-    public List<GetOrderRes> getOrdersByStoreIdx(int storeIdx){
+    public List<GetOrderItemRes> getOrdersByStoreIdx(int storeIdx){
         String OrdersQuery ="SELECT\n" +
                 "    *\n" +
-                "FROM(SELECT O.orderIdx,S.store_name,C.uid,O.order_time,OL.cnt, SUM(OL.cnt * M.price) AS total_price,\n" +
-                "      M.menu_name,OL.cnt,\n" +
-                "       O.pickup_time,O.request,O.payment_status,O.status\n" +
-                "FROM OrderLists OL\n" +
-                "LEFT JOIN Orders O on OL.orderIdx = O.orderIdx\n" +
-                "LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
-                "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
-                "LEFT JOIN Stores S on O.storeIdx = S.storeIdx\n" +
-                "LEFT JOIN Customers C on O.customerIdx = C.customerIdx\n" +
-                "WHERE sellerIdx = ? AND O.status = 'W'\n" +
-                "GROUP BY O.orderIdx, OL.orderlistIdx) R\n" +
-                "ORDER BY R.order_time;";
+                "FROM(\n" +
+                "    SELECT O.orderIdx, O.order_time, O.pickup_time,\n" +
+                "           O.request, SUM(OL.cnt * TM.price) AS total_price,\n" +
+                "           O.payment_status,\n" +
+                "           M.menu_name,\n" +
+                "           M.price as menu_price,\n" +
+                "           TM.discount,\n" +
+                "           TM.price as today_menu_price,\n" +
+                "           OL.cnt,\n" +
+                "           O.status,\n" +
+                "           C.customerIdx\n" +
+                "    FROM OrderLists OL\n" +
+                "    LEFT JOIN Orders O on OL.orderIdx = O.orderIdx\n" +
+                "    LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
+                "    LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
+                "    LEFT JOIN Customers C on O.customerIdx = C.customerIdx\n" +
+                "    WHERE O.storeIdx = ? AND O.status = 'W'\n" +
+                "    GROUP BY O.orderIdx, OL.orderlistIdx) R\n" +
+                "    ORDER BY R.order_time;";
         return this.jdbcTemplate.query(OrdersQuery,
-                (rs, rowNum) -> new GetOrderRes(
+                (rs, rowNum) -> new GetOrderItemRes(
                         rs.getInt("orderIdx"),
-                        rs.getString("store_name"),
-                        rs.getString("uid"),
                         rs.getString("order_time"),
-                        rs.getInt("total_menu"),
-                        rs.getInt("total_price"),
-                        rs.getString("menu_name"),
-                        rs.getString("cnt"),
                         rs.getString("pickup_time"),
                         rs.getString("request"),
+                        rs.getInt("total_price"),
                         rs.getString("payment_status"),
-                        rs.getString("status"),
-                        null
+                        rs.getString("menu_name"),
+                        rs.getInt("cnt"),
+                        rs.getInt("today_menu_price")
                 ), storeIdx);
     }
 
@@ -100,7 +103,7 @@ public class OrderDao {
 
     }
 
-    public List<OrderMenu> getOrderMenus(int storeIdx, int orderIdx){
+    public List<OrderMenuCnt> getOrderMenus(int storeIdx, int orderIdx){
         String query = "SELECT M.menu_name, OL.cnt\n" +
                 "FROM Orders O\n" +
                 "LEFT JOIN  OrderLists OL on OL.orderIdx = O.orderIdx\n" +
@@ -109,7 +112,7 @@ public class OrderDao {
                 "WHERE O.orderIdx = ?\n" +
                 "ORDER BY O.orderIdx;";   //join 할 때 큰 것에서 작은 것으로 join하기
         return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new OrderMenu(
+                (rs, rowNum) -> new OrderMenuCnt(
                         rs.getString("menu_name"),
                         rs.getInt("cnt")
                 ), orderIdx);
@@ -147,7 +150,7 @@ public class OrderDao {
 
     }
 
-    public List<OrderMenu> orderItem(int storeIdx, int orderIdx) {
+    public List<OrderMenuCnt> orderItem(int storeIdx, int orderIdx) {
         String query = "SELECT M.menu_name, OL.cnt\n" +
                 "FROM OrderLists OL\n" +
                 "LEFT JOIN Orders O ON OL.orderIdx = O.orderIdx\n" +
@@ -164,7 +167,7 @@ public class OrderDao {
         };
 
         return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new OrderMenu(
+                (rs, rowNum) -> new OrderMenuCnt(
                         rs.getString("menu_name"),
                         rs.getInt("cnt")
                 ),params);

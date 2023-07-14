@@ -19,6 +19,6 @@ public class GetBillRes implements Serializable {
     private String paymentStatus;
     private String pickUpTime;
     private String request;
-    private List<OrderMenu> orderItem;
+    private List<OrderMenuCnt> orderItem;
 
 }

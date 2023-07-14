@@ -22,5 +22,5 @@ public class GetOrderItem implements Serializable {
     private int orderCount;
     private int totalPrice;
     private String payStatus;
-    @Nullable  List<OrderMenu> orderItems;
+    @Nullable  List<OrderMenuCnt> orderItems;
 }
