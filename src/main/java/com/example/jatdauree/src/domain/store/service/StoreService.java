@@ -5,18 +5,18 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.src.domain.store.dao.StoreDao;
 import com.example.jatdauree.src.domain.store.dto.*;
+import com.example.jatdauree.utils.UtilNanoTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static com.example.jatdauree.config.BaseResponseStatus.*;
 
@@ -36,10 +36,37 @@ public class StoreService {
         this.s3Client = s3Client;
     }
 
-    private String checkFileIsNull(MultipartFile files){
-        String absolutePath = "/home/ubuntu/s3tempImg/";
+    private String checkFileIsNullThenName(MultipartFile files){
+        //String absolutePath = "/home/ubuntu/s3tempImg/";
+        String absolutePath = "C:\\Users\\d\\Desktop\\s3\\s3Save\\";
 
-        return files != null ? absolutePath + files.getOriginalFilename() : null;
+        long nanos = UtilNanoTime.currentTimeNanos();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+
+        String fileNanoName = sdf.format(nanos/1000000L);
+
+        if(!files.isEmpty()){
+            String contentType = files.getContentType();
+            String originalFileExtension;
+
+            if (ObjectUtils.isEmpty(contentType)){
+                return null;
+            }
+            else{
+                if (contentType.contains("image/jpeg"))
+                    originalFileExtension = ".jpg";
+                else if (contentType.contains("image/png"))
+                    originalFileExtension = ".png";
+                else if (contentType.contains("image/gif"))
+                    originalFileExtension = ".gif";
+                else
+                    return null;
+
+                return absolutePath + fileNanoName + System.nanoTime() + originalFileExtension;
+            }
+        }
+        return null;
     }
 
     @Transactional(rollbackFor = BaseException.class)
@@ -55,19 +82,36 @@ public class StoreService {
         File[] files = new File[]{null, null, null, null, null};
         try{
 
-            fileNames[0] = checkFileIsNull(postStoreReq.getBusinessCertificateFile()); // 사업자 등록증 이미지파일
-            fileNames[1] = checkFileIsNull(postStoreReq.getSellerCertificateFile()); // 영업자 등록증 이미지 파일
-            fileNames[2] = checkFileIsNull(postStoreReq.getCopyAccountFile()); // 통장 사본 이미지 파일
-            fileNames[3] = checkFileIsNull(postStoreReq.getStoreLogoFile()); // 가게로고 이미지파일
-            fileNames[4] = checkFileIsNull(postStoreReq.getSignFile()); // 가게 간판 이미지 파일
+            fileNames[0] = checkFileIsNullThenName(postStoreReq.getBusinessCertificateFile()); // 사업자 등록증 이미지파일
+            fileNames[1] = checkFileIsNullThenName(postStoreReq.getSellerCertificateFile()); // 영업자 등록증 이미지 파일
+            fileNames[2] = checkFileIsNullThenName(postStoreReq.getCopyAccountFile()); // 통장 사본 이미지 파일
+            fileNames[3] = checkFileIsNullThenName(postStoreReq.getStoreLogoFile()); // 가게로고 이미지파일
+            fileNames[4] = checkFileIsNullThenName(postStoreReq.getSignFile()); // 가게 간판 이미지 파일
 
             // 보낼 이미지 생성
             for (int i = 0; i<5 ; i++)
-                if (fileNames[i] != null)
+                if (fileNames[i] != null) {
                     files[i] = new File(fileNames[i]);
-
+                    System.out.println(fileNames[i] +": "+ files[i]);
+                }
         }catch (Exception e){
-            throw new BaseException(STORE_URL_POST_ERROR);
+            throw new BaseException(STORE_URL_POST_ERROR); // 4034: 등록하는 이미지의 형태가 잘못 처리되었습니다.
+        }
+
+        // 실제 파일 생성
+        try{
+            if (files[0] != null)
+                postStoreReq.getBusinessCertificateFile().transferTo(files[0]);
+            if (files[1] != null)
+                postStoreReq.getSellerCertificateFile().transferTo(files[1]);
+            if (files[2] != null)
+                postStoreReq.getCopyAccountFile().transferTo(files[2]);
+            if (files[3] != null)
+                postStoreReq.getStoreLogoFile().transferTo(files[3]);
+            if (files[4] != null)
+                postStoreReq.getSignFile().transferTo(files[4]);
+        }catch (Exception e){
+            throw new BaseException(STORE_URL_POST_ERROR); // 4034: 등록하는 이미지의 형태가 잘못 처리되었습니다.
         }
 
         // 2) 가게 등록에 필요한 각 이미지 url 생성
@@ -77,17 +121,17 @@ public class StoreService {
                 if (fileNames[i] != null) {
                     s3Client.putObject(new PutObjectRequest(bucketName, fileNames[i], files[i]));
                     urls[i] = "" + s3Client.getUrl(bucketName, fileNames[i]);
+                    files[i].delete();
                 }
             }
-
         } catch (Exception e){
-            throw new BaseException(S3_ACCESS_API_ERROR);
+            System.out.println(e);
+            throw new BaseException(S3_ACCESS_API_ERROR); // 5030 : 이미지 url 생성에 실패하였습니다.
         }
 
         try{ // url 저장
            return new PostStoreRes(storeDao.storeRegister(sellerIdx, postStoreReq, urls));
         } catch (Exception e){
-            System.out.println("2:" + e);
             throw new BaseException(DATABASE_ERROR);
         }
     }
