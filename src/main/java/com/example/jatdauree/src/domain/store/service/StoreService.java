@@ -31,6 +31,9 @@ public class StoreService {
 
     private AmazonS3 s3Client;
 
+    //private static String absolutePath = "/home/ubuntu/s3tempImg/";
+    private static String absolutePath = "C:\\Users\\d\\Desktop\\s3\\s3Save\\";
+
     @Autowired
     public StoreService(StoreDao storeDao, AmazonS3 s3Client) {
         this.storeDao = storeDao;
@@ -43,9 +46,6 @@ public class StoreService {
     }
 
     private String checkFileIsNullThenName(MultipartFile files){
-        //String absolutePath = "/home/ubuntu/s3tempImg/";
-        String absolutePath = "C:\\Users\\d\\Desktop\\s3\\s3Save\\";
-
         long nanos = UtilNanoTime.currentTimeNanos();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
@@ -69,7 +69,7 @@ public class StoreService {
                 else
                     return null;
 
-                return absolutePath + fileNanoName + System.nanoTime() + originalFileExtension;
+                return fileNanoName + System.nanoTime() + originalFileExtension;
             }
         }
         return null;
@@ -97,7 +97,7 @@ public class StoreService {
             // 보낼 이미지 생성
             for (int i = 0; i<5 ; i++)
                 if (fileNames[i] != null) {
-                    files[i] = new File(fileNames[i]);
+                    files[i] = new File(absolutePath + fileNames[i]);
                     System.out.println(fileNames[i] +": "+ files[i]);
                 }
         }catch (Exception e){
@@ -153,12 +153,19 @@ public class StoreService {
         // 2) 판매자의 가게 Idx로 가게 기본정보 조회
         try{
             GetStoreInfoRes getStoreInfoRes =  storeDao.getStoreInfo(storeIdx);
-            String s3StoreLogoFileName = ""+s3Client.getUrl(bucketName, getStoreInfoRes.getStoreLogoUrl());
-            String s3StoreSignFileName = ""+s3Client.getUrl(bucketName, getStoreInfoRes.getSignUrl());
-            System.out.println(s3StoreSignFileName);
-            System.out.println(s3StoreLogoFileName);
-            getStoreInfoRes.setStoreLogoUrl(s3StoreLogoFileName);
-            getStoreInfoRes.setSignUrl(s3StoreSignFileName);
+            String s3StoreLogoFileName, s3StoreSignFileName ;
+
+            if(!getStoreInfoRes.getStoreLogoUrl().equals("")){
+                s3StoreLogoFileName = ""+s3Client.getUrl(bucketName, getStoreInfoRes.getStoreLogoUrl());
+                getStoreInfoRes.setStoreLogoUrl(s3StoreLogoFileName);
+                getStoreInfoRes.setStoreLogoUrl(s3StoreLogoFileName);
+            }
+
+            if(!getStoreInfoRes.getStoreLogoUrl().equals("")){
+                s3StoreSignFileName = ""+s3Client.getUrl(bucketName, getStoreInfoRes.getSignUrl());
+                getStoreInfoRes.setSignUrl(s3StoreSignFileName);
+            }
+
             return  getStoreInfoRes;
         }catch (Exception e){
             throw new BaseException(DATABASE_ERROR);
@@ -175,18 +182,61 @@ public class StoreService {
             throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
 
-        /*// 2) 파일 url 존재 확인
-        List<String> fileNames;
+        // 2) 파일 url 존재 확인
+        SavedFileNames savedFileNames;
         try{
-            fileNames = storeDao.getS3FileNames(storeIdx);
+            // 서버에 등록되어있는 로고와 간판 이미지 파일 확인
+            savedFileNames = storeDao.getS3FileNames(storeIdx);
+
+            // *이미 서버에 로고와 간판 파일이 등록되어 있지 않다면? 새로 등록해야함 (새로운 파일이름)*
+            // 1- 로고 수정요청이 있고, 서버에 등록이 되지 않은 경우 = 새로운 파일명 생성
+            if(patchStoreInfoReq.getStoreLogoUrl()!= null && savedFileNames.getLogoFileName() == null){
+                savedFileNames.setLogoFileName(checkFileIsNullThenName(patchStoreInfoReq.getStoreLogoUrl()));
+            }
+            // 2- 간판 수정 요청이 있고, 서버에 등록이 되지 않은 경우 = 새로운 파일명 생성
+            // 간판 새로운 이미지 등록 수정 요청일 경우 && 서버에 수정요청이 이미지를 새로운 등록을 하는 경우
+            if(patchStoreInfoReq.getSignUrl()!= null && savedFileNames.getSignFileName() == null){
+                savedFileNames.setSignFileName(checkFileIsNullThenName(patchStoreInfoReq.getSignUrl()));
+            }
+
+            // 2- 로고 수정요청이 있고, 서버에 이미 등록이 되어있는 경우 = 기존 서버에 저장된 파일명 이용
+            // 3- 로고 수정요청이 없고, 서버에 이미 등록이 되어있는 경우 = 기존 서버에 저장된 파일명 이용
+            // 4- 로고 수정요청이 없고, 서버에 등록이 되지 않은 경우  = 기존 서버에 저장된 파일 명 이용
         }catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
-        }*/
+        }
+
+        // 파일 생성
+        File logoFile = null, signFile = null;
+        try{
+            if(savedFileNames.getLogoFileName() != null)
+                logoFile = new File(absolutePath + savedFileNames.getLogoFileName());
+            if(savedFileNames.getSignFileName() != null)
+                signFile = new File(absolutePath + savedFileNames.getSignFileName());
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        // s3 파일 보낼준비 및 S3 URL 생성 요청
+        try{
+            if(logoFile != null) {
+                patchStoreInfoReq.getStoreLogoUrl().transferTo(logoFile);
+                s3Client.putObject(new PutObjectRequest(bucketName, savedFileNames.getLogoFileName(), logoFile));
+                logoFile.delete();
+            }
+            if(signFile != null) {
+                patchStoreInfoReq.getSignUrl().transferTo(signFile);
+                s3Client.putObject(new PutObjectRequest(bucketName, savedFileNames.getSignFileName(), signFile));
+                signFile.delete();
+            }
+        } catch (Exception e){
+            throw new BaseException(S3_ACCESS_API_ERROR); // 5030 : 이미지 url 생성에 실패하였습니다.
+        }
 
 
         // 2) 가게 정보 수정
         try {
-            storeDao.storeUpdate(storeIdx, patchStoreInfoReq);
+            storeDao.storeUpdate(storeIdx, patchStoreInfoReq, savedFileNames);
             return new PatchStoreInfoRes(storeIdx);
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);

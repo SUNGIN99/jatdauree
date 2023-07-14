@@ -135,7 +135,7 @@ public class StoreDao {
      * 23.07.07 작성자 : 이윤채, 김성인
      * 가게수정
      */
-    public void storeUpdate(int storeIdx, PatchStoreInfoReq patchStoreInfoReq){
+    public void storeUpdate(int storeIdx, PatchStoreInfoReq patchStoreInfoReq, SavedFileNames savedFileNames){
         String query= "UPDATE Stores " +
                 "SET store_name = ?," +
                 "business_phone = ?," +
@@ -155,8 +155,8 @@ public class StoreDao {
                 patchStoreInfoReq.getStoreOpen(),
                 patchStoreInfoReq.getStoreClose(),
                 patchStoreInfoReq.getStorePhone(),
-                patchStoreInfoReq.getStoreLogoUrl(),
-                patchStoreInfoReq.getSignUrl(),
+                savedFileNames.getLogoFileName(),
+                savedFileNames.getSignFileName(),
                 storeIdx
         };
         this.jdbcTemplate.update(query, params);
@@ -203,6 +203,16 @@ public class StoreDao {
         String duplicateCheck = "SELECT EXISTS(SELECT storeIdx FROM Stores WHERE store_name = ?)";
 
         return this.jdbcTemplate.queryForObject(duplicateCheck, int.class, storeName);
+    }
+
+    public SavedFileNames getS3FileNames(int storeIdx) {
+        String query = "SELECT store_logo_url, sign_url FROM Stores WHERE storeIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new SavedFileNames(
+                        rs.getString("store_logo_url"),
+                        rs.getString("sign_url")
+                ), storeIdx);
     }
 }
 
