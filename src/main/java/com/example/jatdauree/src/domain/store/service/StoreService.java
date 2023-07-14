@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import static com.example.jatdauree.config.BaseResponseStatus.*;
 
@@ -34,6 +35,11 @@ public class StoreService {
     public StoreService(StoreDao storeDao, AmazonS3 s3Client) {
         this.storeDao = storeDao;
         this.s3Client = s3Client;
+    }
+
+    public StoreNameDupRes storeNameDuplicate(String storeName) {
+        int check = storeDao.storeNameDuplicate(storeName);
+        return new StoreNameDupRes(check);
     }
 
     private String checkFileIsNullThenName(MultipartFile files){
@@ -69,7 +75,7 @@ public class StoreService {
         return null;
     }
 
-    @Transactional(rollbackFor = BaseException.class)
+    @Transactional(rollbackFor = {BaseException.class, IOException.class})
     public PostStoreRes storeRegister(int sellerIdx, PostStoreReq postStoreReq) throws BaseException, IOException {
         //0) 가게 중복 등록 방지
         int storeRegistredCheck = storeDao.storeAlreadyRegister(sellerIdx);
@@ -125,12 +131,11 @@ public class StoreService {
                 }
             }
         } catch (Exception e){
-            System.out.println(e);
             throw new BaseException(S3_ACCESS_API_ERROR); // 5030 : 이미지 url 생성에 실패하였습니다.
         }
 
         try{ // url 저장
-           return new PostStoreRes(storeDao.storeRegister(sellerIdx, postStoreReq, urls));
+           return new PostStoreRes(storeDao.storeRegister(sellerIdx, postStoreReq, fileNames));
         } catch (Exception e){
             throw new BaseException(DATABASE_ERROR);
         }
@@ -147,7 +152,14 @@ public class StoreService {
 
         // 2) 판매자의 가게 Idx로 가게 기본정보 조회
         try{
-            return storeDao.getStoreInfo(storeIdx);
+            GetStoreInfoRes getStoreInfoRes =  storeDao.getStoreInfo(storeIdx);
+            String s3StoreLogoFileName = ""+s3Client.getUrl(bucketName, getStoreInfoRes.getStoreLogoUrl());
+            String s3StoreSignFileName = ""+s3Client.getUrl(bucketName, getStoreInfoRes.getSignUrl());
+            System.out.println(s3StoreSignFileName);
+            System.out.println(s3StoreLogoFileName);
+            getStoreInfoRes.setStoreLogoUrl(s3StoreLogoFileName);
+            getStoreInfoRes.setSignUrl(s3StoreSignFileName);
+            return  getStoreInfoRes;
         }catch (Exception e){
             throw new BaseException(DATABASE_ERROR);
         }
@@ -162,6 +174,15 @@ public class StoreService {
         } catch (Exception e) {
             throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
+
+        /*// 2) 파일 url 존재 확인
+        List<String> fileNames;
+        try{
+            fileNames = storeDao.getS3FileNames(storeIdx);
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }*/
+
 
         // 2) 가게 정보 수정
         try {
@@ -194,5 +215,6 @@ public class StoreService {
             throw new BaseException(DATABASE_ERROR); //값을 바꾸는데 실패
         }
     }
+
 
 }

@@ -191,18 +191,18 @@ public class StoreDao {
                 ), storeIdx);
     }
 
-    // 오늘의 메뉴 상태 값 체크..
-    public List<String> checkStoreEndStatus(int storeIdx) {
-        String query = "SELECT status FROM TodayMenu WHERE storeIdx = ?;";
-        return this.jdbcTemplate.queryForList(query, String.class, storeIdx);
-    }
 
     //영업종료
     public int storeEnd(int storeIdx){
         String updatequery = "UPDATE TodayMenu SET status ='D' WHERE storeIdx = ?;";
 
-        return jdbcTemplate.update(updatequery, storeIdx);
+        return this.jdbcTemplate.update(updatequery, storeIdx);
     }
 
+    public int storeNameDuplicate(String storeName) {
+        String duplicateCheck = "SELECT EXISTS(SELECT storeIdx FROM Stores WHERE store_name = ?)";
+
+        return this.jdbcTemplate.queryForObject(duplicateCheck, int.class, storeName);
+    }
 }
 

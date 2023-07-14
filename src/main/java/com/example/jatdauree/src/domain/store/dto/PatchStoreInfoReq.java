@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -17,6 +18,6 @@ public class PatchStoreInfoReq {
     private String storeOpen;
     private String storeClose;
     private String storePhone;
-    private String storeLogoUrl;
-    private String signUrl;
+    private MultipartFile storeLogoUrl;
+    private MultipartFile signUrl;
 }

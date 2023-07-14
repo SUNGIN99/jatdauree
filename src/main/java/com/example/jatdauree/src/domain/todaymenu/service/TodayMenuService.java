@@ -7,6 +7,7 @@ import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuRegReq;
 import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuRegRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,7 +26,9 @@ public class TodayMenuService {
         this.storeDao = storeDao;
     }
 
+
     // 떨이메뉴 등록
+    @Transactional(rollbackFor = BaseException.class)
     public PostTodayMenuRegRes registerTodayMenu(int sellerIdx, PostTodayMenuRegReq postTodayMenuRegReq) throws BaseException {
         // 1) 사용자 가게 조회
         int storeIdx;
@@ -41,7 +44,7 @@ public class TodayMenuService {
             if(postTodayMenuRegReq.getTodayMenuListMain() != null && postTodayMenuRegReq.getTodayMenuListMain().size() != 0)
                 mainTodayMenuItemCount = todayMenuDao.registerTodayMenu(storeIdx, postTodayMenuRegReq.getTodayMenuListMain(), "M");
             else
-                throw new BaseException(POST_TODAY_MAINMENU_DATA_UNVALID); // 2041 : 오늘의 떨이메뉴(메인) 등록 정보가 올바르지 않습니다.
+                mainTodayMenuItemCount = 0; // 2041 : 오늘의 떨이메뉴(메인) 등록 정보가 올바르지 않습니다.
         }catch (Exception e) {
             throw new BaseException(POST_TODAY_MAINMENU_SAVE_ERROR); // 4041 : 오늘의 떨이메뉴(메인) 등록에 실패하였습니다.
         }
@@ -51,7 +54,7 @@ public class TodayMenuService {
             if(postTodayMenuRegReq.getTodayMenuListSide() != null && postTodayMenuRegReq.getTodayMenuListSide().size() != 0)
                 sideTodayMenuItemCount = todayMenuDao.registerTodayMenu(storeIdx, postTodayMenuRegReq.getTodayMenuListSide(), "S");
             else
-            throw new BaseException(POST_TODAY_SIDEMENU_DATA_UNVALID); // 2042 : 오늘의 떨이메뉴(사이드) 등록 정보가 올바르지 않습니다.
+                sideTodayMenuItemCount = 0; // 2042 : 오늘의 떨이메뉴(사이드) 등록 정보가 올바르지 않습니다.
         }catch (Exception e) {
             throw new BaseException(POST_TODAY_SIDEMENU_SAVE_ERROR); // 4042 : 오늘의 떨이메뉴(사이드) 등록에 실패하였습니다.
         }
