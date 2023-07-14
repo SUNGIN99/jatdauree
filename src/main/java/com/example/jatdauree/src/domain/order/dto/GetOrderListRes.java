@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetOrderProRes implements Serializable {
+public class GetOrderListRes <T> implements Serializable {
     private int storeIdx;
-    List<GetOrderItem> orderLists;
+    private List<T> orderLists;
 }

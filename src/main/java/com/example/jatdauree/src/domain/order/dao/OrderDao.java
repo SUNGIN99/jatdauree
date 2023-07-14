@@ -21,11 +21,11 @@ public class OrderDao {
      * 23.07.06 작성자 : 윤다은
      * storeIdx로 상태가 'W'인 Orders 조회하기
      */
-    public List<GetOrderItemRes> getOrdersByStoreIdx(int storeIdx){
+    public List<GetOrderItemRes> getOrdersByStoreIdx(int storeIdx, String status){
         String OrdersQuery ="SELECT\n" +
                 "    *\n" +
                 "FROM(\n" +
-                "    SELECT O.orderIdx, O.order_time, O.pickup_time,\n" +
+                "    SELECT O.orderIdx, O.order_sequence, O.order_time, O.pickup_time,\n" +
                 "           O.request, SUM(OL.cnt * TM.price) AS total_price,\n" +
                 "           O.payment_status,\n" +
                 "           M.menu_name,\n" +
@@ -40,12 +40,13 @@ public class OrderDao {
                 "    LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
                 "    LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
                 "    LEFT JOIN Customers C on O.customerIdx = C.customerIdx\n" +
-                "    WHERE O.storeIdx = ? AND O.status = 'W'\n" +
+                "    WHERE O.storeIdx = ? AND O.status = ?\n" +
                 "    GROUP BY O.orderIdx, OL.orderlistIdx) R\n" +
                 "    ORDER BY R.order_time;";
         return this.jdbcTemplate.query(OrdersQuery,
                 (rs, rowNum) -> new GetOrderItemRes(
                         rs.getInt("orderIdx"),
+                        rs.getInt("order_sequence") == 0 ? 0 : rs.getInt("order_sequence"),
                         rs.getString("order_time"),
                         rs.getString("pickup_time"),
                         rs.getString("request"),
@@ -54,7 +55,7 @@ public class OrderDao {
                         rs.getString("menu_name"),
                         rs.getInt("cnt"),
                         rs.getInt("today_menu_price")
-                ), storeIdx);
+                ), storeIdx, status);
     }
 
     /**
@@ -83,11 +84,9 @@ public class OrderDao {
         String query = "SELECT\n" +
                 "    O.orderIdx, DATE_FORMAT(O.order_time, '%Y-%m-%d') AS orderDate,\n" +
                 "    O.payment_status, DATE_FORMAT(O.pickup_time, '%H:%i') AS pickUpTime,\n" +
+                "    O.order_sequence, \n" +
                 "    O.request\n" +
                 "FROM Orders O\n" +
-                "LEFT JOIN OrderLists OL on OL.orderIdx = O.orderIdx\n" +
-                "LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
-                "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
                 "WHERE O.orderIdx = ?\n";
 
         return this.jdbcTemplate.queryForObject(query,
@@ -97,13 +96,14 @@ public class OrderDao {
                         rs.getString("orderDate"),
                         rs.getString("payment_status"),
                         rs.getString("pickUpTime"),
+                        rs.getInt("order_sequence"),//0, // 주문 번호
                         rs.getString("request"),
                         null
                 ),orderIdx);
 
     }
 
-    public List<OrderMenuCnt> getOrderMenus(int storeIdx, int orderIdx){
+    public List<OrderMenuCnt> getOrderMenus(int orderIdx){
         String query = "SELECT M.menu_name, OL.cnt\n" +
                 "FROM Orders O\n" +
                 "LEFT JOIN  OrderLists OL on OL.orderIdx = O.orderIdx\n" +
@@ -118,64 +118,8 @@ public class OrderDao {
                 ), orderIdx);
     }
 
-    /**
-     * OrdersDao-3
-     * 23.07.13 작성자 : 윤다은
-     * 주문 처리 중 페이지 조회하기
-     */
-    public List<GetOrderItem> orderByStoreIdx(int storeIdx) {  //total_price를 한눈에 받아올 수 있도록 하기
-        String query = "SELECT\n *" +
-                "FROM(SELECT O.orderIdx,DATE_FORMAT(O.order_time,'%H:%i:%s') AS order_time, " +
-                "DATE_FORMAT(O.pickup_time,'%H:%i:%s') AS pickup_time," +
-                "O.request, COUNT(OL.orderlistIdx) AS orderCount, SUM(OL.cnt * TM.price) AS totalPrice,O.payment_status\n" +
-                "FROM OrderLists OL\n" +
-                "LEFT JOIN Orders O on OL.orderIdx = O.orderIdx\n" +
-                "LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
-                "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
-                "WHERE O.status = 'P'and O.storeIdx = ? \n" +
-                "GROUP BY O.orderIdx) R\n" +
-                "ORDER BY R.orderIdx;";
-
-        return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new GetOrderItem(
-                        rs.getInt("orderIdx"),
-                        rs.getString("order_time"),
-                        rs.getString("pickup_time"),
-                        rs.getString("request"),
-                        rs.getInt("orderCount"),
-                        rs.getInt("totalPrice"),
-                        rs.getString("payment_status"),
-                        null
-                ),storeIdx);
-
-    }
-
-    public List<OrderMenuCnt> orderItem(int storeIdx, int orderIdx) {
-        String query = "SELECT M.menu_name, OL.cnt\n" +
-                "FROM OrderLists OL\n" +
-                "LEFT JOIN Orders O ON OL.orderIdx = O.orderIdx\n" +
-                "LEFT JOIN TodayMenu TM ON OL.todaymenuIdx = TM.todaymenuIdx\n" +
-                "LEFT JOIN Menu M ON TM.menuIdx = M.menuIdx\n" +
-                "WHERE O.status = 'P' " +
-                "    AND O.storeIdx = ? " +
-                "    AND O.orderIdx = ? \n" +
-                "GROUP BY O.orderIdx, OL.orderlistIdx;" ;
-
-        Object[] params = new Object[]{
-                storeIdx,
-                orderIdx
-        };
-
-        return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new OrderMenuCnt(
-                        rs.getString("menu_name"),
-                        rs.getInt("cnt")
-                ),params);
-    }
-
 
     public int orderPickupUpdate(int orderIdx) throws BaseException {
-
         String updatequery = "UPDATE Orders " +
                 "    SET status = 'A' \n " +
                 "WHERE " +

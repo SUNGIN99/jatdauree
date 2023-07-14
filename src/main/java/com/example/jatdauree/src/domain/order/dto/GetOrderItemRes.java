@@ -15,6 +15,7 @@ import java.util.List;
 public class GetOrderItemRes implements Serializable {
 
     private int orderIdx;
+    private int orderSequence;
     private String orderTime;
     private String pickUpTime;
     private String request;
