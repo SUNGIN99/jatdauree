@@ -80,6 +80,33 @@ public class ReviewDao {
         this.jdbcTemplate.update(query,params);
     }
 
+    //리뷰 개수,별점 평균,별점 가지고 오기
+    public GetReviewStarRes reviewStarTotal(int storeIdx){
+        String query ="SELECT\n" +
+                "      ROUND(AVG(star),1) AS star_average,\n" +
+                "      COUNT(*) AS reviews_total,\n" +
+                "      COUNT(CASE WHEN star = 1 THEN 1 END) AS star1_count,\n" +
+                "      COUNT(CASE WHEN star = 2 THEN 1 END) AS star2_count,\n" +
+                "      COUNT(CASE WHEN star = 3 THEN 1 END) AS star3_count,\n" +
+                "      COUNT(CASE WHEN star = 4 THEN 1 END) AS star4_count,\n" +
+                "      COUNT(CASE WHEN star = 5 THEN 1 END) AS star5_count\n" +
+                "      FROM Review\n" +
+                "WHERE storeIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new GetReviewStarRes(
+                        storeIdx,
+                        rs.getDouble("star_average"),
+                        rs.getInt("reviews_total"),
+                        rs.getInt("star1_count"),
+                        rs.getInt("star2_count"),
+                        rs.getInt("star3_count"),
+                        rs.getInt("star4_count"),
+                        rs.getInt("star5_count")
+                )
+                ,storeIdx);
+    }
+
 
 }
 

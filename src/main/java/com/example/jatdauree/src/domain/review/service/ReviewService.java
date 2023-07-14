@@ -8,6 +8,7 @@ import com.example.jatdauree.src.domain.store.dao.StoreDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.jatdauree.config.BaseResponseStatus.*;
@@ -90,6 +91,35 @@ public class ReviewService {
             reviewDao.reviewAnswer(reviewAnswerReq);
             return new ReviewAnswerRes(storeIdx, reviewAnswerReq.getReviewIdx(), reviewAnswerReq.getComment());
         } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+    }
+
+    //리뷰 총 별점
+    public GetReviewStarTotalRes reviewStarTotal(int sellerIdx) throws BaseException {
+
+        // 1) 사용자 가게 조회
+        int storeIdx;
+        try {
+            storeIdx = storeDao.storeIdxBySellerIdx(sellerIdx);
+        } catch (Exception e) {
+            throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
+
+        // 2)리뷰 개수,별점 평균,별점 가지고 오기
+        try{
+            GetReviewStarRes reviewStar = reviewDao.reviewStarTotal(storeIdx);
+
+            List<StarCountRatio> starCountRatios = new ArrayList<>();
+            starCountRatios.add(new StarCountRatio("별 5개", reviewStar.getStar5(), (int) (reviewStar.getStar5() * 1.0 / reviewStar.getReviews_total() * 100)));
+            starCountRatios.add(new StarCountRatio("별 4개", reviewStar.getStar4(), (int) (reviewStar.getStar4() * 1.0  / reviewStar.getReviews_total() * 100)));
+            starCountRatios.add(new StarCountRatio("별 3개", reviewStar.getStar3(), (int) (reviewStar.getStar3() * 1.0  / reviewStar.getReviews_total() * 100)));
+            starCountRatios.add(new StarCountRatio("별 2개", reviewStar.getStar2(), (int) (reviewStar.getStar2() * 1.0  / reviewStar.getReviews_total() * 100)));
+            starCountRatios.add(new StarCountRatio("별 1개", reviewStar.getStar1(), (int) (reviewStar.getStar1() * 1.0  / reviewStar.getReviews_total() * 100)));
+
+            return new GetReviewStarTotalRes(storeIdx, reviewStar.getStar_average(), reviewStar.getReviews_total(), starCountRatios);
+        }catch (Exception e){
             throw new BaseException(DATABASE_ERROR);
         }
 

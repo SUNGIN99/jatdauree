@@ -61,4 +61,22 @@ public class ReviewController {
         }
     }
 
+    /**
+     * 23.07.13 작성자 : 정주현
+     * 리뷰 총 리뷰 현황
+     * Patch /jat/review/average
+     * @return BaseResponse<GetAverageReviewRes>
+     */
+    @ResponseBody
+    @GetMapping("/average")
+    public BaseResponse<GetReviewStarTotalRes> reviewStarTotal() throws BaseException {
+        int sellerIdx = jwtService.getUserIdx();
+        try{
+            GetReviewStarTotalRes getReviewStarTotalRes  = reviewService.reviewStarTotal(sellerIdx);
+            return new BaseResponse<>(getReviewStarTotalRes);
+        }catch(BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
+
 }
