@@ -100,7 +100,7 @@ public class MenuService {
             else
                 mainMenuItemCount = 0; // 2031 : 메인 메뉴 등록 정보가 올바르지 않습니다.
         } catch (Exception e) {
-            //System.out.println("1:" + e);
+            System.out.println("1:" + e);
             throw new BaseException(STORE_MAINMENU_SAVE_ERROR); // 4031 : 메인메뉴 등록에 실패하였습니다.
         }
 
@@ -112,7 +112,7 @@ public class MenuService {
             else
                 sideMenuItemCount = 0; // 2032 : 사이드 메뉴 등록 정보가 올바르지 않습니다.
         } catch (Exception e) {
-            //System.out.println("2:" + e);
+            System.out.println("2:" + e);
             throw new BaseException(STORE_SIDEMENU_SAVE_ERROR); // 4032: 사이드메뉴 등록에 실패하였습니다.
         }
 
@@ -126,7 +126,7 @@ public class MenuService {
             else
                 throw new RuntimeException();
         } catch (Exception e) {
-            //System.out.println("3:" + e);
+            System.out.println("3:" + e);
             throw new BaseException(STORE_INGREDIENT_SAVE_ERROR); // 4033 : 원산지 등록에 실패하였습니다.
         }
 
