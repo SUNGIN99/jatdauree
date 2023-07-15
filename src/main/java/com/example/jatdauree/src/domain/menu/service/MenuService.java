@@ -93,6 +93,10 @@ public class MenuService {
             throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
 
+        System.out.println("메인메뉴 null :" + postMenuReq.getMainMenuItems() == null);
+        System.out.println("사이드메뉴 null :" + postMenuReq.getSideMenuItems() == null);
+        System.out.println("원산지 null :" +postMenuReq.getIngredientItems() == null);
+
         // 2) 가게 메뉴/원산지 등록
         int mainMenuItemCount = 0, sideMenuItemCount = 0, ingredientCount = 0;
         ArrayList<PostMenuUrlItem> urlItems = null;
@@ -114,8 +118,8 @@ public class MenuService {
                 sideMenuItemCount = menuDao.menuRegister(storeIdx, urlItems, "S");
             }
             else
-                throw new BaseException(STORE_SIDEMENU_SAVE_ERROR);
-            //sideMenuItemCount = 0; // 2032 : 사이드 메뉴 등록 정보가 올바르지 않습니다.
+                sideMenuItemCount = 0;//throw new BaseException(STORE_SIDEMENU_SAVE_ERROR);
+            // // 2032 : 사이드 메뉴 등록 정보가 올바르지 않습니다.
         } catch (Exception e) {
             //System.out.println("2:" + e);
             throw new BaseException(STORE_SIDEMENU_SAVE_ERROR); // 4032: 사이드메뉴 등록에 실패하였습니다.
