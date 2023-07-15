@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.example.jatdauree.config.BaseResponseStatus.SMS_DATA_FIND_ERROR;
+
 //@CrossOrigin(origins="*")
 @Slf4j
 @RestController
@@ -80,7 +82,12 @@ public class SellerController {
     public BaseResponse<PostSignUpAuthyRes> userAuthyPass(@RequestBody PostSignUpAuthyReq passReq){
         try{
             PostSignUpAuthyRes passRes = sellerService.userAuthyPass(passReq);
-            return new BaseResponse<>(passRes);
+
+            if (passRes.getValidIdentify() == 1){
+                return new BaseResponse<>(passRes);
+            }else {
+                return new BaseResponse<>( SMS_DATA_FIND_ERROR, passRes);
+            }
         }catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());
         }

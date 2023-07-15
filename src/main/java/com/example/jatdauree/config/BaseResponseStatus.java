@@ -28,6 +28,7 @@ public enum BaseResponseStatus {
 
     POST_USERS_INVALID_BIRTHDAY(false, 2013, "생년월일 양식을 yyyy.MM.dd로 설정해주세요."),
     POST_USERS_INVALID_PHONENUM(false, 2014, "전화번호는 - 없이 숫자만 입력해주세요."),
+    POST_USERS_INVALID_AUTHYNUM(false, 2015, "유효하지 않은 인증번호입니다."),
 
     // 회원가입
     // [POST] /users
