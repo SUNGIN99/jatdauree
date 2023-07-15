@@ -3,6 +3,8 @@ package com.example.jatdauree.src.domain.todaymenu.service;
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.src.domain.store.dao.StoreDao;
 import com.example.jatdauree.src.domain.todaymenu.dao.TodayMenuDao;
+import com.example.jatdauree.src.domain.todaymenu.dto.GetMainPageItem;
+import com.example.jatdauree.src.domain.todaymenu.dto.GetMainPageMenu;
 import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuRegReq;
 import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuRegRes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import static com.example.jatdauree.config.BaseResponseStatus.*;
 
@@ -24,6 +27,33 @@ public class TodayMenuService {
     public TodayMenuService(TodayMenuDao todayMenuDao, StoreDao storeDao) {
         this.todayMenuDao = todayMenuDao;
         this.storeDao = storeDao;
+    }
+
+
+
+    public GetMainPageMenu getTodayMenuList(int sellerIdx) throws BaseException{
+        // 1) 사용자 가게 조회
+        int storeIdx;
+        try{
+            storeIdx = storeDao.storeIdxBySellerIdx(sellerIdx);
+        } catch (Exception e) {
+            throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
+
+        List<GetMainPageItem> mainTodaymenuItems, sideTodaymenuItems;
+        try{
+            mainTodaymenuItems = todayMenuDao.getTodayMenuList(storeIdx, "M");
+        }catch (Exception e) {
+            throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
+
+        try{
+            sideTodaymenuItems = todayMenuDao.getTodayMenuList(storeIdx, "S");
+        }catch (Exception e) {
+            throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
+
+        return new GetMainPageMenu(storeIdx, mainTodaymenuItems, sideTodaymenuItems);
     }
 
 

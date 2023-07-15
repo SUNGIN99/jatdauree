@@ -1,5 +1,6 @@
 package com.example.jatdauree.src.domain.todaymenu.dao;
 
+import com.example.jatdauree.src.domain.todaymenu.dto.GetMainPageItem;
 import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 public class TodayMenuDao {
@@ -44,6 +46,37 @@ public class TodayMenuDao {
         return todayMenuItems.size();
     }
 
+    public List<GetMainPageItem> getTodayMenuList(int storeIdx, String status) {
+        String query = "SELECT\n" +
+                "    M.menuIdx, M.menu_name, M.price as origin_price,\n" +
+                "    IF(T.status = 'D' , null, T.todaymenuIdx) as todaymenuIdx,\n" +
+                "    IF(T.status = 'D' , null, T.discount) as discount,\n" +
+                "    IF(T.status = 'D' , null, T.price) as discount_price,\n" +
+                "    IF(T.status = 'D' , null, T.remain) as remain,\n" +
+                "    IF(T.status = 'D' , null, T.status) as status\n" +
+                "FROM Menu M\n" +
+                "LEFT JOIN TodayMenu T on M.menuIdx = T.menuIdx\n" +
+                "WHERE M.storeIdx = ?\n" +
+                "AND M.status = ?";
+
+        Object[] params = new Object[]{
+                storeIdx,
+                status
+        };
+
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new GetMainPageItem(
+                        rs.getInt("menuIdx"),
+                        rs.getString("menu_name"),
+                        rs.getInt("origin_price"),
+                        rs.getInt("todaymenuIdx"),
+                        rs.getInt("discount"),
+                        rs.getInt("discount_price"),
+                        rs.getInt("remain"),
+                        rs.getString("status") == null ? "N" : rs.getString("status"),
+                        rs.getString("status") == null ? -1 : 0
+                ), params);
+    }
 }
 
 

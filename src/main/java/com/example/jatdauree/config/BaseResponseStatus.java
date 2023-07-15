@@ -98,11 +98,14 @@ public enum BaseResponseStatus {
     STORE_INGREDIENT_SAVE_ERROR(false, 4033, "원산지 등록에 실패하였습니다."),
     STORE_MENU_ALREADY_SAVED(false, 4034, "메뉴등록이 이미 이루어진 판매자입니다."),
     STORE_REGISTER_NOT_PERMITTED(false, 4035, "관리자에게 가게 승인되지 않은 판매자 계정입니다."),
-    STORE_URL_POST_ERROR(false, 4034, "등록하는 이미지의 형태가 잘못 처리되었습니다."),
+    STORE_URL_POST_ERROR(false, 4036, "등록하는 이미지의 형태가 잘못 처리되었습니다."),
 
     // 4040~) 오늘의 떨이메뉴 등록
     POST_TODAY_MAINMENU_SAVE_ERROR(false, 4041, "오늘의 떨이메뉴(메인) 등록에 실패하였습니다."),
     POST_TODAY_SIDEMENU_SAVE_ERROR(false, 4042, "오늘의 떨이메뉴(사이드) 등록에 실패하였습니다."),
+
+    // 4050~) 메뉴조회
+    GET_MENU_ERROR(false, 4050, "메뉴 조회에 실패하였습니다."),
 
 
     /**

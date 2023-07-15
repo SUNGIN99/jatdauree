@@ -93,9 +93,9 @@ public class MenuService {
             throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
 
-        System.out.println("메인메뉴 null :" + postMenuReq.getMainMenuItems() == null);
-        System.out.println("사이드메뉴 null :" + postMenuReq.getSideMenuItems() == null);
-        System.out.println("원산지 null :" +postMenuReq.getIngredientItems() == null);
+        //System.out.println("메인메뉴 null :" + postMenuReq.getMainMenuItems() == null);
+        //System.out.println("사이드메뉴 null :" + postMenuReq.getSideMenuItems() == null);
+        //System.out.println("원산지 null :" +postMenuReq.getIngredientItems() == null);
 
         // 2) 가게 메뉴/원산지 등록
         int mainMenuItemCount = 0, sideMenuItemCount = 0, ingredientCount = 0;
@@ -179,28 +179,44 @@ public class MenuService {
         try{
             mainMenuList = menuDao.getStoreMenuList(storeIdx, "M");
         }catch (Exception e) {
-            mainMenuList = null;
+            throw new BaseException(GET_MENU_ERROR);
+        }
+
+        // 메인 메뉴 url 가져오기
+        try{
+            for(GetMenuItem item : mainMenuList){
+                if (item.getMenuUrl() != null && !item.getMenuUrl().equals("")) {
+                    item.setMenuUrl(""+s3Client.getUrl(bucketName, item.getMenuUrl()));
+                }
+            }
+        }catch (Exception e) {
+            throw new BaseException(GET_MENU_ERROR);
         }
 
         // 3) 사이드 메뉴 조회
         try{
             sideMenuList = menuDao.getStoreMenuList(storeIdx, "S");
         }catch (Exception e) {
-            sideMenuList = null;
+            throw new BaseException(GET_MENU_ERROR);
+        }
+
+        // 사이드 메뉴 url 가져오기
+        try{
+            for(GetMenuItem item : sideMenuList){
+                if (item.getMenuUrl() != null && !item.getMenuUrl().equals("")) {
+                    item.setMenuUrl(""+s3Client.getUrl(bucketName, item.getMenuUrl()));
+                }
+            }
+        }catch (Exception e) {
+            throw new BaseException(GET_MENU_ERROR);
         }
 
         return new GetMenuItemsRes(storeIdx, mainMenuList, sideMenuList);
 
     }
 
-    /*public PostMenuUpRes menuUpdate(PostMenuUpReq postMenuUpReq) throws BaseException {
-        try {
-            return new PostMenuUpRes(menuDao.menuUpdate(postMenuUpReq));
-        } catch (Exception e) {
 
-            throw new BaseException(RESPONSE_ERROR);
-        }
-    }*/
+
 }
 
 

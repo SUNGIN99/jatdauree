@@ -83,15 +83,20 @@ public class MenuDao {
      * 가게 idx로 가게에 등록된 메뉴 조회
      */
     public List<GetMenuItem> getStoreMenuList(int storeIdx, String status) {
-        String query = "SELECT menuIdx, menu_name, price\n" +
+        String query = "SELECT menuIdx, menu_name, price, composition, description, menu_url\n" +
                 "FROM Menu WHERE storeIdx = ? AND status = ?";
 
         Object[] params = new Object[]{storeIdx, status};
+
         return this.jdbcTemplate.query(query,
                 (rs, rowNum) -> new GetMenuItem(
                         rs.getInt("menuIdx"),
                         rs.getString("menu_name"),
-                        rs.getInt("price")
+                        rs.getInt("price"),
+                        rs.getString("composition"),
+                        rs.getString("description"),
+                        rs.getString("menu_url"),
+                        0
                 ), params);
     }
 

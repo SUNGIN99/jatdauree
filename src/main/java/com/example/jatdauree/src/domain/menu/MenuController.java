@@ -45,10 +45,10 @@ public class MenuController {
     }
 
     /**
-     * 23.07.07 작성자 : 정주현, 김성인
+     * 23.07.16 작성자 : 김성인
      * 등록된 메뉴 조회
      * GET /jat/menus
-     * @return BaseResponse<GetMenusSearchRes>
+     * @return BaseResponse<GetMenuItemsRes>
      */
     @ResponseBody
     @GetMapping("")
@@ -63,23 +63,8 @@ public class MenuController {
         }
     }
 
-    /**
-     * 23.07.06 작성자 : 이윤채
-     * 메뉴 수정
-     * Patch/jat/menu/menuUpdate
-     * @param @RequestBody PostMenuUpReq
-     * @return BaseResponse<postMenuUpRes>
-     *
-     */
-    /*@ResponseBody
-    @PatchMapping("")
-    public BaseResponse<PostMenuUpRes> menuUpdate(@RequestBody PostMenuUpReq postMenuUpReq){
-        try {
-            PostMenuUpRes postMenuUpRes =menuService.menuUpdate(postMenuUpReq);
-            return new BaseResponse<>(postMenuUpRes);
-        }catch (BaseException baseException){
-            return new BaseResponse<>(baseException.getStatus());
-        }
-    }*/
+
+
+
 
 }
