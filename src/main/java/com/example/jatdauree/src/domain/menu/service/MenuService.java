@@ -1,5 +1,7 @@
 package com.example.jatdauree.src.domain.menu.service;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.src.domain.menu.dao.MenuDao;
 import com.example.jatdauree.src.domain.menu.dto.*;
@@ -7,12 +9,18 @@ import com.example.jatdauree.src.domain.seller.dao.SellerDao;
 import com.example.jatdauree.src.domain.store.dao.StoreDao;
 import com.example.jatdauree.src.domain.menu.dto.GetMenuItemsRes;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.jatdauree.config.BaseResponseStatus.*;
+import static com.example.jatdauree.utils.UtilNanoTime.absolutePath;
+import static com.example.jatdauree.utils.UtilNanoTime.checkFileIsNullThenName;
 
 @Service
 public class MenuService {
@@ -20,11 +28,43 @@ public class MenuService {
     private final StoreDao storeDao;
     private final SellerDao sellerDao;
 
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
+
+    private AmazonS3 s3Client;
+
     @Autowired
-    public MenuService(MenuDao menuDao, StoreDao storeDao, SellerDao sellerDao) {
+    public MenuService(MenuDao menuDao, StoreDao storeDao, SellerDao sellerDao, AmazonS3  s3Client) {
         this.menuDao = menuDao;
         this.storeDao = storeDao;
         this.sellerDao = sellerDao;
+        this.s3Client = s3Client;
+    }
+
+
+    public ArrayList<PostMenuUrlItem> convertToUrlFileNames(ArrayList<PostMenuItem> fileItem) throws IOException {
+        ArrayList<PostMenuUrlItem> urlItems = new ArrayList<>();
+        String fileNames; File file;
+
+        for (PostMenuItem item : fileItem) {
+            fileNames = checkFileIsNullThenName(item.getMenuUrl());
+            if(fileNames != null) {
+                file = new File(absolutePath + fileNames);
+                item.getMenuUrl().transferTo(file);
+                s3Client.putObject(new PutObjectRequest(bucketName, fileNames, file));
+                file.delete();
+            }
+
+            urlItems.add(new PostMenuUrlItem(
+                    item.getMenuName(),
+                    item.getPrice(),
+                    item.getComposition(),
+                    item.getDescription(),
+                    fileNames
+            ));
+        }
+        return urlItems;
+
     }
 
     // 초기 메뉴 등록
@@ -51,30 +91,39 @@ public class MenuService {
 
         // 2) 가게 메뉴/원산지 등록
         int mainMenuItemCount = 0, sideMenuItemCount = 0, ingredientCount = 0;
+        ArrayList<PostMenuUrlItem> urlItems;
         try { // 2-1) 메인 메뉴 등록
-            if (postMenuReq.getPostMenuItems() != null && postMenuReq.getPostMenuItems().size() != 0)
-                mainMenuItemCount =  menuDao.mainMenuRegister(storeIdx, postMenuReq.getPostMenuItems());
+            if (postMenuReq.getMainMenuItems() != null && postMenuReq.getMainMenuItems().size() != 0) {
+                urlItems = convertToUrlFileNames(postMenuReq.getMainMenuItems());
+                mainMenuItemCount = menuDao.menuRegister(storeIdx, urlItems, "M");
+            }
             else
                 mainMenuItemCount = 0; // 2031 : 메인 메뉴 등록 정보가 올바르지 않습니다.
         } catch (Exception e) {
+            //System.out.println("1:" + e);
             throw new BaseException(STORE_MAINMENU_SAVE_ERROR); // 4031 : 메인메뉴 등록에 실패하였습니다.
         }
 
         try { // 2-2) 사이드 메뉴 등록
-            if (postMenuReq.getPostSideMenuItems() != null && postMenuReq.getPostSideMenuItems().size() != 0)
-                sideMenuItemCount = menuDao.sideMenuRegister(storeIdx, postMenuReq.getPostSideMenuItems());
+            if (postMenuReq.getSideMenuItems() != null && postMenuReq.getSideMenuItems().size() != 0) {
+                urlItems = convertToUrlFileNames(postMenuReq.getSideMenuItems());
+                sideMenuItemCount = menuDao.menuRegister(storeIdx, urlItems, "S");
+            }
             else
                 sideMenuItemCount = 0; // 2032 : 사이드 메뉴 등록 정보가 올바르지 않습니다.
         } catch (Exception e) {
+            //System.out.println("2:" + e);
             throw new BaseException(STORE_SIDEMENU_SAVE_ERROR); // 4032: 사이드메뉴 등록에 실패하였습니다.
         }
 
         try { // 2-3) 원산지 등록
-            if (postMenuReq.getPostIngredientItems() != null && postMenuReq.getPostIngredientItems().size() != 0)
-                ingredientCount = menuDao.ingredientRegister(storeIdx, postMenuReq.getPostIngredientItems());
+            if (postMenuReq.getIngredientItems() != null && postMenuReq.getIngredientItems().size() != 0) {
+                ingredientCount = menuDao.ingredientRegister(storeIdx, postMenuReq.getIngredientItems());
+            }
             else
                 ingredientCount = 0; // 2033 : 원산지 등록 정보가 올바르지 않습니다.
         } catch (Exception e) {
+            //System.out.println("3:" + e);
             throw new BaseException(STORE_INGREDIENT_SAVE_ERROR); // 4033 : 원산지 등록에 실패하였습니다.
         }
 

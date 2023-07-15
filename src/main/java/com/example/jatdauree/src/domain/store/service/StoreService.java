@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.example.jatdauree.config.BaseResponseStatus.*;
+import static com.example.jatdauree.utils.UtilNanoTime.checkFileIsNullThenName;
 
 
 @Service
@@ -45,35 +46,6 @@ public class StoreService {
         return new StoreNameDupRes(check);
     }
 
-    private String checkFileIsNullThenName(MultipartFile files){
-        long nanos = UtilNanoTime.currentTimeNanos();
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-
-        String fileNanoName = sdf.format(nanos/1000000L);
-
-        if(!files.isEmpty()){
-            String contentType = files.getContentType();
-            String originalFileExtension;
-
-            if (ObjectUtils.isEmpty(contentType)){
-                return null;
-            }
-            else{
-                if (contentType.contains("image/jpeg"))
-                    originalFileExtension = ".jpg";
-                else if (contentType.contains("image/png"))
-                    originalFileExtension = ".png";
-                else if (contentType.contains("image/gif"))
-                    originalFileExtension = ".gif";
-                else
-                    return null;
-
-                return fileNanoName + System.nanoTime() + originalFileExtension;
-            }
-        }
-        return null;
-    }
 
     @Transactional(rollbackFor = {BaseException.class, IOException.class})
     public PostStoreRes storeRegister(int sellerIdx, PostStoreReq postStoreReq) throws BaseException, IOException {

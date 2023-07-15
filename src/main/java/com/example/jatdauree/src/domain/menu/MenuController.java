@@ -33,7 +33,7 @@ public class MenuController {
      */
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<PostMenuRes> menuRegister(@RequestBody PostMenuReq postMenuReq) {
+    public BaseResponse<PostMenuRes> menuRegister(PostMenuReq postMenuReq) {
         try {
             int sellerIdx = jwtService.getUserIdx();
 

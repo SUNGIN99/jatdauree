@@ -49,7 +49,7 @@ public class OrderDao {
                         rs.getInt("order_sequence") == 0 ? 0 : rs.getInt("order_sequence"),
                         rs.getString("order_time"),
                         rs.getString("pickup_time"),
-                        rs.getString("request"),
+                        rs.getString("request") == null ? "": rs.getString("request"),
                         rs.getInt("total_price"),
                         rs.getString("payment_status"),
                         rs.getString("menu_name"),

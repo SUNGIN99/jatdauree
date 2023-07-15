@@ -68,10 +68,10 @@ public class OrderController {
      * OrderController -3
      * 23.07.11 작성자 : 윤다은
      * 주문표 인쇄하기
-     * GET /jat/orders/bills
+     * POST /jat/orders/bills
      * */
     @ResponseBody
-    @GetMapping("/bills")
+    @PostMapping("/bills")
     public BaseResponse<GetBillRes> getBillsByOrderIdx(@RequestBody GetBillReq getBillReq){
         try{
             int sellerIdx = jwtService.getUserIdx();

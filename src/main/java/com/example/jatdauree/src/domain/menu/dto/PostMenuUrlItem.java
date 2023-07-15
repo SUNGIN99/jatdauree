@@ -12,10 +12,10 @@ import java.io.Serializable;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostMenuItem implements Serializable {
+public class PostMenuUrlItem implements Serializable {
     private String menuName;
     private int price;
     private String composition;
     private String description;
-    private MultipartFile menuUrl;
+    private String menuUrl;
 }

@@ -1,7 +1,6 @@
 package com.example.jatdauree.src.domain.menu.dao;
 
 import com.example.jatdauree.src.domain.menu.dto.*;
-import com.example.jatdauree.src.domain.menu.dto.GetMenuItemsRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -28,7 +27,7 @@ public class MenuDao {
      * Main menuRegister 메인 메뉴등록
      * 반환 정보 : 메인 메뉴 등록 개수
      */
-    public int mainMenuRegister(int storeIdx, ArrayList<PostMenuItem> mainMenuList)  {
+    public int menuRegister(int storeIdx, ArrayList<PostMenuUrlItem> mainMenuList, String mOrS)  {
         String query = "INSERT INTO Menu (" +
                 "storeIdx, " +
                 "menu_name, " +
@@ -37,53 +36,22 @@ public class MenuDao {
                 "description," +
                 "menu_url," +
                 "status)\n" +
-                "VALUES (?,?,?,?,?,?,'M');";
+                "VALUES (?,?,?,?,?,?,?);";
 
             this.jdbcTemplate.batchUpdate(query,
                     mainMenuList,
                     mainMenuList.size(),
-                    (PreparedStatement ps, PostMenuItem menuItem) ->{
+                    (PreparedStatement ps, PostMenuUrlItem menuItem) ->{
                         ps.setInt(1, storeIdx);
                         ps.setString(2, menuItem.getMenuName());
                         ps.setInt(3, menuItem.getPrice());
                         ps.setString(4, menuItem.getComposition());
                         ps.setString(5, menuItem.getDescription());
                         ps.setString(6, menuItem.getMenuUrl());
+                        ps.setString(7, mOrS);
                     });
 
         return mainMenuList.size();
-    }
-
-    /**
-     * menuDao - 2
-     * 23.07.07 작성자 : 이윤채, 김성인
-     * Main menuRegister 사이드 메뉴등록
-     * 반환 정보 : 사이드 메뉴 등록 개수
-     */
-    public int sideMenuRegister(int storeIdx, ArrayList<PostMenuItem> sideMenuList)  {
-        String query = "INSERT INTO Menu (" +
-                "storeIdx, " +
-                "menu_name, " +
-                "price, " +
-                "composition," +
-                "description," +
-                "menu_url," +
-                "status)\n" +
-                "VALUES (?,?,?,?,?,?,'S');";
-
-        this.jdbcTemplate.batchUpdate(query,
-                sideMenuList,
-                sideMenuList.size(),
-                (PreparedStatement ps, PostMenuItem menuItem) ->{
-                    ps.setInt(1, storeIdx);
-                    ps.setString(2, menuItem.getMenuName());
-                    ps.setInt(3, menuItem.getPrice());
-                    ps.setString(4, menuItem.getComposition());
-                    ps.setString(5, menuItem.getDescription());
-                    ps.setString(6, menuItem.getMenuUrl());
-                });
-
-        return sideMenuList.size();
     }
 
     /**
