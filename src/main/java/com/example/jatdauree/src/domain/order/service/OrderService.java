@@ -147,7 +147,7 @@ public class OrderService {
         }catch (Exception e){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR); //현재 상태가 존재하지 않는 경우이다.
         }
-        if (!status.equals("P") || !status.equals("W") || status.equals("D")){
+        if ((!status.equals("P") || !status.equals("W")) && status.equals("D")){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR); // 현재 옳바르지 않은 상태이다.
         }
 
