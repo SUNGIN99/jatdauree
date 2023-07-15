@@ -56,7 +56,7 @@ public class ReviewDao {
                         rs.getInt("star"),
                         rs.getString("contents"),
                         rs.getString("comment") == null? "" : rs.getString("comment"),
-                        rs.getString("review_url") == null?"": rs.getString("review_url") ,
+                        rs.getString("review_url"),
                         null
                 ), storeIdx);
 

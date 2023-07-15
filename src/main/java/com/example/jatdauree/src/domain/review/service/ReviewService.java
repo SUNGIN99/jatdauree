@@ -1,11 +1,13 @@
 package com.example.jatdauree.src.domain.review.service;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.BaseResponseStatus;
 import com.example.jatdauree.src.domain.review.dao.ReviewDao;
 import com.example.jatdauree.src.domain.review.dto.*;
 import com.example.jatdauree.src.domain.store.dao.StoreDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,10 +21,15 @@ public class ReviewService {
     private final StoreDao storeDao;
     private final ReviewDao reviewDao;
 
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
+    private AmazonS3 s3Client;
+
     @Autowired
-    public ReviewService(StoreDao storeDao, ReviewDao reviewDao) {
+    public ReviewService(StoreDao storeDao, ReviewDao reviewDao, AmazonS3 s3Client) {
         this.storeDao = storeDao;
         this.reviewDao = reviewDao;
+        this.s3Client = s3Client;
     }
 
     //리뷰 조회
@@ -40,8 +47,19 @@ public class ReviewService {
         try {
             reviewItems = reviewDao.reviewItems(storeIdx);
         } catch (Exception e) {
-            System.out.println("exception1: " + e);
+            //System.out.println("exception1: " + e);
             throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);    // 리뷰 조회에 실패하였습니다.
+        }
+
+        // 리뷰에 사진 정보 있으면 s3에서 url 가져오기
+        try{
+            for (ReviewItems item : reviewItems) {
+                if(item.getReview_url() != null )
+                    item.setReview_url(""+s3Client.getUrl(bucketName, item.getReview_url()));
+            }
+        }catch (Exception e) {
+            //System.out.println("exception1: " + e);
+            throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);    // 리뷰 이미지 url 실패하였습니다.
         }
 
         // 3) 리뷰 주문 내의 메뉴 목록 조회
@@ -51,7 +69,7 @@ public class ReviewService {
             }
             return new GetReviewRes(storeIdx, reviewItems);
         } catch (Exception e) {
-            System.out.println("exception2: " + e);
+            //System.out.println("exception2: " + e);
             throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);    // 리뷰 조회에 실패하였습니다.
         }
     }

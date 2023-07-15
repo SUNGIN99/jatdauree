@@ -26,7 +26,7 @@ import static com.example.jatdauree.utils.UtilNanoTime.checkFileIsNullThenName;
 
 @Service
 public class StoreService {
-    private StoreDao storeDao;
+    private final StoreDao storeDao;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
