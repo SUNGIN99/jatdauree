@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.example.jatdauree.config.BaseResponseStatus.*;
+import static com.example.jatdauree.utils.UtilNanoTime.absolutePath;
 import static com.example.jatdauree.utils.UtilNanoTime.checkFileIsNullThenName;
 
 
@@ -31,9 +32,6 @@ public class StoreService {
     private String bucketName;
 
     private AmazonS3 s3Client;
-
-    //private static String absolutePath = "/home/ubuntu/s3tempImg/";
-    private static String absolutePath = "C:\\Users\\d\\Desktop\\s3\\s3Save\\";
 
     @Autowired
     public StoreService(StoreDao storeDao, AmazonS3 s3Client) {

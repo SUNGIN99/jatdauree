@@ -11,8 +11,8 @@ public class UtilNanoTime {
         return System.nanoTime() + currentTimeNanosOffset;
     }
 
-    //private static String absolutePath = "/home/ubuntu/s3tempImg/";
-    public static String absolutePath = "C:\\Users\\d\\Desktop\\s3\\s3Save\\";
+    public static String absolutePath = "/home/ubuntu/s3tempImg/";
+    //public static String absolutePath = "C:\\Users\\d\\Desktop\\s3\\s3Save\\";
 
     public static String checkFileIsNullThenName(MultipartFile files){
         long nanos = UtilNanoTime.currentTimeNanos();
