@@ -130,10 +130,6 @@ public class SmsDao {
     /**
      * SmsDao - 5
      * 23.07.02 작성자 : 김성인
-     * ID 찾기할때 인증번호 전송 정보 저장
-     * 넣을때 ID 찾기는 이름, 전화번호만  checkType = 'I'
-     * PW 찾기는 아이디, 전화번호만 입력됨  checkType = 'P'
-     * 전화번호는 무조건 입력,
      */
     public int smsAuthyPass(PostSignUpAuthyReq signUPValid){
         String query = "SELECT EXISTS(\n" +

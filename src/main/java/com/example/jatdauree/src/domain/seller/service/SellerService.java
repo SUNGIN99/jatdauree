@@ -69,7 +69,7 @@ public class SellerService {
         if(!isRegexBirth(postSignUpReq.getBirthday())){
             throw new BaseException(POST_USERS_INVALID_BIRTHDAY);
         }
-        if(!isRegexPhone(postSignUpReq.getBirthday())){
+        if(!isRegexPhone(postSignUpReq.getPhone())){
             throw new BaseException(POST_USERS_INVALID_PHONENUM);
         }
         // 중복 아이디 체크
@@ -310,7 +310,7 @@ public class SellerService {
     public PostSignUpAuthyRes userAuthyPass(PostSignUpAuthyReq passReq) throws BaseException{
         try{
             int userPass = smsDao.smsAuthyPass(passReq);
-
+            System.out.println(userPass);
             return new PostSignUpAuthyRes(userPass);
         }catch(Exception exception){
             throw new BaseException(COOLSMS_API_ERROR); // 5010 : SMS 인증번호 발송을 실패하였습니다.
