@@ -52,6 +52,43 @@ public class SellerController {
 
     /**
      * 23.06.29 작성자 : 김성인
+     * 회원가입시 번호 인증 요청
+     * Post /jat/authy
+     * @param @RequestBody postSignUpAuthyReq
+     * @return BaseResponse<postSignUpAuthyRes>
+     */
+    @ResponseBody
+    @PostMapping("/authy")
+    public BaseResponse<PostSignUpAuthyRes> userAuthy(@RequestBody PostSignUpAuthyReq signUpAuthy){
+        try{
+            PostSignUpAuthyRes signUpAuthyRes = sellerService.userAuthy(signUpAuthy);
+            return new BaseResponse<>(signUpAuthyRes);
+        }catch (BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
+
+    /**
+     * 23.06.29 작성자 : 김성인
+     * 회원가입시 번호 인증 요청
+     * Post /jat/authy-pass
+     * @param @RequestBody postSignUpAuthyReq
+     * @return BaseResponse<postSignUpAuthyRes>
+     */
+    @ResponseBody
+    @PostMapping("/authy-pass")
+    public BaseResponse<PostSignUpAuthyRes> userAuthyPass(@RequestBody PostSignUpAuthyReq passReq){
+        try{
+            PostSignUpAuthyRes passRes = sellerService.userAuthyPass(passReq);
+            return new BaseResponse<>(passRes);
+        }catch (BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
+
+
+    /**
+     * 23.06.29 작성자 : 김성인
      * 로그인 요청 후 jwt 반환 (sellerIdx, Role(추가예정) 포함)
      * Post /jat/sellers/login
      * @param @RequestBody PostLoginReq

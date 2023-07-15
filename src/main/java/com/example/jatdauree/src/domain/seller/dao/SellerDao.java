@@ -236,4 +236,21 @@ public class SellerDao {
                         rs.getInt("menu_register")}
         , sellerIdx);
     }
+
+    public int userAuthy(PostSignUpAuthyReq signUpAuthy) {
+        String query = "SELECT NOT EXISTS(\n" +
+                "    SELECT * FROM Merchandisers\n" +
+                "             WHERE name = ? AND\n" +
+                "                   birthday = ? AND\n" +
+                "                   phone = ? AND \n" +
+                "                   status = 'A'\n" +
+                ")";
+        Object[] params = new Object[]{
+                signUpAuthy.getName(),
+                signUpAuthy.getBirth(),
+                signUpAuthy.getPhoneNum()
+        };
+
+        return this.jdbcTemplate.queryForObject(query, int.class, params);
+    }
 }

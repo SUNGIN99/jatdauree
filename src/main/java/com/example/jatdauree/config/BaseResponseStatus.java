@@ -26,8 +26,12 @@ public enum BaseResponseStatus {
     // users
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
 
+    POST_USERS_INVALID_BIRTHDAY(false, 2013, "생년월일 양식을 yyyy.MM.dd로 설정해주세요."),
+    POST_USERS_INVALID_PHONENUM(false, 2014, "전화번호는 - 없이 숫자만 입력해주세요."),
+
     // 회원가입
     // [POST] /users
+    POST_USERS_ALREADY_EXISTS(false, 2016, "이미 가입한 회원입니다."),
     POST_USERS_EXISTS_EMAIL(false,2017,"중복된 이메일입니다."),
     // 회원가입 > 중복아이디 체크
     POST_USERS_EXISTS_ID(false,2018,"중복된 아이디입니다."),
