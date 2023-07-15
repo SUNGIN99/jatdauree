@@ -118,10 +118,13 @@ public class MenuService {
 
         try { // 2-3) 원산지 등록
             if (postMenuReq.getIngredientItems() != null && postMenuReq.getIngredientItems().size() != 0) {
+                System.out.println(postMenuReq.getIngredientItems().toString());
+                System.out.println(postMenuReq.getIngredientItems() != null);
+                System.out.println(postMenuReq.getIngredientItems().size());
                 ingredientCount = menuDao.ingredientRegister(storeIdx, postMenuReq.getIngredientItems());
             }
             else
-                ingredientCount = 0; // 2033 : 원산지 등록 정보가 올바르지 않습니다.
+                throw new RuntimeException();
         } catch (Exception e) {
             //System.out.println("3:" + e);
             throw new BaseException(STORE_INGREDIENT_SAVE_ERROR); // 4033 : 원산지 등록에 실패하였습니다.
