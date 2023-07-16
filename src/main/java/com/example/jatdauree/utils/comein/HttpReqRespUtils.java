@@ -45,7 +45,7 @@ public class HttpReqRespUtils {
     public static void allHeaderOutput(){
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         Enumeration<String> headerNames = request.getHeaderNames();
-        log.info("allHeaderOutput()->>");
+        log.info("allHeaderOutput()->> : "+ request.getRequestURI());
         if (headerNames != null) {
             while (headerNames.hasMoreElements()) {
                 String name = (String) headerNames.nextElement();
