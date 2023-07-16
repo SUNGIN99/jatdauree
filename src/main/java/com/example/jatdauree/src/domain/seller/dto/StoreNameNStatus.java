@@ -9,12 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostLoginRes {
-    private String jwt;
-    private int sellerIdx;
-    private String name;
-    private int first_login;
-    private int menu_register;
+public class StoreNameNStatus {
     private String store_name;
     private String store_status;
 }

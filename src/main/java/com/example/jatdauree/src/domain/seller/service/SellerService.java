@@ -113,12 +113,20 @@ public class SellerService {
             throw new BaseException(FAILED_TO_LOGIN);
         }
 
-        // 2) 회원가입후 가게 승인 및 메뉴등록이 모두 마쳐진 유저일 경우
-       String storeName = "";
+        // 1-2) 전 가게 등록 여부 존재확인
+        int storeRegistered = 0;
         try{
-            if(seller.getFirst_login() == 0 && seller.getMenu_register()== 0){
+            storeRegistered = storeDao.storeIdxBySellerIdxExists(seller.getSellerIdx());
+        }catch(Exception exception){
+            throw new BaseException(FAILED_TO_LOGIN);
+        }
+
+        // 2) 회원가입후 가게승인 및 메뉴 등록 여부 확인
+        StoreNameNStatus storeNameStatus = null;
+        try{
+            if (storeRegistered == 1){
                 // storeName from storeDao
-                storeName = storeDao.storeNameBySellerIdx(seller.getSellerIdx());
+                storeNameStatus = storeDao.storeNameBySellerIdx(seller.getSellerIdx());
             }
         }catch(Exception exception){
             throw new BaseException(FAILED_TO_LOGIN);
@@ -136,7 +144,8 @@ public class SellerService {
                         seller.getName(),
                         seller.getFirst_login(),
                         seller.getMenu_register(),
-                        seller.getFirst_login() == 0 && seller.getMenu_register()== 0 ? storeName: "");
+                        storeNameStatus != null ? storeNameStatus.getStore_name() : "", // null 이 아닌것은 가게등록을 무조건 했다는것.
+                        storeNameStatus != null ? storeNameStatus.getStore_status() : null); // null
             }
             else{
                 throw new BaseException(FAILED_TO_LOGIN);

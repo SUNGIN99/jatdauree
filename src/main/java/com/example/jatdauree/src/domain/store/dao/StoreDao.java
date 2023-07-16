@@ -1,5 +1,6 @@
 package com.example.jatdauree.src.domain.store.dao;
 
+import com.example.jatdauree.src.domain.seller.dto.StoreNameNStatus;
 import com.example.jatdauree.src.domain.store.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,11 +27,14 @@ public class StoreDao {
      * 23.07.06 작성자 : 김성인
      * 등록된 판매자 가게 조회
      */
-    public String storeNameBySellerIdx(int sellerIdx){
-        String query = "SELECT store_name FROM Stores WHERE sellerIdx = ?";
+    public StoreNameNStatus storeNameBySellerIdx(int sellerIdx){
+        String query = "SELECT store_name, status FROM Stores WHERE sellerIdx = ?";
 
         return this.jdbcTemplate.queryForObject(query,
-                (rs, rowNum) -> rs.getString("store_name"), sellerIdx);
+                (rs, rowNum) -> new StoreNameNStatus(
+                        rs.getString("store_name"),
+                        rs.getString("status")
+                ), sellerIdx);
     }
 
     /**
@@ -44,6 +48,18 @@ public class StoreDao {
         return this.jdbcTemplate.queryForObject(query,
                 (rs, rowNum) -> rs.getInt("storeIdx"), sellerIdx);
     }
+
+    /**
+     * storeDao - 0 - 3
+     * 23.07.06 작성자 : 김성인
+     * 등록된 판매자 가게 Idx 조회
+     */
+    public int storeIdxBySellerIdxExists(int sellerIdx){
+        String query = "SELECT EXISTS(SELECT storeIdx FROM Stores WHERE sellerIdx = ?)";
+
+        return this.jdbcTemplate.queryForObject(query, int.class, sellerIdx);
+    }
+
 
 
     /**
