@@ -62,12 +62,11 @@ public class PracController {
     }*/
 
     @GetMapping("")
-    public int a(){
+    public void a(){
 
         String remoteAddr = getClientIpAddressIfServletRequestExist();
         log.info("getIpAddIfserveletReqExist: " + remoteAddr);
 
         allHeaderOutput();
-        return 1;
     }
 }
