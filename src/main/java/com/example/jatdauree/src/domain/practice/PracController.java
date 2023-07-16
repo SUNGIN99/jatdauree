@@ -8,11 +8,16 @@ import com.example.jatdauree.src.domain.practice.dto.GetItemRes;
 import com.example.jatdauree.src.domain.practice.dto.PostItemsReq;
 import com.example.jatdauree.src.domain.practice.dto.PostItemsRes;
 import com.example.jatdauree.src.domain.practice.service.PracService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 
+import static com.example.jatdauree.utils.comein.HttpReqRespUtils.allHeaderOutput;
+import static com.example.jatdauree.utils.comein.HttpReqRespUtils.getClientIpAddressIfServletRequestExist;
+
+@Slf4j
 @RestController
 @RequestMapping("/prac")
 public class PracController {
@@ -58,6 +63,11 @@ public class PracController {
 
     @GetMapping("")
     public int a(){
+
+        String remoteAddr = getClientIpAddressIfServletRequestExist();
+        log.info("getIpAddIfserveletReqExist: " + remoteAddr);
+
+        allHeaderOutput();
         return 1;
     }
 }

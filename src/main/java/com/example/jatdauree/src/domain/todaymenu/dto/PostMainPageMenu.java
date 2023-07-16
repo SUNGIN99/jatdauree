@@ -5,13 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostTodayMenuItem {
-    private int menuIdx;
-    private int discountPrice;
-    private int discount;
-    private int remain;
+public class PostMainPageMenu implements Serializable {
+    private List<GetMainPageItem> mainMenus;
+    private List<GetMainPageItem> sideMenus;
 }

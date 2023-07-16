@@ -5,13 +5,13 @@ import com.example.jatdauree.src.domain.store.dao.StoreDao;
 import com.example.jatdauree.src.domain.todaymenu.dao.TodayMenuDao;
 import com.example.jatdauree.src.domain.todaymenu.dto.GetMainPageItem;
 import com.example.jatdauree.src.domain.todaymenu.dto.GetMainPageMenu;
-import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuRegReq;
-import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuRegRes;
+import com.example.jatdauree.src.domain.todaymenu.dto.PostMainPageMenu;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -59,7 +59,7 @@ public class TodayMenuService {
 
     // 떨이메뉴 등록
     @Transactional(rollbackFor = BaseException.class)
-    public PostTodayMenuRegRes registerTodayMenu(int sellerIdx, PostTodayMenuRegReq postTodayMenuRegReq) throws BaseException {
+    public PostMainPageMenu registerTodayMenu(int sellerIdx, PostMainPageMenu postTodayMenuReq) throws BaseException {
         // 1) 사용자 가게 조회
         int storeIdx;
         try{
@@ -68,31 +68,37 @@ public class TodayMenuService {
             throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
 
-        // 2) 떨이 메인 메뉴 등록
-        int mainTodayMenuItemCount = 0, sideTodayMenuItemCount = 0;
-        try{
-            if(postTodayMenuRegReq.getTodayMenuListMain() != null && postTodayMenuRegReq.getTodayMenuListMain().size() != 0)
-                mainTodayMenuItemCount = todayMenuDao.registerTodayMenu(storeIdx, postTodayMenuRegReq.getTodayMenuListMain(), "M");
-            else
-                mainTodayMenuItemCount = 0; // 2041 : 오늘의 떨이메뉴(메인) 등록 정보가 올바르지 않습니다.
-        }catch (Exception e) {
-            throw new BaseException(POST_TODAY_MAINMENU_SAVE_ERROR); // 4041 : 오늘의 떨이메뉴(메인) 등록에 실패하였습니다.
+        // -1 : 미등록 상태 메뉴
+        //  0 : 등록 되어있지만 수정 안하는 떨이메뉴
+        //  1 : 등록되어 있고, 수정을 하는 떨이메뉴
+        //  2 : 등록 안되어 있다가 새로 등록하는 떨이메뉴
+        // 2-1) 메인 메뉴 떨이메뉴 수정/등록 확인
+        List<GetMainPageItem> newTodayMain = new ArrayList<>(), updateTodayMain = new ArrayList<>();
+        if (postTodayMenuReq.getMainMenus() != null) {
+            for (GetMainPageItem pageItem : postTodayMenuReq.getMainMenus()) {
+                if (pageItem.getIsUpdated() == 2) { // 2: 새로 등록하는 오늘의 떨이 메뉴 일 경우!
+                    newTodayMain.add(pageItem);
+                }
+                else if(pageItem.getIsUpdated() == 1){ // 1: 등록되어있는 메뉴 중 수정하는 떨이 메뉴일 경우!
+                    updateTodayMain.add(pageItem);
+                }
+            }
         }
 
-        // 2) 떨이 사이드 메뉴 등록
-        try{
-            if(postTodayMenuRegReq.getTodayMenuListSide() != null && postTodayMenuRegReq.getTodayMenuListSide().size() != 0)
-                sideTodayMenuItemCount = todayMenuDao.registerTodayMenu(storeIdx, postTodayMenuRegReq.getTodayMenuListSide(), "S");
-            else
-                sideTodayMenuItemCount = 0; // 2042 : 오늘의 떨이메뉴(사이드) 등록 정보가 올바르지 않습니다.
-        }catch (Exception e) {
-            throw new BaseException(POST_TODAY_SIDEMENU_SAVE_ERROR); // 4042 : 오늘의 떨이메뉴(사이드) 등록에 실패하였습니다.
+        // 2-2) 사이드 메뉴 떨이메뉴 수정/등록 확인
+        List<GetMainPageItem> newTodaySide = new ArrayList<>(), updateTodaySide = new ArrayList<>();
+        if (postTodayMenuReq.getSideMenus() != null) {
+            for (GetMainPageItem pageItem : postTodayMenuReq.getSideMenus()) {
+                if (pageItem.getIsUpdated() == 2) { // 2: 새로 등록하는 오늘의 떨이 메뉴 일 경우!
+                    newTodaySide.add(pageItem);
+                }
+                else if(pageItem.getIsUpdated() == 1){
+                    updateTodaySide.add(pageItem);
+                }
+            }
         }
 
-        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-
-        return new PostTodayMenuRegRes(storeIdx, date, mainTodayMenuItemCount, sideTodayMenuItemCount);
-
+        return null;
     }
 
 

@@ -4,8 +4,7 @@ package com.example.jatdauree.src.domain.todaymenu;
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.BaseResponse;
 import com.example.jatdauree.src.domain.todaymenu.dto.GetMainPageMenu;
-import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuRegReq;
-import com.example.jatdauree.src.domain.todaymenu.dto.PostTodayMenuRegRes;
+import com.example.jatdauree.src.domain.todaymenu.dto.PostMainPageMenu;
 import com.example.jatdauree.src.domain.todaymenu.service.TodayMenuService;
 import com.example.jatdauree.utils.jwt.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,7 @@ public class TodayMenuController {
 
 
     /**
-     * 23.07.07 작성자 : 정주현, 김성인
+     * 23.07.17 작성자 : 정주현, 김성인
      * 등록된 메뉴 조회
      * GET /jat/today
      * @return BaseResponse<GetMainPageMenu>
@@ -55,10 +54,10 @@ public class TodayMenuController {
      */
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<PostTodayMenuRegRes> registerTodayMenu(@RequestBody PostTodayMenuRegReq postTodayMenuRegReq) {
+    public BaseResponse<PostMainPageMenu> registerTodayMenu(@RequestBody PostMainPageMenu postTodayMenuReg) {
         try {
             int sellerIdx = jwtService.getUserIdx();
-            PostTodayMenuRegRes postTodayMenuRegRes = todaymenuService.registerTodayMenu(sellerIdx, postTodayMenuRegReq);
+            PostMainPageMenu postTodayMenuRegRes = todaymenuService.registerTodayMenu(sellerIdx, postTodayMenuReg);
             return new BaseResponse<>(postTodayMenuRegRes);
         } catch (BaseException baseException) {
             return new BaseResponse<>(baseException.getStatus());
