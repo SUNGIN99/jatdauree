@@ -18,9 +18,10 @@ import org.springframework.cglib.core.Constants;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.InputStreamReader;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,28 +50,31 @@ public class WSOpenAPIService implements Constants {
         ObjectMapper objectMapper = null;
 
         try {
-            List<NameValuePair> nameValuePairs= new ArrayList<NameValuePair>();
 
-            nameValuePairs.add(new BasicNameValuePair("query",ip));
-            nameValuePairs.add(new BasicNameValuePair("serviceKey",apiKey));
-            nameValuePairs.add(new BasicNameValuePair("answer","JSON"));
+            StringBuilder urlBuilder = new StringBuilder(apiUri);
+            urlBuilder.append("?"+ URLEncoder.encode("query", "UTF-8") + "="+ip);
+            urlBuilder.append("&"+ URLEncoder.encode("serviceKey", "UTF-8") + "="+apiKey);
+            urlBuilder.append("&"+ URLEncoder.encode("answer", "UTF-8") + "=JSON");
 
-            HttpGet httpGet = new HttpGet(apiUri);
-            httpGet.setConfig(requestConfig);
-            httpGet.addHeader("Content-type", "application/json;charset=UTF-8");
+            URL url = new URL(urlBuilder.toString());
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Content-type", "application/json;charset=UTF-8");
 
-            URI uri = new URIBuilder(httpGet.getURI())
-                    .addParameters(nameValuePairs)
-                    .build();
+            BufferedReader rd;
+            // 서비스코드가 정상이면 200~300사이의 숫자가 나옵니다.
+            rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
 
-            httpGet.setURI(uri);
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = rd.readLine()) != null) {
+                sb.append(line);
+            }
+            rd.close();
+            conn.disconnect();
 
-            CloseableHttpResponse response = closeableHttpClient.execute(httpGet);
-
-            int statusCode = response.getStatusLine().getStatusCode();
-
-            if(statusCode == HttpStatus.OK.value()) {
-                String json = EntityUtils.toString(response.getEntity(), "UTF-8");
+            if(conn.getResponseCode() == HttpStatus.OK.value()) {
+                String json = sb.toString();
                 logger.info("WHO IS API Response json : "+json);
                 objectMapper = new ObjectMapper();
 
@@ -79,19 +83,16 @@ public class WSOpenAPIService implements Constants {
                 return map.get("whois");
 
             }else{
+                String json = sb.toString();
                 logger.info("WHO IS API Response failed: ");
-                System.out.println(EntityUtils.toString(response.getEntity(), "UTF-8"));
+                System.out.println(json);
                 return null;
             }
         } catch (ClientProtocolException e) {
             logger.error(e.getMessage());
             e.printStackTrace();
             return null;
-        } catch (URISyntaxException e) {
-            logger.error(e.getMessage());
-            e.printStackTrace();
-            return null;
-        } catch (IOException e) {
+        }  catch (IOException e) {
             logger.error(e.getMessage());
             e.printStackTrace();
             return null;
