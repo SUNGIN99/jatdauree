@@ -26,11 +26,12 @@ WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/jat/sellers/test").hasRole("SELLER")
                 .anyRequest().permitAll()
                 .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .addFilterBefore(new JwtAuthenticateFilter(jwtTokenProvider),
                         UsernamePasswordAuthenticationFilter.class);
 
         //http.cors();
-
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 }
