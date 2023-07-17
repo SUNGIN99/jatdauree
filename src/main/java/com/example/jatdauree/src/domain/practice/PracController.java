@@ -61,12 +61,12 @@ public class PracController {
     public BaseResponse<> outputItemsPathId(){
     }*/
 
-    @GetMapping("")
+   /* @GetMapping("")
     public void a(){
 
         String remoteAddr = getClientIpAddressIfServletRequestExist();
         log.info("getIpAddIfserveletReqExist: " + remoteAddr);
 
         allHeaderOutput();
-    }
+    }*/
 }

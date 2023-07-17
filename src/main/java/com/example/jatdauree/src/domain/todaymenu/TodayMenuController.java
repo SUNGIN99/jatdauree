@@ -4,7 +4,7 @@ package com.example.jatdauree.src.domain.todaymenu;
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.BaseResponse;
 import com.example.jatdauree.src.domain.todaymenu.dto.GetMainPageMenu;
-import com.example.jatdauree.src.domain.todaymenu.dto.PostMainPageMenu;
+import com.example.jatdauree.src.domain.todaymenu.dto.PostMainPageTMenu;
 import com.example.jatdauree.src.domain.todaymenu.service.TodayMenuService;
 import com.example.jatdauree.utils.jwt.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,10 +54,10 @@ public class TodayMenuController {
      */
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<PostMainPageMenu> registerTodayMenu(@RequestBody PostMainPageMenu postTodayMenuReg) {
+    public BaseResponse<PostMainPageTMenu> registerTodayMenu(@RequestBody PostMainPageTMenu postTodayMenuReg) {
         try {
             int sellerIdx = jwtService.getUserIdx();
-            PostMainPageMenu postTodayMenuRegRes = todaymenuService.registerTodayMenu(sellerIdx, postTodayMenuReg);
+            PostMainPageTMenu postTodayMenuRegRes = todaymenuService.registerTodayMenu(sellerIdx, postTodayMenuReg);
             return new BaseResponse<>(postTodayMenuRegRes);
         } catch (BaseException baseException) {
             return new BaseResponse<>(baseException.getStatus());

@@ -5,14 +5,12 @@ import com.example.jatdauree.src.domain.store.dao.StoreDao;
 import com.example.jatdauree.src.domain.todaymenu.dao.TodayMenuDao;
 import com.example.jatdauree.src.domain.todaymenu.dto.GetMainPageItem;
 import com.example.jatdauree.src.domain.todaymenu.dto.GetMainPageMenu;
-import com.example.jatdauree.src.domain.todaymenu.dto.PostMainPageMenu;
+import com.example.jatdauree.src.domain.todaymenu.dto.PostMainPageTMenu;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static com.example.jatdauree.config.BaseResponseStatus.*;
@@ -59,7 +57,7 @@ public class TodayMenuService {
 
     // 떨이메뉴 등록
     @Transactional(rollbackFor = BaseException.class)
-    public PostMainPageMenu registerTodayMenu(int sellerIdx, PostMainPageMenu postTodayMenuReq) throws BaseException {
+    public PostMainPageTMenu registerTodayMenu(int sellerIdx, PostMainPageTMenu postTodayMenuReq) throws BaseException {
         // 1) 사용자 가게 조회
         int storeIdx;
         try{
@@ -74,6 +72,7 @@ public class TodayMenuService {
         //  2 : 등록 안되어 있다가 새로 등록하는 떨이메뉴
         // 2-1) 메인 메뉴 떨이메뉴 수정/등록 확인
         List<GetMainPageItem> newTodayMain = new ArrayList<>(), updateTodayMain = new ArrayList<>();
+        int newTodayMainCnt = 0, updateTodayMainCnt = 0;
         if (postTodayMenuReq.getMainMenus() != null) {
             for (GetMainPageItem pageItem : postTodayMenuReq.getMainMenus()) {
                 if (pageItem.getIsUpdated() == 2) { // 2: 새로 등록하는 오늘의 떨이 메뉴 일 경우!
@@ -84,9 +83,17 @@ public class TodayMenuService {
                 }
             }
         }
+        // 2-2) 메인 떨이메뉴 등록/수정
+        try{
+            newTodayMainCnt = todayMenuDao.registerTodayMenu(storeIdx, newTodayMain, "M");
+            updateTodayMainCnt = todayMenuDao.updateTodayMenu(updateTodayMain);
+        } catch (Exception e) {
+            throw new BaseException(POST_TODAY_MAINMENU_SAVE_ERROR); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
 
-        // 2-2) 사이드 메뉴 떨이메뉴 수정/등록 확인
+        // 3-1) 사이드 메뉴 떨이메뉴 수정/등록 확인
         List<GetMainPageItem> newTodaySide = new ArrayList<>(), updateTodaySide = new ArrayList<>();
+        int newTodaySideCnt = 0, updateTodaySideCnt = 0;
         if (postTodayMenuReq.getSideMenus() != null) {
             for (GetMainPageItem pageItem : postTodayMenuReq.getSideMenus()) {
                 if (pageItem.getIsUpdated() == 2) { // 2: 새로 등록하는 오늘의 떨이 메뉴 일 경우!
@@ -96,6 +103,13 @@ public class TodayMenuService {
                     updateTodaySide.add(pageItem);
                 }
             }
+        }
+        // 3-2) 사이드 떨이메뉴 등록/수정
+        try{
+            newTodaySideCnt = todayMenuDao.registerTodayMenu(storeIdx, newTodaySide, "S");
+            updateTodaySideCnt = todayMenuDao.updateTodayMenu(updateTodaySide);
+        } catch (Exception e) {
+            throw new BaseException(POST_TODAY_MAINMENU_SAVE_ERROR); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
 
         return null;

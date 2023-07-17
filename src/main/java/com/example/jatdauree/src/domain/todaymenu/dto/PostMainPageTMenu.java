@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostMainPageMenu implements Serializable {
+public class PostMainPageTMenu implements Serializable {
     private List<GetMainPageItem> mainMenus;
     private List<GetMainPageItem> sideMenus;
 }

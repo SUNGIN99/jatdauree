@@ -57,16 +57,15 @@ public class TodayMenuDao {
                 "        remain = ?\n" +
                 "WHERE todaymenuIdx = ?";
 
-        this.jdbcTemplate.batchUpdate(query,
+        return this.jdbcTemplate.batchUpdate(query,
                 todayMenuItems,
                 todayMenuItems.size(),
                 (PreparedStatement ps, GetMainPageItem todayMenuItem) -> {
                     ps.setInt(1, todayMenuItem.getDiscountPrice());
                     ps.setInt(2, todayMenuItem.getDiscountRatio());
                     ps.setInt(3, todayMenuItem.getRemain());
-                });
+                }).length ;
 
-        return todayMenuItems.size();
     }
 
 
