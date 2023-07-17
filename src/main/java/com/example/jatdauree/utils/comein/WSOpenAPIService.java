@@ -57,7 +57,7 @@ public class WSOpenAPIService implements Constants {
 
             HttpGet httpGet = new HttpGet(apiUri);
             httpGet.setConfig(requestConfig);
-            httpGet.addHeader("Content-type", "application/json");
+            httpGet.addHeader("Content-type", "application/json;charset=UTF-8");
 
             URI uri = new URIBuilder(httpGet.getURI())
                     .addParameters(nameValuePairs)
@@ -80,7 +80,7 @@ public class WSOpenAPIService implements Constants {
 
             }else{
                 logger.info("WHO IS API Response failed: ");
-                System.out.println(response);
+                System.out.println(EntityUtils.toString(response.getEntity(), "UTF-8"));
                 return null;
             }
         } catch (ClientProtocolException e) {
