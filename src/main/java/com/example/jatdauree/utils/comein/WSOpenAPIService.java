@@ -53,7 +53,7 @@ public class WSOpenAPIService implements Constants {
 
             nameValuePairs.add(new BasicNameValuePair("query",ip));
             nameValuePairs.add(new BasicNameValuePair("serviceKey",apiKey));
-            nameValuePairs.add(new BasicNameValuePair("answer","json"));
+            nameValuePairs.add(new BasicNameValuePair("answer","JSON"));
 
             HttpGet httpGet = new HttpGet(apiUri);
             httpGet.setConfig(requestConfig);
