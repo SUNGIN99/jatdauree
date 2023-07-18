@@ -87,9 +87,12 @@ public class TodayMenuService {
         }
         // 2-2) 메인 떨이메뉴 등록/수정
         try{
-            System.out.println("todayMainParsed: " + newTodayMain.size());
+            System.out.println("todayMainParsed1: " + newTodayMain.size());
+            System.out.println("todayMainParsed2: " + updateTodayMain.size());
             newTodayMainCnt = todayMenuDao.registerTodayMenu(storeIdx, newTodayMain, "M");
             updateTodayMainCnt = todayMenuDao.updateTodayMenu(updateTodayMain);
+            System.out.println("newTodayMainCnt: " + newTodayMainCnt);
+            System.out.println("updateTodayMainCnt: " + updateTodayMainCnt);
         } catch (Exception e) {
             throw new BaseException(POST_TODAY_MAINMENU_SAVE_ERROR); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
