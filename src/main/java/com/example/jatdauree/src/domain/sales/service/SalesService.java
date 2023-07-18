@@ -315,4 +315,50 @@ public class SalesService {
 
         return new MonthlyMenuSalesRes(storeIdx, month, sortedItemSales);
     }
+
+    public MonthlyMenuOrdersRes getMontlyMenuOrders(int month, int sellerIdx) throws BaseException{
+        // 0) 사용자 가게 조회
+        int storeIdx;
+        try {
+            storeIdx = storeDao.storeIdxBySellerIdx(sellerIdx);
+        } catch (Exception e) {
+            throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
+
+        // 1) 가게의 메뉴 총 주문 수 조회
+        int totalMenuOrderCount = 0;
+        try{
+            totalMenuOrderCount = salesDao.getStoresTotalOrderCount(storeIdx);
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
+
+        // 2) 메뉴 별 주문 수 조회
+        List<ItemSalesOrderRatio> orderRatios = null;
+        try{
+            orderRatios = salesDao.getMontlyMenuOrders(storeIdx, month);
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
+
+        // 3) 메뉴 별 주문 비율 구하기
+        int tempTotalCount = 0;
+        try{
+            if (orderRatios != null && totalMenuOrderCount != 0){
+                for(ItemSalesOrderRatio itemSale : orderRatios){
+                    tempTotalCount += itemSale.getMenuOrderCount();
+                    double menuCharge = Math.round(itemSale.getMenuOrderCount() * 1.0 / totalMenuOrderCount * 10000) / 100.0;
+                    itemSale.setMenuCharge(menuCharge);
+                }
+            }
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
+        if(tempTotalCount != totalMenuOrderCount){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        return new MonthlyMenuOrdersRes(storeIdx, month, totalMenuOrderCount ,orderRatios);
+
+    }
 }

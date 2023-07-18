@@ -126,4 +126,44 @@ public class SalesDao {
                 ), params);
 
     }
+
+    public int getStoresTotalOrderCount(int storeIdx) {
+        String query = "SELECT\n" +
+                "    COUNT(M.menuIdx) as total_menu_orders\n" +
+                "FROM Orders O\n" +
+                "LEFT JOIN OrderLists OL on O.orderIdx = OL.orderIdx\n" +
+                "LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
+                "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
+                "WHERE O.storeIdx = ?\n" +
+                "  AND O.status = 'A'";
+        return this.jdbcTemplate.queryForObject(query, int.class, storeIdx);
+    }
+
+    public List<ItemSalesOrderRatio> getMontlyMenuOrders(int storeIdx, int month) {
+        String query = "SELECT\n" +
+                "    M.menuIdx,\n" +
+                "    M.menu_name,\n" +
+                "    COUNT(M.menuIdx) as menu_order_count\n" +
+                "FROM Orders O\n" +
+                "LEFT JOIN OrderLists OL on O.orderIdx = OL.orderIdx\n" +
+                "LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
+                "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
+                "WHERE O.storeIdx = ?\n" +
+                "  AND O.status = 'A'\n" +
+                "  AND DATE_FORMAT(O.created, '%c') = ?\n" +
+                "GROUP BY M.menuIdx";
+
+        Object[] params = new Object[] {
+                storeIdx, month
+        };
+
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new ItemSalesOrderRatio(
+                        rs.getInt("menuIdx"),
+                        rs.getString("menu_name"),
+                        rs.getInt("menu_order_count"),
+                        0
+                ), params);
+
+    }
 }
