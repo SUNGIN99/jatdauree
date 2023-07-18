@@ -6,6 +6,7 @@ import com.example.jatdauree.src.domain.todaymenu.dao.TodayMenuDao;
 import com.example.jatdauree.src.domain.todaymenu.dto.GetMainPageItem;
 import com.example.jatdauree.src.domain.todaymenu.dto.GetMainPageMenu;
 import com.example.jatdauree.src.domain.todaymenu.dto.PostMainPageTMenu;
+import com.example.jatdauree.src.domain.todaymenu.dto.PostMainPageTMenuRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +58,7 @@ public class TodayMenuService {
 
     // 떨이메뉴 등록
     @Transactional(rollbackFor = BaseException.class)
-    public PostMainPageTMenu registerTodayMenu(int sellerIdx, PostMainPageTMenu postTodayMenuReq) throws BaseException {
+    public PostMainPageTMenuRes registerTodayMenu(int sellerIdx, PostMainPageTMenu postTodayMenuReq) throws BaseException {
         // 1) 사용자 가게 조회
         int storeIdx;
         try{
@@ -112,7 +113,7 @@ public class TodayMenuService {
             throw new BaseException(POST_TODAY_MAINMENU_SAVE_ERROR); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
 
-        return null;
+        return new PostMainPageTMenuRes(storeIdx, newTodayMainCnt, updateTodayMainCnt, newTodaySideCnt, updateTodaySideCnt);
     }
 
 
