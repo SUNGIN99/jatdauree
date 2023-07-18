@@ -77,14 +77,12 @@ public class TodayMenuService {
         if (postTodayMenuReq.getMainMenus() != null) {
             System.out.println("todayMain: " + postTodayMenuReq.getMainMenus().size());
             for (GetMainPageItem pageItem : postTodayMenuReq.getMainMenus()) {
+                System.out.println(pageItem.getTodaymenuIdx() +": "+ pageItem.getMenuName() + ": " + pageItem.getIsUpdated());
                 if (pageItem.getIsUpdated() == 2) { // 2: 새로 등록하는 오늘의 떨이 메뉴 일 경우!
-                    System.out.println("newMainItem! ");
                     newTodayMain.add(pageItem);
                 }
                 else if(pageItem.getIsUpdated() == 1){ // 1: 등록되어있는 메뉴 중 수정하는 떨이 메뉴일 경우!
                     updateTodayMain.add(pageItem);
-                }else{
-                    System.out.println("justMainItem! ");
                 }
             }
         }
