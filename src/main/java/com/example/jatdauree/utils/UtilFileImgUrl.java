@@ -5,8 +5,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.text.SimpleDateFormat;
 
-public class UtilNanoTime {
+public class UtilFileImgUrl {
     private final static long currentTimeNanosOffset = (System.currentTimeMillis() * 1000000) - System.nanoTime();
+
     public static long currentTimeNanos() {
         return System.nanoTime() + currentTimeNanosOffset;
     }
@@ -14,27 +15,25 @@ public class UtilNanoTime {
     public static String absolutePath = "/home/ubuntu/s3tempImg/";
     //public static String absolutePath = "C:\\Users\\d\\Desktop\\s3\\s3Save\\";
 
-    public static String checkFileIsNullThenName(MultipartFile files){
-        long nanos = UtilNanoTime.currentTimeNanos();
+    public static String checkFileIsNullThenName(MultipartFile files) {
+        long nanos = UtilFileImgUrl.currentTimeNanos();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
-        String fileNanoName = sdf.format(nanos/1000000L);
+        String fileNanoName = sdf.format(nanos / 1000000L);
 
         //System.out.println("checkFileIsNullThenName 1:");
-        if(files == null) {
+        if (files == null) {
             return null;
-        }
-        else if(!files.isEmpty()){
+        } else if (!files.isEmpty()) {
             String contentType = files.getContentType();
             String originalFileExtension;
 
             //System.out.println("checkFileIsNullThenName 2:");
-            if (ObjectUtils.isEmpty(contentType)){
+            if (ObjectUtils.isEmpty(contentType)) {
                 //System.out.println("checkFileIsNullThenName 3:");
                 return null;
-            }
-            else{
+            } else {
                 //System.out.println("checkFileIsNullThenName 4:");
                 if (contentType.contains("image/jpeg"))
                     originalFileExtension = ".jpg";
@@ -51,3 +50,4 @@ public class UtilNanoTime {
         return null;
     }
 }
+

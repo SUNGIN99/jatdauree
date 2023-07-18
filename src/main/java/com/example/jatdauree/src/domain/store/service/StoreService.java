@@ -5,23 +5,17 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.src.domain.store.dao.StoreDao;
 import com.example.jatdauree.src.domain.store.dto.*;
-import com.example.jatdauree.utils.UtilNanoTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 import static com.example.jatdauree.config.BaseResponseStatus.*;
-import static com.example.jatdauree.utils.UtilNanoTime.absolutePath;
-import static com.example.jatdauree.utils.UtilNanoTime.checkFileIsNullThenName;
+import static com.example.jatdauree.utils.UtilFileImgUrl.absolutePath;
+import static com.example.jatdauree.utils.UtilFileImgUrl.checkFileIsNullThenName;
 
 
 @Service

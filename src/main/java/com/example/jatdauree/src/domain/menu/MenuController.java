@@ -63,6 +63,24 @@ public class MenuController {
         }
     }
 
+    /**
+     * 23.07.18 작성자 : 김성인
+     * 메뉴수정
+     * PATCH /jat/menus
+     * @return BaseResponse<GetMenuItemsRes>
+     */
+    @ResponseBody
+    @PatchMapping("")
+    public BaseResponse<PatchMenuRes> menuUpdate(PatchMenuReq postMenuReq) {
+        try {
+            int sellerIdx = jwtService.getUserIdx();
+
+            PatchMenuRes patchMenuRes = menuService.menuUpdate(sellerIdx, postMenuReq);
+            return new BaseResponse<>(patchMenuRes);
+        } catch (BaseException baseException) {
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
 
 
 

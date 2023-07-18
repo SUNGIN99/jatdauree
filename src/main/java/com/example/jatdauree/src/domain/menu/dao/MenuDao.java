@@ -1,6 +1,7 @@
 package com.example.jatdauree.src.domain.menu.dao;
 
 import com.example.jatdauree.src.domain.menu.dto.*;
+import com.example.jatdauree.src.domain.todaymenu.dto.GetMainPageItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -27,7 +28,7 @@ public class MenuDao {
      * Main menuRegister 메인 메뉴등록
      * 반환 정보 : 메인 메뉴 등록 개수
      */
-    public int menuRegister(int storeIdx, ArrayList<PostMenuUrlItem> mainMenuList, String mOrS)  {
+    public int menuRegister(int storeIdx, List<PostMenuUrlItem> mainMenuList, String mOrS)  {
         String query = "INSERT INTO Menu (" +
                 "storeIdx, " +
                 "menu_name, " +
@@ -60,7 +61,7 @@ public class MenuDao {
      * 원산지 등록
      * 반환 정보 : 원산지 등록 개수
      */
-    public int ingredientRegister(int storeIdx, ArrayList<PostIngredientItem> ingredientList)  {
+    public int ingredientRegister(int storeIdx, List<PostIngredientItem> ingredientList)  {
         String query ="INSERT INTO Ingredients (storeIdx, ingredient_name, origin, menu_names)\n" +
                 "VALUES (?,?,?,?);";
 
@@ -105,22 +106,43 @@ public class MenuDao {
      * 23.07.06 작성자 : 이윤채
      * menuUpdate 메뉴 업데이트 (POST)
      */
-    /*public int menuUpdate(PostMenuUpReq postMenuUpReq){
-        String query= "UPDATE Menu SET menu_name = ?, price = ? ,composition=?,description=?,menu_url=?,status=? WHERE menuIdx = ? AND storeIdx=?;";
-        Object[] params = new Object[]{
+    public int menuUpdate(List<PatchMenuUrlItem> menuItems){
+        String query= "UPDATE Menu\n" +
+                "SET menu_name = ?,\n" +
+                "    price = ?,\n" +
+                "    composition = ?,\n" +
+                "    description = ?, \n" +
+                "    menu_url = ?\n" +
+                "WHERE menuIdx = ?";
 
-                postMenuUpReq.getMenuName(),
-                postMenuUpReq.getPrice(),
-                postMenuUpReq.getComposition(),
-                postMenuUpReq.getDescription(),
-                postMenuUpReq.getMenuUrl(),
-                postMenuUpReq.getStatus(),
-                postMenuUpReq.getMenuIdx(),
-                postMenuUpReq.getStoreIdx()
+        return this.jdbcTemplate.batchUpdate(query,
+                menuItems,
+                menuItems.size(),
+                (PreparedStatement ps, PatchMenuUrlItem item) ->{
+                    ps.setString(1, item.getMenuName());
+                    ps.setInt(2, item.getPrice());
+                    ps.setString(3, item.getComposition());
+                    ps.setString(4, item.getDescription());
+                    ps.setString(5, item.getMenuUrl());
+                    ps.setInt(6, item.getMenuIdx());
 
-        };
-        return this.jdbcTemplate.update(query, params);
-    }*/
+                }
+        ).length;
+    }
+
+    public int menuDeActive(List<PatchMenuItem> menuItems){
+        String query = "UPDATE Menu\n" +
+                "SET status = 'D'\n" +
+                "WHERE menuIdx = ?";
+
+        return this.jdbcTemplate.batchUpdate(query,
+                menuItems,
+                menuItems.size(),
+                (PreparedStatement ps, PatchMenuItem item) ->{
+                    ps.setInt(1, item.getMenuIdx());
+                }
+        ).length;
+    }
 
 
 }

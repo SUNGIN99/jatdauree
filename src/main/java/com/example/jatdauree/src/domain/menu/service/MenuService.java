@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.jatdauree.config.BaseResponseStatus.*;
-import static com.example.jatdauree.utils.UtilNanoTime.absolutePath;
-import static com.example.jatdauree.utils.UtilNanoTime.checkFileIsNullThenName;
+import static com.example.jatdauree.utils.UtilFileImgUrl.absolutePath;
+import static com.example.jatdauree.utils.UtilFileImgUrl.checkFileIsNullThenName;
 
 @Service
 public class MenuService {
@@ -42,8 +42,8 @@ public class MenuService {
     }
 
 
-    public ArrayList<PostMenuUrlItem> convertToUrlFileNames(ArrayList<PostMenuItem> fileItem) throws IOException {
-        ArrayList<PostMenuUrlItem> urlItems = new ArrayList<>();
+    public List<PostMenuUrlItem> convertToUrlFileNames(List<PostMenuItem> fileItem) throws IOException {
+        List<PostMenuUrlItem> urlItems = new ArrayList<>();
         String fileNames; File file;
         //System.out.println("convertToUrlFileNames 1:");
         for (PostMenuItem item : fileItem) {
@@ -65,10 +65,36 @@ public class MenuService {
                     fileNames
             ));
         }
-
         //System.out.println("convertToUrlFileNames 3:");
         return urlItems;
+    }
 
+    public List<PatchMenuUrlItem> convertToUrlFileNamesUpd(List<PatchMenuItem> fileItem) throws IOException {
+        List<PatchMenuUrlItem> urlItems = new ArrayList<>();
+        String fileNames; File file;
+        //System.out.println("convertToUrlFileNames 1:");
+        for (PatchMenuItem item : fileItem) {
+            fileNames = checkFileIsNullThenName(item.getMenuUrl());
+            if(fileNames != null) {
+
+                //System.out.println("convertToUrlFileNames 2:");
+                file = new File(absolutePath + fileNames);
+                item.getMenuUrl().transferTo(file);
+                s3Client.putObject(new PutObjectRequest(bucketName, fileNames, file));
+                file.delete();
+            }
+
+            urlItems.add(new PatchMenuUrlItem(
+                    item.getMenuIdx(),
+                    item.getMenuName(),
+                    item.getPrice(),
+                    item.getComposition(),
+                    item.getDescription(),
+                    fileNames
+            ));
+        }
+        //System.out.println("convertToUrlFileNames 3:");
+        return urlItems;
     }
 
     // 초기 메뉴 등록
@@ -99,7 +125,7 @@ public class MenuService {
 
         // 2) 가게 메뉴/원산지 등록
         int mainMenuItemCount = 0, sideMenuItemCount = 0, ingredientCount = 0;
-        ArrayList<PostMenuUrlItem> urlItems = null;
+        List<PostMenuUrlItem> urlItems = null;
         try { // 2-1) 메인 메뉴 등록
             if (postMenuReq.getMainMenuItems() != null && postMenuReq.getMainMenuItems().size() != 0) {
                 urlItems = convertToUrlFileNames(postMenuReq.getMainMenuItems());
@@ -216,6 +242,160 @@ public class MenuService {
     }
 
 
+    @Transactional(rollbackFor = BaseException.class)
+    public PatchMenuRes menuUpdate(int sellerIdx, PatchMenuReq postMenuReq) throws BaseException{
+        // 1)사용자 가게 조회
+        int storeIdx;
+        try{
+            storeIdx = storeDao.storeIdxBySellerIdx(sellerIdx);
+        } catch (Exception e) {
+            throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
+        }
+
+        // 0: 수정안하고 그대로 유지메뉴
+        // 1: 수정할 메뉴
+        // 2: 삭제할 메뉴
+        // 3: 새로운 메뉴
+        List<PostMenuItem> newMainMenu = new ArrayList<>(), newSideMenu = new ArrayList<>();
+        List<PatchMenuItem> updMainMenu = new ArrayList<>(), updSideMenu = new ArrayList<>();
+        List<PatchMenuItem> delMainMenu = new ArrayList<>(), delSideMenu = new ArrayList<>();
+        int newMainCnt = 0, newSideCnt = 0;
+        int updMainCnt = 0, updSideCnt = 0;
+        int delMainCnt = 0, delSideCnt = 0;
+
+        // 2-M) 수정/삭제/신규등록 할 메인 메뉴 분리
+        if(postMenuReq.getMainMenuItems() != null){
+            System.out.println("main");
+            for(PatchMenuItem item : postMenuReq.getMainMenuItems()){
+                if (item.getIsUpdated() == 0){
+                    continue;
+                }else if(item.getIsUpdated() == 3){ // 3: 새로운 메뉴
+                    newMainMenu.add(new PostMenuItem(item.getMenuName(), item.getPrice(),
+                            item.getComposition(),item.getDescription(),item.getMenuUrl()));
+                    newMainCnt ++;
+                }else if(item.getIsUpdated() == 2){ // 2: 삭제할 메뉴
+                    delMainMenu.add(item);
+                    delMainCnt++;
+                }else if(item.getIsUpdated() == 1){ // 1: 수정할 메뉴
+                    updMainMenu.add(new PatchMenuItem(item.getMenuIdx(), item.getMenuName(), item.getPrice(),
+                            item.getComposition(),item.getDescription(),item.getMenuUrl(), item.getIsUpdated()));
+                    updMainCnt++;
+                }
+            }
+        }
+        // 2-S) 수정/삭제/신규등록 할 사이드 메뉴 분리
+        if(postMenuReq.getSideMenuItems() != null){
+            System.out.println("side");
+            for(PatchMenuItem item : postMenuReq.getSideMenuItems()){
+                if (item.getIsUpdated() == 0) {
+                    continue;
+                } else if(item.getIsUpdated() == 3){
+                    newSideMenu.add(new PostMenuItem(item.getMenuName(), item.getPrice(),
+                            item.getComposition(),item.getDescription(),item.getMenuUrl()));
+                    newSideCnt++;
+                } else if(item.getIsUpdated() == 2){
+                    delSideMenu.add(item);
+                    delSideCnt++;
+                }else if(item.getIsUpdated() == 1){
+                    updSideMenu.add(new PatchMenuItem(item.getMenuIdx(), item.getMenuName(), item.getPrice(),
+                            item.getComposition(),item.getDescription(),item.getMenuUrl(), item.getIsUpdated()));
+                    updSideCnt++;
+                }
+            }
+        }
+
+        List<PostMenuUrlItem> urlItemsNew = null;
+        List<PatchMenuUrlItem> urlItemsUpd = null;
+        // 3-M) 메인 메뉴 신규등록
+        try{
+            if(newMainMenu != null && newMainMenu.size() != 0){
+                System.out.println("newMain");
+                urlItemsNew = convertToUrlFileNames(newMainMenu);
+                int newComplete = menuDao.menuRegister(storeIdx, urlItemsNew, "M");
+                if (newMainCnt != newComplete)
+                    throw new Exception();
+            }
+        }catch (Exception e){
+            System.out.println("1:" + e);
+            throw new BaseException(STORE_MAINMENU_SAVE_ERROR);
+        }
+
+        // 3-S) 사이드 메뉴 신규등록
+        try{
+            if(newSideMenu != null && newSideMenu.size() != 0){
+                System.out.println("newSide");
+                urlItemsNew = convertToUrlFileNames(newSideMenu);
+                int newComplete = menuDao.menuRegister(storeIdx, urlItemsNew, "M");
+                if (newSideCnt != newComplete)
+                    throw new Exception();
+            }
+        }catch (Exception e){
+            System.out.println("2:" + e);
+            throw new BaseException(STORE_SIDEMENU_SAVE_ERROR);
+        }
+
+
+        // 4-M) 메인 메뉴 수정
+        try{
+            if(updMainMenu != null && updMainMenu.size() != 0){
+                System.out.println("updMain");
+                urlItemsUpd =convertToUrlFileNamesUpd(updMainMenu);
+                int updComplete = menuDao.menuUpdate(urlItemsUpd);
+                System.out.println(updMainCnt +" " +updComplete);
+                if (updMainCnt != updComplete)
+                    throw new Exception();
+            }
+        }catch (Exception e){
+            System.out.println("3:" + e);
+            throw new BaseException(STORE_MAINMENU_SAVE_ERROR);
+        }
+        // 4-S) 사이드 메뉴 수정
+        try{
+            if(updSideMenu != null && updSideMenu.size() != 0){
+                System.out.println("updSide");
+                urlItemsUpd =convertToUrlFileNamesUpd(updSideMenu);
+                int updComplete = menuDao.menuUpdate(urlItemsUpd);
+                if (updMainCnt != updComplete)
+                    throw new Exception();
+            }
+        }catch (Exception e){
+            System.out.println("4:" + e);
+            throw new BaseException(STORE_SIDEMENU_SAVE_ERROR);
+        }
+
+        // 5) 메인메뉴, 사이드 메뉴 삭제
+        try{
+            if(delMainMenu != null && delMainMenu.size() != 0){
+                System.out.println("delMain");
+                int delComplete = menuDao.menuDeActive(delMainMenu);
+                if (delMainCnt != delComplete)
+                    throw new Exception();
+            }
+        }catch (Exception e){
+            System.out.println("5:" + e);
+            throw new BaseException(STORE_MAINMENU_SAVE_ERROR);
+        }
+        try{
+            if(delSideMenu != null && delSideMenu.size() != 0){
+                System.out.println("delSide");
+                int delComplete = menuDao.menuDeActive(delSideMenu);
+                if (delSideCnt != delComplete)
+                    throw new Exception();
+            }
+        }catch (Exception e){
+            System.out.println("6:" + e);
+            throw new BaseException(STORE_SIDEMENU_SAVE_ERROR);
+        }
+
+        return new PatchMenuRes(storeIdx,
+                (postMenuReq.getMainMenuItems() != null ?  postMenuReq.getMainMenuItems().size(): 0)
+                +(postMenuReq.getSideMenuItems() != null ?  postMenuReq.getSideMenuItems().size(): 0),
+                newMainCnt,
+                updMainCnt,
+                newSideCnt,
+                updSideCnt
+                );
+    }
 
 }
 
