@@ -64,6 +64,7 @@ public class TodayMenuDao {
                     ps.setInt(1, todayMenuItem.getDiscountPrice());
                     ps.setInt(2, todayMenuItem.getDiscountRatio());
                     ps.setInt(3, todayMenuItem.getRemain());
+                    ps.setInt(4, todayMenuItem.getTodaymenuIdx());
                 }).length ;
 
     }
