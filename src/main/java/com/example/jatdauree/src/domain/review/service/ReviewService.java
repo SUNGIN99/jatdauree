@@ -100,7 +100,7 @@ public class ReviewService {
         }
 
         // 4) 리뷰에 대한 입력값 수정
-        if (reviewAnswerReq.getComment() == null || reviewAnswerReq.getComment().length() == 0 ){
+        if (reviewAnswerReq.getComment() == null){
             throw new BaseException(POST_REVIEW_COMMENT_DATA_UNVALID); // 2051 : 리뷰 답글을 작성하지 않았습니다.
         }
 
