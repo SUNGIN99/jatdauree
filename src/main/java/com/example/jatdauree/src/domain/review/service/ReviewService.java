@@ -143,6 +143,20 @@ public class ReviewService {
 
     }
 
+    public ReviewReportRes reviewReport(int sellerIdx, ReviewReportReq reportReq) throws BaseException {
+        int reportDone;
+        try{
+            reportDone = reviewDao.reviewReport(reportReq);
+        }catch (Exception e){
+            throw new BaseException(DATABASE_ERROR);
+
+        }if(reportDone == 1){
+            ReviewReportRes reportRes = new ReviewReportRes(reportReq.getReviewIdx(), reportDone);
+            return reportRes;
+        }else{
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }
 
 

@@ -41,12 +41,20 @@ public class ReviewDao {
 
     //리뷰 정보 가져오기
     public List<ReviewItems> reviewItems(int storeIdx) {
-        String query = "SELECT O.orderIdx, R.reviewIdx, C.name, R.star ,R.contents, R.comment, R.review_url\n" +
-                " FROM Orders O\n" +
-                "    JOIN Review R on O.orderIdx = R.orderIdx\n" +
-                "    JOIN Customers C ON R.customerIdx = C.customerIdx\n" +
-                " WHERE\n" +
-                "    R.storeIdx = ? AND O.status = 'A';"; // 23.07.13 상태값 고객이쓴 리뷰 정보 없으므로 수정 필요
+        String query = "SELECT\n" +
+                "    O.orderIdx,\n" +
+                "    R.reviewIdx,\n" +
+                "    C.name,\n" +
+                "    R.star ,\n" +
+                "    R.contents, R.comment, R.review_url\n" +
+                "FROM Orders O\n" +
+                "JOIN Review R on O.orderIdx = R.orderIdx\n" +
+                "JOIN Customers C ON R.customerIdx = C.customerIdx\n" +
+                "WHERE\n" +
+                "    R.storeIdx = ?\n" +
+                "  AND O.status = 'A'\n" +
+                "  AND R.status <> 'D'\n" +
+                "ORDER BY reviewIdx;"; // 23.07.13 상태값 고객이쓴 리뷰 정보 없으므로 수정 필요
 
         return this.jdbcTemplate.query(query,
                 (rs, rowNum) -> new ReviewItems(
@@ -108,6 +116,13 @@ public class ReviewDao {
     }
 
 
+    public int reviewReport(ReviewReportReq reportReq) {
+        String query = "UPDATE Review\n" +
+                "SET status = 'R'\n" +
+                "WHERE reviewIdx = ?";
+
+        return this.jdbcTemplate.update(query, reportReq.getReviewIdx());
+    }
 }
 
 
