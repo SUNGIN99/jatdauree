@@ -11,6 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class GetStoreListAdmin {
     private int storeIdx;
-    private String storeNames;
+    private String storeName;
     private String storeRegisterDate;
 }

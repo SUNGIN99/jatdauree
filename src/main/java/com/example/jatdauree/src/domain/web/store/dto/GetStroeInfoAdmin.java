@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class GetStroeInfoAdmin {
     private int storeIdx;
     private String storeName; // 기업명(상호명)
-    private String categoryIdx;  // 가게업종
+    private String categoryName;  // 가게업종
     private String businessPhone; // 사업주 휴대번호
     private String businessEmail; // 사업주 이메일
     private String businessCertificateUrl; // 사업자 등록증 이미지 url
