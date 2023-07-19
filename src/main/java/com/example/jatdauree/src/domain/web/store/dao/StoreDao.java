@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 
 @Repository
@@ -226,6 +227,87 @@ public class StoreDao {
                 (rs, rowNum) -> new SavedFileNames(
                         rs.getString("store_logo_url"),
                         rs.getString("sign_url")
+                ), storeIdx);
+    }
+
+    public GetStroeInfoAdmin getStoreInfoAdmin(int storeIdx) {
+        String query = "SELECT\n" +
+                "    store_name,\n" +
+                "    category_name,\n" +
+                "    business_phone,\n" +
+                "    business_email,\n" +
+                "    business_certificate_url,\n" +
+                "    seller_certificate_url,\n" +
+                "    copyaccount_url,\n" +
+                "    breakday,\n" +
+                "    DATE_FORMAT(store_open, '%H:%i') as store_open,\n" +
+                "    DATE_FORMAT(store_close, '%H:%i') as store_close,\n" +
+                "    store_phone,\n" +
+                "    store_address,\n" +
+                "    store_logo_url,\n" +
+                "    sign_url\n" +
+                "FROM Stores\n" +
+                "LEFT JOIN StroeCategories SC on Stores.categoryIdx = SC.categoryIdx\n" +
+                "WHERE storeIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new GetStroeInfoAdmin(
+                        rs.getString(1),
+                        rs.getString(2),
+                        rs.getString(3),
+                        rs.getString(4),
+                        rs.getString(5),
+                        rs.getString(6),
+                        rs.getString(7),
+                        rs.getString(8),
+                        rs.getString(9),
+                        rs.getString(10),
+                        rs.getString(11),
+                        rs.getString(12),
+                        rs.getString(13),
+                        rs.getString(14)
+                ), storeIdx);
+    }
+
+    public List<GetStoreListAdmin> getStoreListAdmin() {
+        String query ="SELECT\n" +
+                "    storeIdx,\n" +
+                "    store_name,\n" +
+                "    created\n" +
+                "FROM Stores\n" +
+                "WHERE status = 'W'\n" +
+                "ORDER BY created";
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new GetStoreListAdmin(
+                        rs.getInt("storeIdx"),
+                        rs.getString("store_name"),
+                        rs.getString("created")
+                ));
+    }
+
+    public int storePermit(StorePermit storePermit) {
+        String query = "UPDATE Stores\n" +
+                "    SET status = 'A'\n" +
+                "WHERE storeIdx = ?";
+        return this.jdbcTemplate.update(query, int.class, storePermit.getStoreIdx());
+    }
+
+    public StorePermitRes storeSellersPhone(int storeIdx) {
+        String query = "SELECT\n" +
+                "    storeIdx,\n" +
+                "    store_name,\n" +
+                "    M.phone,\n" +
+                "    M.name\n" +
+                "FROM Stores\n" +
+                "LEFT JOIN Merchandisers M on Stores.sellerIdx = M.sellerIdx\n" +
+                "WHERE storeIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new StorePermitRes(
+                        rs.getInt("storeIdx"),
+                        rs.getString("store_name"),
+                        rs.getString("phone"),
+                        rs.getString("name")
                 ), storeIdx);
     }
 }

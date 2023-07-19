@@ -23,7 +23,7 @@ public class ReviewService {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
-    private AmazonS3 s3Client;
+    private final AmazonS3 s3Client;
 
     @Autowired
     public ReviewService(StoreDao storeDao, ReviewDao reviewDao, AmazonS3 s3Client) {

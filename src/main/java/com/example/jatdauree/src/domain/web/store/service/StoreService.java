@@ -3,8 +3,15 @@ package com.example.jatdauree.src.domain.web.store.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.jatdauree.config.BaseException;
+import com.example.jatdauree.config.secret.SmsSecret;
 import com.example.jatdauree.src.domain.web.store.dao.StoreDao;
 import com.example.jatdauree.src.domain.web.store.dto.*;
+import lombok.extern.slf4j.Slf4j;
+import net.nurigo.sdk.NurigoApp;
+import net.nurigo.sdk.message.model.Message;
+import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
+import net.nurigo.sdk.message.response.SingleMessageSentResponse;
+import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,12 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import static com.example.jatdauree.config.BaseResponseStatus.*;
 import static com.example.jatdauree.utils.UtilFileImgUrl.absolutePath;
 import static com.example.jatdauree.utils.UtilFileImgUrl.checkFileIsNullThenName;
 
 
+@Slf4j
 @Service
 public class StoreService {
     private final StoreDao storeDao;
@@ -25,12 +34,15 @@ public class StoreService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
-    private AmazonS3 s3Client;
+    private final AmazonS3 s3Client;
+
+    private final DefaultMessageService messageService;
 
     @Autowired
     public StoreService(StoreDao storeDao, AmazonS3 s3Client) {
         this.storeDao = storeDao;
         this.s3Client = s3Client;
+        this.messageService = NurigoApp.INSTANCE.initialize(SmsSecret.APIKey, SmsSecret.Secret, "https://api.coolsms.co.kr");
     }
 
     public StoreNameDupRes storeNameDuplicate(String storeName) {
@@ -231,4 +243,86 @@ public class StoreService {
     }
 
 
+    public GetStroeInfoAdmin getStoreInfoAdmin(int storeIdx) throws BaseException {
+        // 1) 가게정보가져오기
+        GetStroeInfoAdmin storeInfoA;
+        try{
+            storeInfoA = storeDao.getStoreInfoAdmin(storeIdx);
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR); //값을 바꾸는데 실패
+        }
+
+        // 2) 이미지 url 가져오기
+        try{
+            if(storeInfoA != null){
+                if(storeInfoA.getBusinessCertificateUrl() != null){
+                    storeInfoA.setBusinessCertificateUrl(""+s3Client.getUrl(bucketName, storeInfoA.getBusinessCertificateUrl()));
+                }
+                if(storeInfoA.getSellerCertificateUrl() != null){
+                    storeInfoA.setSellerCertificateUrl(""+s3Client.getUrl(bucketName, storeInfoA.getSellerCertificateUrl()));
+                }
+                if(storeInfoA.getCopyAccountUrl() != null){
+                    storeInfoA.setCopyAccountUrl(""+s3Client.getUrl(bucketName, storeInfoA.getCopyAccountUrl()));
+                }
+                if(storeInfoA.getStoreLogoUrl() != null){
+                    storeInfoA.setStoreLogoUrl(""+s3Client.getUrl(bucketName, storeInfoA.getStoreLogoUrl()));
+                }
+                if(storeInfoA.getSignUrl() != null){
+                    storeInfoA.setSignUrl(""+s3Client.getUrl(bucketName, storeInfoA.getSignUrl()));
+                }
+            }
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR); //값을 바꾸는데 실패
+        }
+
+        return storeInfoA;
+    }
+
+    public List<GetStoreListAdmin> getStoreListAdmin() throws BaseException{
+        try{
+            return storeDao.getStoreListAdmin();
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR); //값을 바꾸는데 실패
+        }
+    }
+
+    public StorePermitRes storePermit(StorePermit storePermit) throws BaseException {
+        // 가게 승인(상태값 변경)
+        int updated;
+        try{
+            updated = storeDao.storePermit(storePermit);
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR); //값을 바꾸는데 실패
+        }
+
+        // 판매자 전화번호 조회
+        StorePermitRes permitRes;
+        try{
+            permitRes = storeDao.storeSellersPhone(storePermit.getStoreIdx());
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR); //값을 바꾸는데 실패
+        }
+
+        if(updated == 1) {
+            // 가게 승인 완료 메시지 전송
+            try {
+                Message message = new Message();
+                message.setFrom("01043753181");
+                message.setTo(permitRes.getSellerPhone());
+                message.setText("[재떨이]:판매자 가게 승인 완료\n" +
+                        permitRes.getSellerName() + "님의" +
+                        permitRes.getStoreName() + "의 판매 승인이 완료되었습니다!\n" +
+                        "어서 재떨이 서비스를 이용하세요!");
+                SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
+                log.info("coolSMS API요청 :{}", response);
+
+            } catch (Exception e) {
+                throw new BaseException(DATABASE_ERROR); //값을 바꾸는데 실패
+            }
+
+            return permitRes;
+        }else{
+            throw new BaseException(DATABASE_ERROR); //값을 바꾸는데 실패
+        }
+    }
 }

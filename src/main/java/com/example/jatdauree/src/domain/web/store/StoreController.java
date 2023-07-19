@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/jat/stores")
@@ -129,6 +130,45 @@ public class StoreController {
             //System.out.println(" RESPONSE_ERROR5 : " + baseException.getMessage());
             return new BaseResponse<>(baseException.getStatus());
         }
+    }
+
+    @ResponseBody
+    @GetMapping("/admin/info")
+    public BaseResponse<GetStroeInfoAdmin> getStoreInfoAdmin(@RequestParam int storeIdx){
+        try{
+            int sellerIdx = jwtService.getUserIdx();
+            GetStroeInfoAdmin storeInfoA = storeService.getStoreInfoAdmin(storeIdx);
+            return new BaseResponse<>(storeInfoA);
+        }catch (BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+
+    }
+
+    @ResponseBody
+    @GetMapping("/admin")
+    public BaseResponse<List<GetStoreListAdmin>> getStoreListAdmin(){
+        try{
+            int sellerIdx = jwtService.getUserIdx();
+            List<GetStoreListAdmin> storeListA = storeService.getStoreListAdmin();
+            return new BaseResponse<>(storeListA);
+        }catch (BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+
+    }
+
+    @ResponseBody
+    @PatchMapping("/admin")
+    public BaseResponse<StorePermitRes> storePermit(@RequestBody StorePermit storePermit){
+        try{
+            int sellerIdx = jwtService.getUserIdx();
+            StorePermitRes storeListA = storeService.storePermit(storePermit);
+            return new BaseResponse<>(storeListA);
+        }catch (BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+
     }
 
 }
