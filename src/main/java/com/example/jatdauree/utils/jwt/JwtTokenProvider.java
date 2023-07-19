@@ -1,7 +1,7 @@
 package com.example.jatdauree.utils.jwt;
 
 import com.example.jatdauree.config.secret.JwtSecret;
-import com.example.jatdauree.src.domain.seller.service.SellerService;
+import com.example.jatdauree.src.domain.web.seller.service.SellerService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
