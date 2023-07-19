@@ -232,6 +232,7 @@ public class StoreDao {
 
     public GetStroeInfoAdmin getStoreInfoAdmin(int storeIdx) {
         String query = "SELECT\n" +
+                "    storeIdx, \n" +
                 "    store_name,\n" +
                 "    category_name,\n" +
                 "    business_phone,\n" +
@@ -252,7 +253,7 @@ public class StoreDao {
 
         return this.jdbcTemplate.queryForObject(query,
                 (rs, rowNum) -> new GetStroeInfoAdmin(
-                        rs.getString(1),
+                        rs.getInt(1),
                         rs.getString(2),
                         rs.getString(3),
                         rs.getString(4),
@@ -265,7 +266,8 @@ public class StoreDao {
                         rs.getString(11),
                         rs.getString(12),
                         rs.getString(13),
-                        rs.getString(14)
+                        rs.getString(14),
+                        rs.getString(15)
                 ), storeIdx);
     }
 

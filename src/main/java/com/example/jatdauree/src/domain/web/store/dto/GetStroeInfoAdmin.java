@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetStroeInfoAdmin {
+    private int storeIdx;
     private String storeName; // 기업명(상호명)
     private String categoryIdx;  // 가게업종
     private String businessPhone; // 사업주 휴대번호
