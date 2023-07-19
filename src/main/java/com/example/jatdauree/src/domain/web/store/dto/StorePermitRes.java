@@ -12,6 +12,7 @@ import lombok.Setter;
 public class StorePermitRes {
     private int storeIdx;
     private String storeName;
+    private int sellerIdx;
     private String sellerPhone;
     private String sellerName;
 }

@@ -289,13 +289,14 @@ public class StoreDao {
         String query = "UPDATE Stores\n" +
                 "    SET status = 'A'\n" +
                 "WHERE storeIdx = ?";
-        return this.jdbcTemplate.update(query, int.class, storePermit.getStoreIdx());
+        return this.jdbcTemplate.update(query, storePermit.getStoreIdx());
     }
 
     public StorePermitRes storeSellersPhone(int storeIdx) {
         String query = "SELECT\n" +
                 "    storeIdx,\n" +
                 "    store_name,\n" +
+                "    M.sellerIdx,\n" +
                 "    M.phone,\n" +
                 "    M.name\n" +
                 "FROM Stores\n" +
@@ -306,9 +307,18 @@ public class StoreDao {
                 (rs, rowNum) -> new StorePermitRes(
                         rs.getInt("storeIdx"),
                         rs.getString("store_name"),
+                        rs.getInt("sellerIdx"),
                         rs.getString("phone"),
                         rs.getString("name")
                 ), storeIdx);
+    }
+
+    public int sellerPermit(int sellerIdx) {
+        String query = "UPDATE Merchandisers\n" +
+                "    SET first_login = 0\n" +
+                "WHERE sellerIdx = ?";
+
+        return this.jdbcTemplate.update(query, sellerIdx);
     }
 }
 

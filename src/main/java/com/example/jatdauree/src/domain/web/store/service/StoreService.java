@@ -288,9 +288,9 @@ public class StoreService {
 
     public StorePermitRes storePermit(StorePermit storePermit) throws BaseException {
         // 가게 승인(상태값 변경)
-        int updated;
+        int updated1 = 0, updated2 = 0;
         try{
-            updated = storeDao.storePermit(storePermit);
+            updated1 = storeDao.storePermit(storePermit);
         }catch (Exception e) {
             throw new BaseException(DATABASE_ERROR); //값을 바꾸는데 실패
         }
@@ -303,7 +303,13 @@ public class StoreService {
             throw new BaseException(DATABASE_ERROR); //값을 바꾸는데 실패
         }
 
-        if(updated == 1) {
+        try{
+            updated2 = storeDao.sellerPermit(permitRes.getSellerIdx());
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR); //값을 바꾸는데 실패
+        }
+
+        if(updated1 == 1 && updated2 == 1) {
             // 가게 승인 완료 메시지 전송
             try {
                 Message message = new Message();
