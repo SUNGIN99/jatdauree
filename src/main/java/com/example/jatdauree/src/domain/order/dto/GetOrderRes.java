@@ -15,18 +15,12 @@ import java.util.List;
 public class GetOrderRes implements Serializable {
 
     private int orderIdx;
-    private String store_name;
-    private String uid;
-    private String order_time;
-    private int total_menu;
-    private int total_price;
-    private String menu_name;
-    private String cnt;
-    private String pickup_time;
+    private int orderSequence;
+    private String orderTime;
+    private String pickUpTime;
     private String request;
-    private String payment_status;
-    private String status;
-    private List<OrderMenu> menuLists;
-
-
+    private int menuDiverse;
+    private int totalPrice;
+    private String payStatus;
+    private List<OrderMenuCntPrirce> orderItem;
 }

@@ -2,6 +2,7 @@ package com.example.jatdauree.src.domain.seller.service;
 
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.secret.SmsSecret;
+import com.example.jatdauree.src.domain.seller.dto.PostSignUpAuthyRes;
 import com.example.jatdauree.src.domain.seller.dao.SellerDao;
 import com.example.jatdauree.src.domain.seller.dto.*;
 import com.example.jatdauree.src.domain.sms.dao.SmsDao;
@@ -64,10 +65,19 @@ public class SellerService {
         if(!isRegexPassword(postSignUpReq.getPassword())){
             throw new BaseException(POST_USERS_INVALID_PASSWORD); // 2011 : 비밀번호 정규 표현식 예외
         }
+        // 올바른 생년월일 양식인지?
+        if(!isRegexBirth(postSignUpReq.getBirthday())){
+            throw new BaseException(POST_USERS_INVALID_BIRTHDAY);
+        }
+        if(!isRegexPhone(postSignUpReq.getPhone())){
+            throw new BaseException(POST_USERS_INVALID_PHONENUM);
+        }
         // 중복 아이디 체크
         if(sellerDao.checkUid(postSignUpReq.getUid()) == 1){
             throw new BaseException(POST_USERS_EXISTS_ID); // 2018 : 중복 아이디
         }
+
+
         // 비밀번호 암호화
         try{
             salt = SHA256.createSalt(postSignUpReq.getPassword()); // 비밀번호를 이용하여 salt 생성
@@ -103,12 +113,20 @@ public class SellerService {
             throw new BaseException(FAILED_TO_LOGIN);
         }
 
-        // 2) 회원가입후 가게 승인 및 메뉴등록이 모두 마쳐진 유저일 경우
-       String storeName = "";
+        // 1-2) 전 가게 등록 여부 존재확인
+        int storeRegistered = 0;
         try{
-            if(seller.getFirst_login() == 0 && seller.getMenu_register()== 0){
+            storeRegistered = storeDao.storeIdxBySellerIdxExists(seller.getSellerIdx());
+        }catch(Exception exception){
+            throw new BaseException(FAILED_TO_LOGIN);
+        }
+
+        // 2) 회원가입후 가게승인 및 메뉴 등록 여부 확인
+        StoreNameNStatus storeNameStatus = null;
+        try{
+            if (storeRegistered == 1){
                 // storeName from storeDao
-                storeName = storeDao.storeNameBySellerIdx(seller.getSellerIdx());
+                storeNameStatus = storeDao.storeNameBySellerIdx(seller.getSellerIdx());
             }
         }catch(Exception exception){
             throw new BaseException(FAILED_TO_LOGIN);
@@ -126,7 +144,8 @@ public class SellerService {
                         seller.getName(),
                         seller.getFirst_login(),
                         seller.getMenu_register(),
-                        seller.getFirst_login() == 0 && seller.getMenu_register()== 0 ? storeName: "");
+                        storeNameStatus != null ? storeNameStatus.getStore_name() : "", // null 이 아닌것은 가게등록을 무조건 했다는것.
+                        storeNameStatus != null ? storeNameStatus.getStore_status() : null); // null
             }
             else{
                 throw new BaseException(FAILED_TO_LOGIN);
@@ -252,6 +271,58 @@ public class SellerService {
             return new RestorePwRes(0,1);
         }catch(Exception exception){
             throw new BaseException(MODIFY_FAIL_USERPASSWORD); // 4015 : 유저 비밀번호 수정 실패
+        }
+    }
+
+    public PostSignUpAuthyRes userAuthy(PostSignUpAuthyReq signUpAuthy) throws BaseException {
+        // 1) 회원가입 가능한지?? 이미 등록된 회원인지??
+        int duplicateUser;
+        try{
+            duplicateUser = sellerDao.userAuthy(signUpAuthy);
+        }catch(Exception exception){
+            throw new BaseException(MODIFY_FAIL_USERPASSWORD); // 4015 : 유저 비밀번호 수정 실패
+        }
+
+        if (duplicateUser == 1){
+            try{
+                // 4) 랜덤 인증번호 생성 (번호)
+                Random rand  = new Random();
+                String certificationNum = "";
+                for(int i=0; i<6; i++) {
+                    String ran = Integer.toString(rand.nextInt(10));
+                    certificationNum+=ran;
+                }
+
+                // 인증 메시지 생성
+                Message message = new Message();
+                message.setFrom("01043753181");
+                message.setTo(signUpAuthy.getPhoneNum());
+                message.setText("회원가입 본인인증 확인입니다.\n["+certificationNum+"]");
+
+                // coolSMS API 사용하여 사용자 핸드폰에 전송
+                SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
+                log.info("coolSMS API요청 :{}", response);
+
+                // DB에 전송 인증정보 저장
+                int smsSendRes = smsDao.smsAuthy(signUpAuthy, certificationNum, "S");
+                return new PostSignUpAuthyRes(smsSendRes);
+
+            }catch(Exception exception){
+                throw new BaseException(COOLSMS_API_ERROR); //  5010 : SMS 인증번호 발송을 실패하였습니다.
+            }
+        }
+        else{
+            throw new BaseException(POST_USERS_ALREADY_EXISTS);
+        }
+    }
+
+    public PostSignUpAuthyRes userAuthyPass(PostSignUpAuthyReq passReq) throws BaseException{
+        try{
+            int userPass = smsDao.smsAuthyPass(passReq);
+            System.out.println(userPass);
+            return new PostSignUpAuthyRes(userPass);
+        }catch(Exception exception){
+            throw new BaseException(COOLSMS_API_ERROR); // 5010 : SMS 인증번호 발송을 실패하였습니다.
         }
     }
 }

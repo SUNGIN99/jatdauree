@@ -6,19 +6,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.lang.Nullable;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostMenuReq{
+public class PatchMenuReq {
     @Nullable
-    private List<PostMenuItem> mainMenuItems;
+    private ArrayList<PatchMenuItem> mainMenuItems;
     @Nullable
-    private List<PostMenuItem> sideMenuItems;
-    @Nullable
-    private List<PostIngredientItem> ingredientItems;
+    private ArrayList<PatchMenuItem> sideMenuItems;
 }

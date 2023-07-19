@@ -1,7 +1,7 @@
 package com.example.jatdauree.src.domain.menu.dao;
 
 import com.example.jatdauree.src.domain.menu.dto.*;
-import com.example.jatdauree.src.domain.menu.dto.GetMenuItemsRes;
+import com.example.jatdauree.src.domain.todaymenu.dto.GetMainPageItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -28,7 +28,7 @@ public class MenuDao {
      * Main menuRegister 메인 메뉴등록
      * 반환 정보 : 메인 메뉴 등록 개수
      */
-    public int mainMenuRegister(int storeIdx, ArrayList<PostMenuItem> mainMenuList)  {
+    public int menuRegister(int storeIdx, List<PostMenuUrlItem> mainMenuList, String mOrS)  {
         String query = "INSERT INTO Menu (" +
                 "storeIdx, " +
                 "menu_name, " +
@@ -37,53 +37,22 @@ public class MenuDao {
                 "description," +
                 "menu_url," +
                 "status)\n" +
-                "VALUES (?,?,?,?,?,?,'M');";
+                "VALUES (?,?,?,?,?,?,?);";
 
             this.jdbcTemplate.batchUpdate(query,
                     mainMenuList,
                     mainMenuList.size(),
-                    (PreparedStatement ps, PostMenuItem menuItem) ->{
+                    (PreparedStatement ps, PostMenuUrlItem menuItem) ->{
                         ps.setInt(1, storeIdx);
                         ps.setString(2, menuItem.getMenuName());
                         ps.setInt(3, menuItem.getPrice());
                         ps.setString(4, menuItem.getComposition());
                         ps.setString(5, menuItem.getDescription());
                         ps.setString(6, menuItem.getMenuUrl());
+                        ps.setString(7, mOrS);
                     });
 
         return mainMenuList.size();
-    }
-
-    /**
-     * menuDao - 2
-     * 23.07.07 작성자 : 이윤채, 김성인
-     * Main menuRegister 사이드 메뉴등록
-     * 반환 정보 : 사이드 메뉴 등록 개수
-     */
-    public int sideMenuRegister(int storeIdx, ArrayList<PostMenuItem> sideMenuList)  {
-        String query = "INSERT INTO Menu (" +
-                "storeIdx, " +
-                "menu_name, " +
-                "price, " +
-                "composition," +
-                "description," +
-                "menu_url," +
-                "status)\n" +
-                "VALUES (?,?,?,?,?,?,'S');";
-
-        this.jdbcTemplate.batchUpdate(query,
-                sideMenuList,
-                sideMenuList.size(),
-                (PreparedStatement ps, PostMenuItem menuItem) ->{
-                    ps.setInt(1, storeIdx);
-                    ps.setString(2, menuItem.getMenuName());
-                    ps.setInt(3, menuItem.getPrice());
-                    ps.setString(4, menuItem.getComposition());
-                    ps.setString(5, menuItem.getDescription());
-                    ps.setString(6, menuItem.getMenuUrl());
-                });
-
-        return sideMenuList.size();
     }
 
     /**
@@ -92,7 +61,7 @@ public class MenuDao {
      * 원산지 등록
      * 반환 정보 : 원산지 등록 개수
      */
-    public int ingredientRegister(int storeIdx, ArrayList<PostIngredientItem> ingredientList)  {
+    public int ingredientRegister(int storeIdx, List<PostIngredientItem> ingredientList)  {
         String query ="INSERT INTO Ingredients (storeIdx, ingredient_name, origin, menu_names)\n" +
                 "VALUES (?,?,?,?);";
 
@@ -115,15 +84,20 @@ public class MenuDao {
      * 가게 idx로 가게에 등록된 메뉴 조회
      */
     public List<GetMenuItem> getStoreMenuList(int storeIdx, String status) {
-        String query = "SELECT menuIdx, menu_name, price\n" +
+        String query = "SELECT menuIdx, menu_name, price, composition, description, menu_url\n" +
                 "FROM Menu WHERE storeIdx = ? AND status = ?";
 
         Object[] params = new Object[]{storeIdx, status};
+
         return this.jdbcTemplate.query(query,
                 (rs, rowNum) -> new GetMenuItem(
                         rs.getInt("menuIdx"),
                         rs.getString("menu_name"),
-                        rs.getInt("price")
+                        rs.getInt("price"),
+                        rs.getString("composition"),
+                        rs.getString("description"),
+                        rs.getString("menu_url"),
+                        0
                 ), params);
     }
 
@@ -132,22 +106,43 @@ public class MenuDao {
      * 23.07.06 작성자 : 이윤채
      * menuUpdate 메뉴 업데이트 (POST)
      */
-    /*public int menuUpdate(PostMenuUpReq postMenuUpReq){
-        String query= "UPDATE Menu SET menu_name = ?, price = ? ,composition=?,description=?,menu_url=?,status=? WHERE menuIdx = ? AND storeIdx=?;";
-        Object[] params = new Object[]{
+    public int menuUpdate(List<PatchMenuUrlItem> menuItems){
+        String query= "UPDATE Menu\n" +
+                "SET menu_name = ?,\n" +
+                "    price = ?,\n" +
+                "    composition = ?,\n" +
+                "    description = ?, \n" +
+                "    menu_url = ?\n" +
+                "WHERE menuIdx = ?";
 
-                postMenuUpReq.getMenuName(),
-                postMenuUpReq.getPrice(),
-                postMenuUpReq.getComposition(),
-                postMenuUpReq.getDescription(),
-                postMenuUpReq.getMenuUrl(),
-                postMenuUpReq.getStatus(),
-                postMenuUpReq.getMenuIdx(),
-                postMenuUpReq.getStoreIdx()
+        return this.jdbcTemplate.batchUpdate(query,
+                menuItems,
+                menuItems.size(),
+                (PreparedStatement ps, PatchMenuUrlItem item) ->{
+                    ps.setString(1, item.getMenuName());
+                    ps.setInt(2, item.getPrice());
+                    ps.setString(3, item.getComposition());
+                    ps.setString(4, item.getDescription());
+                    ps.setString(5, item.getMenuUrl());
+                    ps.setInt(6, item.getMenuIdx());
 
-        };
-        return this.jdbcTemplate.update(query, params);
-    }*/
+                }
+        ).length;
+    }
+
+    public int menuDeActive(List<PatchMenuItem> menuItems){
+        String query = "UPDATE Menu\n" +
+                "SET status = 'D'\n" +
+                "WHERE menuIdx = ?";
+
+        return this.jdbcTemplate.batchUpdate(query,
+                menuItems,
+                menuItems.size(),
+                (PreparedStatement ps, PatchMenuItem item) ->{
+                    ps.setInt(1, item.getMenuIdx());
+                }
+        ).length;
+    }
 
 
 }

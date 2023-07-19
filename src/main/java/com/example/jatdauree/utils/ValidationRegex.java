@@ -29,7 +29,15 @@ public class ValidationRegex {
 
         //최대 30글자 : 영문 + 숫자 10자 이상
         String regex2 = "^(?=.*[a-zA-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{10,30}$";
-        result=target.matches(regex1) || target.matches(regex2);
+
+        Pattern pattern1 = Pattern.compile(regex1, Pattern.CASE_INSENSITIVE);
+        Pattern pattern2 = Pattern.compile(regex2, Pattern.CASE_INSENSITIVE);
+
+        Matcher matcher1 = pattern1.matcher(target);
+        Matcher matcher2 = pattern1.matcher(target);
+
+        //result=target.matches(regex1) || target.matches(regex2);
+        result = matcher1.find() || matcher2.find();
         return result;
     }
     // 닉네임 정규식 - 2자 이상 16자 이하, 영어 또는 숫자 또는 한글로 구성
@@ -37,6 +45,22 @@ public class ValidationRegex {
         String regex = "^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,10}$"; // * 특이사항 : 한글 초성 및 모음은 허가하지 않는다.
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(target);
+        return matcher.find();
+    }
+
+    public static boolean isRegexBirth(String target){
+        String regex = "^\\d{4}\\.\\d{2}\\.\\d{2}$";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(target);
+
+        return matcher.find();
+    }
+
+    public static boolean isRegexPhone(String target){
+        String regex = "^\\d{3}\\d{4}\\d{4}$";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(target);
+
         return matcher.find();
     }
 }

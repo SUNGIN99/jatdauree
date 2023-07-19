@@ -41,12 +41,20 @@ public class ReviewDao {
 
     //리뷰 정보 가져오기
     public List<ReviewItems> reviewItems(int storeIdx) {
-        String query = "SELECT O.orderIdx, R.reviewIdx, C.name, R.star ,R.contents, R.comment, R.review_url\n" +
-                " FROM Orders O\n" +
-                "    JOIN Review R on O.orderIdx = R.orderIdx\n" +
-                "    JOIN Customers C ON R.customerIdx = C.customerIdx\n" +
-                " WHERE\n" +
-                "    R.storeIdx = ? AND O.status = 'A';"; // 23.07.13 상태값 고객이쓴 리뷰 정보 없으므로 수정 필요
+        String query = "SELECT\n" +
+                "    O.orderIdx,\n" +
+                "    R.reviewIdx,\n" +
+                "    C.name,\n" +
+                "    R.star ,\n" +
+                "    R.contents, R.comment, R.review_url\n" +
+                "FROM Orders O\n" +
+                "JOIN Review R on O.orderIdx = R.orderIdx\n" +
+                "JOIN Customers C ON R.customerIdx = C.customerIdx\n" +
+                "WHERE\n" +
+                "    R.storeIdx = ?\n" +
+                "  AND O.status = 'A'\n" +
+                "  AND R.status <> 'D'\n" +
+                "ORDER BY reviewIdx;"; // 23.07.13 상태값 고객이쓴 리뷰 정보 없으므로 수정 필요
 
         return this.jdbcTemplate.query(query,
                 (rs, rowNum) -> new ReviewItems(
@@ -56,7 +64,7 @@ public class ReviewDao {
                         rs.getInt("star"),
                         rs.getString("contents"),
                         rs.getString("comment") == null? "" : rs.getString("comment"),
-                        rs.getString("review_url") == null?"": rs.getString("review_url") ,
+                        rs.getString("review_url"),
                         null
                 ), storeIdx);
 
@@ -80,7 +88,41 @@ public class ReviewDao {
         this.jdbcTemplate.update(query,params);
     }
 
+    //리뷰 개수,별점 평균,별점 가지고 오기
+    public GetReviewStarRes reviewStarTotal(int storeIdx){
+        String query ="SELECT\n" +
+                "      ROUND(AVG(star),1) AS star_average,\n" +
+                "      COUNT(*) AS reviews_total,\n" +
+                "      COUNT(CASE WHEN star = 1 THEN 1 END) AS star1_count,\n" +
+                "      COUNT(CASE WHEN star = 2 THEN 1 END) AS star2_count,\n" +
+                "      COUNT(CASE WHEN star = 3 THEN 1 END) AS star3_count,\n" +
+                "      COUNT(CASE WHEN star = 4 THEN 1 END) AS star4_count,\n" +
+                "      COUNT(CASE WHEN star = 5 THEN 1 END) AS star5_count\n" +
+                "      FROM Review\n" +
+                "WHERE storeIdx = ?";
 
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new GetReviewStarRes(
+                        storeIdx,
+                        rs.getDouble("star_average"),
+                        rs.getInt("reviews_total"),
+                        rs.getInt("star1_count"),
+                        rs.getInt("star2_count"),
+                        rs.getInt("star3_count"),
+                        rs.getInt("star4_count"),
+                        rs.getInt("star5_count")
+                )
+                ,storeIdx);
+    }
+
+
+    public int reviewReport(ReviewReportReq reportReq) {
+        String query = "UPDATE Review\n" +
+                "SET status = 'R'\n" +
+                "WHERE reviewIdx = ?";
+
+        return this.jdbcTemplate.update(query, reportReq.getReviewIdx());
+    }
 }
 
 

@@ -3,10 +3,7 @@ package com.example.jatdauree.src.domain.sales;
 
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.BaseResponse;
-import com.example.jatdauree.src.domain.sales.dto.MonthlyMenuSalesRes;
-import com.example.jatdauree.src.domain.sales.dto.TodayTotalSalesRes;
-import com.example.jatdauree.src.domain.sales.dto.YtoTWeekSalesRes;
-import com.example.jatdauree.src.domain.sales.dto.YtoTdaySalesRes;
+import com.example.jatdauree.src.domain.sales.dto.*;
 import com.example.jatdauree.src.domain.sales.service.SalesService;
 import com.example.jatdauree.utils.jwt.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +68,19 @@ public class SalesController {
 
             MonthlyMenuSalesRes monthlyMenuSalesRes = salesService.getMontlyMenuSales(month, sellerIdx);
             return new BaseResponse<>(monthlyMenuSalesRes);
+        }catch (BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/monthly-ratio")
+    public BaseResponse<MonthlyMenuOrdersRes> getMontlyMenuOrders(@RequestParam int month){
+        try{
+            int sellerIdx = jwtService.getUserIdx();
+
+            MonthlyMenuOrdersRes ordersRes = salesService.getMontlyMenuOrders(month, sellerIdx);
+            return new BaseResponse<>(ordersRes);
         }catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());
         }

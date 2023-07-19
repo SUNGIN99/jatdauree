@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.example.jatdauree.config.BaseResponseStatus.SMS_DATA_FIND_ERROR;
+
 //@CrossOrigin(origins="*")
 @Slf4j
 @RestController
@@ -49,6 +51,48 @@ public class SellerController {
             return new BaseResponse<>(baseException.getStatus());
         }
     }
+
+    /**
+     * 23.06.29 작성자 : 김성인
+     * 회원가입시 번호 인증 요청
+     * Post /jat/authy
+     * @param @RequestBody postSignUpAuthyReq
+     * @return BaseResponse<postSignUpAuthyRes>
+     */
+    @ResponseBody
+    @PostMapping("/authy")
+    public BaseResponse<PostSignUpAuthyRes> userAuthy(@RequestBody PostSignUpAuthyReq signUpAuthy){
+        try{
+            PostSignUpAuthyRes signUpAuthyRes = sellerService.userAuthy(signUpAuthy);
+            return new BaseResponse<>(signUpAuthyRes);
+        }catch (BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
+
+    /**
+     * 23.06.29 작성자 : 김성인
+     * 회원가입시 번호 인증 요청
+     * Post /jat/authy-pass
+     * @param @RequestBody postSignUpAuthyReq
+     * @return BaseResponse<postSignUpAuthyRes>
+     */
+    @ResponseBody
+    @PostMapping("/authy-pass")
+    public BaseResponse<PostSignUpAuthyRes> userAuthyPass(@RequestBody PostSignUpAuthyReq passReq){
+        try{
+            PostSignUpAuthyRes passRes = sellerService.userAuthyPass(passReq);
+
+            if (passRes.getValidIdentify() == 1){
+                return new BaseResponse<>(passRes);
+            }else {
+                return new BaseResponse<>( SMS_DATA_FIND_ERROR, passRes);
+            }
+        }catch (BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
+
 
     /**
      * 23.06.29 작성자 : 김성인

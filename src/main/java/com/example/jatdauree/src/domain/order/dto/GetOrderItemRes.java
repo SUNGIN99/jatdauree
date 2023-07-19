@@ -1,11 +1,9 @@
 package com.example.jatdauree.src.domain.order.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.lang.Nullable;
 
 import java.io.Serializable;
 import java.util.List;
@@ -14,13 +12,16 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetOrderItem implements Serializable {
+public class GetOrderItemRes implements Serializable {
+
     private int orderIdx;
+    private int orderSequence;
     private String orderTime;
     private String pickUpTime;
-    @Nullable private String request;
-    private int orderCount;
+    private String request;
     private int totalPrice;
     private String payStatus;
-    @Nullable  List<OrderMenu> orderItems;
+    private String menuName;
+    private int menuCount;
+    private int discountedPrice;
 }

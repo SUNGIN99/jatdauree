@@ -1,5 +1,6 @@
 package com.example.jatdauree.src.domain.store.dao;
 
+import com.example.jatdauree.src.domain.seller.dto.StoreNameNStatus;
 import com.example.jatdauree.src.domain.store.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,11 +27,14 @@ public class StoreDao {
      * 23.07.06 작성자 : 김성인
      * 등록된 판매자 가게 조회
      */
-    public String storeNameBySellerIdx(int sellerIdx){
-        String query = "SELECT store_name FROM Stores WHERE sellerIdx = ?";
+    public StoreNameNStatus storeNameBySellerIdx(int sellerIdx){
+        String query = "SELECT store_name, status FROM Stores WHERE sellerIdx = ?";
 
         return this.jdbcTemplate.queryForObject(query,
-                (rs, rowNum) -> rs.getString("store_name"), sellerIdx);
+                (rs, rowNum) -> new StoreNameNStatus(
+                        rs.getString("store_name"),
+                        rs.getString("status")
+                ), sellerIdx);
     }
 
     /**
@@ -44,6 +48,18 @@ public class StoreDao {
         return this.jdbcTemplate.queryForObject(query,
                 (rs, rowNum) -> rs.getInt("storeIdx"), sellerIdx);
     }
+
+    /**
+     * storeDao - 0 - 3
+     * 23.07.06 작성자 : 김성인
+     * 등록된 판매자 가게 Idx 조회
+     */
+    public int storeIdxBySellerIdxExists(int sellerIdx){
+        String query = "SELECT EXISTS(SELECT storeIdx FROM Stores WHERE sellerIdx = ?)";
+
+        return this.jdbcTemplate.queryForObject(query, int.class, sellerIdx);
+    }
+
 
 
     /**
@@ -135,7 +151,7 @@ public class StoreDao {
      * 23.07.07 작성자 : 이윤채, 김성인
      * 가게수정
      */
-    public void storeUpdate(int storeIdx, PatchStoreInfoReq patchStoreInfoReq){
+    public void storeUpdate(int storeIdx, PatchStoreInfoReq patchStoreInfoReq, SavedFileNames savedFileNames){
         String query= "UPDATE Stores " +
                 "SET store_name = ?," +
                 "business_phone = ?," +
@@ -155,8 +171,8 @@ public class StoreDao {
                 patchStoreInfoReq.getStoreOpen(),
                 patchStoreInfoReq.getStoreClose(),
                 patchStoreInfoReq.getStorePhone(),
-                patchStoreInfoReq.getStoreLogoUrl(),
-                patchStoreInfoReq.getSignUrl(),
+                savedFileNames.getLogoFileName(),
+                savedFileNames.getSignFileName(),
                 storeIdx
         };
         this.jdbcTemplate.update(query, params);
@@ -191,18 +207,28 @@ public class StoreDao {
                 ), storeIdx);
     }
 
-    // 오늘의 메뉴 상태 값 체크..
-    public List<String> checkStoreEndStatus(int storeIdx) {
-        String query = "SELECT status FROM TodayMenu WHERE storeIdx = ?;";
-        return this.jdbcTemplate.queryForList(query, String.class, storeIdx);
-    }
 
     //영업종료
     public int storeEnd(int storeIdx){
         String updatequery = "UPDATE TodayMenu SET status ='D' WHERE storeIdx = ?;";
 
-        return jdbcTemplate.update(updatequery, storeIdx);
+        return this.jdbcTemplate.update(updatequery, storeIdx);
     }
 
+    public int storeNameDuplicate(String storeName) {
+        String duplicateCheck = "SELECT EXISTS(SELECT storeIdx FROM Stores WHERE store_name = ?)";
+
+        return this.jdbcTemplate.queryForObject(duplicateCheck, int.class, storeName);
+    }
+
+    public SavedFileNames getS3FileNames(int storeIdx) {
+        String query = "SELECT store_logo_url, sign_url FROM Stores WHERE storeIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new SavedFileNames(
+                        rs.getString("store_logo_url"),
+                        rs.getString("sign_url")
+                ), storeIdx);
+    }
 }
 

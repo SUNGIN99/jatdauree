@@ -5,14 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostOrderCancelReq {
-    private String uid;
-    private String password;
-    private int orderIdx;
-    private String status;
-
+public class OrderMenuCntPrirce implements Serializable {
+    private String menuName;
+    private int menuCnt;
+    private int discountedPrice;
 }

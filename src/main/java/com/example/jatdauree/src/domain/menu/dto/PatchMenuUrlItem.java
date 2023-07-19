@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 
@@ -12,10 +11,11 @@ import java.io.Serializable;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostMenuItem implements Serializable {
+public class PatchMenuUrlItem implements Serializable {
+    private int menuIdx;
     private String menuName;
     private int price;
     private String composition;
     private String description;
-    private MultipartFile menuUrl;
+    private String menuUrl;
 }

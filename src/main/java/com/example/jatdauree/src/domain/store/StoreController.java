@@ -23,6 +23,26 @@ public class StoreController {
         this.storeService = storeService;
     }
 
+    /**
+     * 23.07.014 작성자 : 김성인
+     * 가게등록
+     * GET /jat/stores/duplicate
+     * @param @RequestParam storeName = ?
+     * @return BaseResponse<postStoreRes>
+     */
+    @ResponseBody
+    @GetMapping("/duplicate")
+    public BaseResponse<StoreNameDupRes> storeNameDuplicate(@RequestParam String storeName){
+        try{
+            int sellerIdx = jwtService.getUserIdx();
+            StoreNameDupRes storeNameDupRes = storeService.storeNameDuplicate(storeName);
+
+            return new BaseResponse<>(storeNameDupRes);
+
+        }catch (BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
 
     /**
      * 23.07.06 작성자 : 이윤채, 김성인
@@ -37,7 +57,7 @@ public class StoreController {
     public BaseResponse<PostStoreRes> storeRegister(PostStoreReq postStoreReq) {
         try {
             int sellerIdx = jwtService.getUserIdx();
-             PostStoreRes postStoreRes = storeService.storeRegister(sellerIdx, postStoreReq);
+            PostStoreRes postStoreRes = storeService.storeRegister(sellerIdx, postStoreReq);
 
             return new BaseResponse<>(postStoreRes);
 
@@ -71,7 +91,7 @@ public class StoreController {
 
 
     /**
-     * 23.07.07 작성자 : 이윤채, 김성인
+     * 23.07.14 작성자 :김성인
      * 가게 등록 수정
      * Patch /jat/stores
      * @param @RequestBody PostStoreUpdateReq
@@ -80,7 +100,7 @@ public class StoreController {
     //가게정보 수정
     @ResponseBody
     @PatchMapping ("")
-    public BaseResponse<PatchStoreInfoRes> storeUpdate(@RequestBody PatchStoreInfoReq patchStoreInfoReq){
+    public BaseResponse<PatchStoreInfoRes> storeUpdate(PatchStoreInfoReq patchStoreInfoReq){
         try {
             int sellerIdx = jwtService.getUserIdx();
 

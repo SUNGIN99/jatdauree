@@ -5,13 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
+import java.io.Serializable;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostTodayMenuRegReq {
-    private ArrayList<PostTodayMenuItem> todayMenuListMain;
-    private ArrayList<PostTodayMenuItem> todayMenuListSide;
+public class GetMainPageMenu implements Serializable {
+    private int storeIdx;
+    private List<GetMainPageItem> mainMenus;
+    private List<GetMainPageItem> sideMenus;
 }

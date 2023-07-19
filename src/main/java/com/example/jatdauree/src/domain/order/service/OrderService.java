@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.example.jatdauree.config.BaseResponseStatus.DATABASE_ERROR;
@@ -26,7 +28,7 @@ public class OrderService {
         this.storeDao = storeDao;
     }
 
-    public List<GetOrderRes> getOrdersBySellerId(int sellerIdx)throws BaseException {
+    public GetOrderListRes getOrdersBySellerIdx(int sellerIdx, String status) throws BaseException {
         // 1) 사용자 가게 조회
         int storeIdx;
         try{
@@ -35,14 +37,55 @@ public class OrderService {
             throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
 
+        // 2) 주문관련된 정보 모두 가져오기 (접수 대기중 W)
+        // 주문Idx, 주문/픽업 시간, 요청사항, 총 결제금액, 결제상태, 메뉴이름, 총 가격
+        List<GetOrderItemRes> getOrdersResList;
         try {
-            List<GetOrderRes> getOrdersResList = orderDao.getOrdersByStoreIdx(storeIdx);
-            return getOrdersResList;
+            getOrdersResList = orderDao.getOrdersByStoreIdx(storeIdx, status);
+        } catch (Exception e){
+            throw new BaseException(BaseResponseStatus.RESPONSE_ERROR); // 주문 대기 조회에 실패하였습니다.
         }
-        catch (Exception exception){
-            System.out.println(exception);
-            throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);
+
+        // 3) 주문관련 정보 조합하기
+        HashMap<Integer, GetOrderRes> orderHash = new HashMap<Integer, GetOrderRes>();
+        try{
+            for(GetOrderItemRes orders : getOrdersResList){
+                if (!orderHash.containsKey(orders.getOrderIdx())){
+                    GetOrderRes orderInfo = new GetOrderRes(
+                            orders.getOrderIdx(),
+                            orders.getOrderSequence(),
+                            orders.getOrderTime(),
+                            orders.getPickUpTime(),
+                            orders.getRequest(),
+                            1, // 주문당 메뉴 종류 개수 1 로 시작
+                            orders.getTotalPrice(),
+                            orders.getPayStatus(),
+                            new ArrayList<>()
+                    );
+                    // 메뉴 목록 리스트 추가
+                    orderInfo.getOrderItem().add(new OrderMenuCntPrirce(orders.getMenuName(), orders.getMenuCount(), orders.getDiscountedPrice()));
+
+                    orderHash.put(orders.getOrderIdx(), orderInfo);
+
+                }else{
+                    // 주문 내 메뉴 개수 1 증가
+                    orderHash.get(orders.getOrderIdx())
+                            .setMenuDiverse(orderHash.get(orders.getOrderIdx()).getMenuDiverse() + 1);
+
+                    // 총 주문 가격 합산
+                    orderHash.get(orders.getOrderIdx())
+                            .setTotalPrice(orderHash.get(orders.getOrderIdx()).getTotalPrice() + orders.getTotalPrice());
+
+                    // 메뉴 이름, 개수목록 추가
+                    orderHash.get(orders.getOrderIdx())
+                            .getOrderItem().add(new OrderMenuCntPrirce(orders.getMenuName(), orders.getMenuCount(), orders.getDiscountedPrice()));
+                }
+            }
+        }catch (Exception e){
+            throw new BaseException(BaseResponseStatus.RESPONSE_ERROR); // 주문 대기 목록을 처리하는데 실패하였습니다.
         }
+
+        return new GetOrderListRes<>(storeIdx, new ArrayList<>(orderHash.values()));
     }
 
     @Transactional(rollbackFor = BaseException.class)
@@ -53,7 +96,6 @@ public class OrderService {
             storeIdx = storeDao.storeIdxBySellerIdx(sellerIdx);
         }
         catch (Exception e){
-            System.out.println("1: " + e);
             throw new BaseException(POST_STORES_NOT_REGISTERD); // 존재하지 않은 가게입니다.
         }
 
@@ -61,16 +103,13 @@ public class OrderService {
         if (!patchReceReq.getStatus().equals("P") && !patchReceReq.getStatus().equals("D"))
             throw new BaseException(DATABASE_ERROR); // 올바르지 않은 주문 접수/취소 요청입니다.
 
-        // 2) 조회해서 상태존재하는가
+        // 2) 조회해서 상태가 대기 상태인지 확인
         String status;
         try{
             status = orderDao.checkOrderStatus(patchReceReq.getOrderIdx());
         }catch (Exception e){
-            System.out.println("3: " + e);
             throw new BaseException(DATABASE_ERROR); // 주문 정보가 옳바르지 않습니다.
         }
-
-        // 3) 현재상태가 W가 아닌 것들은
         if(!"W".equals(status)){
             throw new BaseException(DATABASE_ERROR); // 이미 처리 되거나, 처리 되지 않은 주문입니다.
         }
@@ -81,7 +120,6 @@ public class OrderService {
         try{
             updated = orderDao.updateOrderStatus(storeIdx, patchReceReq.getOrderIdx(), patchReceReq.getStatus());
         }catch (Exception e){
-            System.out.println("1: " + e);
             throw new BaseException(DATABASE_ERROR);// 데이터를 업데이트 하는데 오류가 있음
         }
 
@@ -99,17 +137,17 @@ public class OrderService {
         int storeIdx;
         try {
             storeIdx = storeDao.storeIdxBySellerIdx(sellerIdx);
-        } catch (Exception exception) {
+        } catch (Exception e) {
             throw new BaseException(BaseResponseStatus.POST_STORES_NOT_REGISTERD); //가게가 등록되어 있지 않다.
         }
-        // 2. 상태가 W,D인 경우에는 주문표가 존재하지 않는다.
+        // 2. 상태가 W,D인 경우에는 주문표가 존재하지 않는다. (주문 접수처리가 된 주문표)
         String status;
         try{
             status = orderDao.checkOrderStatus(getBillReq.getOrderIdx());
-        }catch (Exception exception){
+        }catch (Exception e){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR); //현재 상태가 존재하지 않는 경우이다.
         }
-        if (status.equals("W") || status.equals("D")){
+        if ((!status.equals("P") || !status.equals("W")) && status.equals("D")){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR); // 현재 옳바르지 않은 상태이다.
         }
 
@@ -117,47 +155,19 @@ public class OrderService {
         GetBillRes orderBills;
         try{
             orderBills = orderDao.getOrderBills(storeIdx, getBillReq.getOrderIdx());
-        }catch (Exception exception){
+        }catch (Exception e){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
 
         // 4. 주문에 포함된 메뉴 정보 조회하기
         try{
-            orderBills.setOrderItem(orderDao.getOrderMenus(storeIdx, getBillReq.getOrderIdx()));
+            orderBills.setOrderItem(orderDao.getOrderMenus(getBillReq.getOrderIdx()));
+
             return orderBills;
-        }catch (Exception exception){
+        }catch (Exception e){
             throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
         }
 
-
-    }
-
-    public GetOrderProRes getProcessOrder(int sellerIdx) throws BaseException {
-        //1. 가게를 조회해서 존재하는지를 확인한다.
-        int storeIdx;
-        try {
-            storeIdx = storeDao.storeIdxBySellerIdx(sellerIdx);
-        } catch (Exception exception) {
-            throw new BaseException(BaseResponseStatus.POST_STORES_NOT_REGISTERD);
-        }
-
-        //2. orderList 조회하기
-        List<GetOrderItem> orderLists;
-        try {
-            orderLists = orderDao.orderByStoreIdx(storeIdx);
-        } catch (Exception exception){
-            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
-        }
-
-        //3. orderList 안에 있는 orderItem 조회하기
-        try {
-            for (GetOrderItem order : orderLists){
-                order.setOrderItems(orderDao.orderItem(storeIdx, order.getOrderIdx()));
-            }
-            return new GetOrderProRes(storeIdx ,orderLists);
-        }catch (Exception exception){
-            throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
-        }
 
     }
 

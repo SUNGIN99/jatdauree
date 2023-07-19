@@ -26,8 +26,13 @@ public enum BaseResponseStatus {
     // users
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
 
+    POST_USERS_INVALID_BIRTHDAY(false, 2013, "생년월일 양식을 yyyy.MM.dd로 설정해주세요."),
+    POST_USERS_INVALID_PHONENUM(false, 2014, "전화번호는 - 없이 숫자만 입력해주세요."),
+    POST_USERS_INVALID_AUTHYNUM(false, 2015, "유효하지 않은 인증번호입니다."),
+
     // 회원가입
     // [POST] /users
+    POST_USERS_ALREADY_EXISTS(false, 2016, "이미 가입한 회원입니다."),
     POST_USERS_EXISTS_EMAIL(false,2017,"중복된 이메일입니다."),
     // 회원가입 > 중복아이디 체크
     POST_USERS_EXISTS_ID(false,2018,"중복된 아이디입니다."),
@@ -93,11 +98,14 @@ public enum BaseResponseStatus {
     STORE_INGREDIENT_SAVE_ERROR(false, 4033, "원산지 등록에 실패하였습니다."),
     STORE_MENU_ALREADY_SAVED(false, 4034, "메뉴등록이 이미 이루어진 판매자입니다."),
     STORE_REGISTER_NOT_PERMITTED(false, 4035, "관리자에게 가게 승인되지 않은 판매자 계정입니다."),
-    STORE_URL_POST_ERROR(false, 4034, "등록하는 이미지의 형태가 잘못 처리되었습니다."),
+    STORE_URL_POST_ERROR(false, 4036, "등록하는 이미지의 형태가 잘못 처리되었습니다."),
 
     // 4040~) 오늘의 떨이메뉴 등록
     POST_TODAY_MAINMENU_SAVE_ERROR(false, 4041, "오늘의 떨이메뉴(메인) 등록에 실패하였습니다."),
     POST_TODAY_SIDEMENU_SAVE_ERROR(false, 4042, "오늘의 떨이메뉴(사이드) 등록에 실패하였습니다."),
+
+    // 4050~) 메뉴조회
+    GET_MENU_ERROR(false, 4050, "메뉴 조회에 실패하였습니다."),
 
 
     /**

@@ -1,4 +1,4 @@
-package com.example.jatdauree.src.domain.order.dto;
+package com.example.jatdauree.src.domain.seller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetOrderReq {
-    private String uid;
-    private String password;
-
+public class PostSignUpAuthyRes {
+    private int validIdentify;
 }

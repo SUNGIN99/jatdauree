@@ -33,7 +33,7 @@ public class MenuController {
      */
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<PostMenuRes> menuRegister(@RequestBody PostMenuReq postMenuReq) {
+    public BaseResponse<PostMenuRes> menuRegister(PostMenuReq postMenuReq) {
         try {
             int sellerIdx = jwtService.getUserIdx();
 
@@ -45,10 +45,10 @@ public class MenuController {
     }
 
     /**
-     * 23.07.07 작성자 : 정주현, 김성인
+     * 23.07.16 작성자 : 김성인
      * 등록된 메뉴 조회
      * GET /jat/menus
-     * @return BaseResponse<GetMenusSearchRes>
+     * @return BaseResponse<GetMenuItemsRes>
      */
     @ResponseBody
     @GetMapping("")
@@ -64,22 +64,25 @@ public class MenuController {
     }
 
     /**
-     * 23.07.06 작성자 : 이윤채
-     * 메뉴 수정
-     * Patch/jat/menu/menuUpdate
-     * @param @RequestBody PostMenuUpReq
-     * @return BaseResponse<postMenuUpRes>
-     *
+     * 23.07.18 작성자 : 김성인
+     * 메뉴수정
+     * PATCH /jat/menus
+     * @return BaseResponse<GetMenuItemsRes>
      */
-    /*@ResponseBody
+    @ResponseBody
     @PatchMapping("")
-    public BaseResponse<PostMenuUpRes> menuUpdate(@RequestBody PostMenuUpReq postMenuUpReq){
+    public BaseResponse<PatchMenuRes> menuUpdate(PatchMenuReq postMenuReq) {
         try {
-            PostMenuUpRes postMenuUpRes =menuService.menuUpdate(postMenuUpReq);
-            return new BaseResponse<>(postMenuUpRes);
-        }catch (BaseException baseException){
+            int sellerIdx = jwtService.getUserIdx();
+
+            PatchMenuRes patchMenuRes = menuService.menuUpdate(sellerIdx, postMenuReq);
+            return new BaseResponse<>(patchMenuRes);
+        } catch (BaseException baseException) {
             return new BaseResponse<>(baseException.getStatus());
         }
-    }*/
+    }
+
+
+
 
 }

@@ -9,9 +9,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostTodayMenuRegRes {
+public class PostMainPageTMenuRes {
     private int storeIdx;
-    private String date;
-    private int mainTodayMenuItemCount;
-    private int sideTodayMenuItemCount;
+    private int newTodayMainCount;
+    private int updateTodayMainCount;
+    private int newTodaySideCount;
+    private int updateTodaySideCount;
+
 }

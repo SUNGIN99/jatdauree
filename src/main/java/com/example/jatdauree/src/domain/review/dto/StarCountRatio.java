@@ -1,5 +1,4 @@
-package com.example.jatdauree.src.domain.order.dto;
-
+package com.example.jatdauree.src.domain.review.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +11,8 @@ import java.io.Serializable;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MenuList implements Serializable {
-    private String menu_name;
-    private String cnt;
+public class StarCountRatio implements Serializable {
+    private String starPoint;
+    private int starCount;
+    private int starRatio;
 }

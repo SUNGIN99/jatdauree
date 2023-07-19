@@ -5,14 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostPickupReq {
-    private String uid;
-    private String password;
-    private int orderIdx;
-    private String status;
-
+public class GetOrderListRes <T> implements Serializable {
+    private int storeIdx;
+    private List<T> orderLists;
 }

@@ -12,10 +12,16 @@ import java.io.Serializable;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostMenuItem implements Serializable {
+public class PatchMenuItem implements Serializable {
+    private int menuIdx;
     private String menuName;
     private int price;
     private String composition;
     private String description;
     private MultipartFile menuUrl;
+    private int isUpdated;
+    // 0: 수정안하고 그대로 유지메뉴
+    // 1: 수정할 메뉴
+    // 2: 삭제할 메뉴
+    // 3: 새로운 메뉴
 }

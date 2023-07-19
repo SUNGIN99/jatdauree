@@ -1,20 +1,19 @@
 package com.example.jatdauree.src.domain.seller.dto;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostLoginRes {
-    private String jwt;
-    private int sellerIdx;
+public class PostSignUpAuthyReq {
     private String name;
-    private int first_login;
-    private int menu_register;
-    private String store_name;
-    private String store_status;
+    private String birth;
+    private String phoneNum;
+    @Nullable String certificationNum;
 }
