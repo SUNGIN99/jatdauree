@@ -183,7 +183,7 @@ public class StoreService {
             throw new BaseException(DATABASE_ERROR);
         }
 
-        // 파일 생성
+        // 파일명 생성 (checkFileIsNullThenName 에서 파일이 null 이면 가게정보 수정요청들어와도 파일이름 null)
         File logoFile = null, signFile = null;
         try{
             if(savedFileNames.getLogoFileName() != null)
@@ -196,15 +196,21 @@ public class StoreService {
 
         // s3 파일 보낼준비 및 S3 URL 생성 요청
         try{
-            if(logoFile != null) {
+            // 파일명을 만들고,
+            if(logoFile != null && patchStoreInfoReq.getStoreLogoUrl() != null) {
                 System.out.println("logoFile Updated");
                 patchStoreInfoReq.getStoreLogoUrl().transferTo(logoFile);
+                if(s3Client.doesObjectExist(bucketName, savedFileNames.getLogoFileName()))
+                    s3Client.deleteObject(bucketName, savedFileNames.getLogoFileName());
+
                 s3Client.putObject(new PutObjectRequest(bucketName, savedFileNames.getLogoFileName(), logoFile));
                 logoFile.delete();
             }
-            if(signFile != null) {
+            if(signFile != null && patchStoreInfoReq.getSignUrl() != null) {
                 System.out.println("signFile Updated");
                 patchStoreInfoReq.getSignUrl().transferTo(signFile);
+                if(s3Client.doesObjectExist(bucketName, savedFileNames.getSignFileName()))
+                    s3Client.deleteObject(bucketName, savedFileNames.getSignFileName());
                 s3Client.putObject(new PutObjectRequest(bucketName, savedFileNames.getSignFileName(), signFile));
                 signFile.delete();
             }
