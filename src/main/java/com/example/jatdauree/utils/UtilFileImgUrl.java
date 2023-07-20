@@ -24,6 +24,7 @@ public class UtilFileImgUrl {
 
         //System.out.println("checkFileIsNullThenName 1:");
         if (files == null) {
+            System.out.println("file is Null");
             return null;
         } else if (!files.isEmpty()) {
             String contentType = files.getContentType();
