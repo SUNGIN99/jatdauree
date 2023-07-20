@@ -264,7 +264,7 @@ public class MenuService {
 
         // 2-M) 수정/삭제/신규등록 할 메인 메뉴 분리
         if(postMenuReq.getMainMenuItems() != null){
-            //ystem.out.println("main");
+            System.out.println("main");
             for(PatchMenuItem item : postMenuReq.getMainMenuItems()){
                 if (item.getIsUpdated() == 0){
                     continue;
@@ -284,7 +284,7 @@ public class MenuService {
         }
         // 2-S) 수정/삭제/신규등록 할 사이드 메뉴 분리
         if(postMenuReq.getSideMenuItems() != null){
-            //System.out.println("side");
+            System.out.println("side");
             for(PatchMenuItem item : postMenuReq.getSideMenuItems()){
                 if (item.getIsUpdated() == 0) {
                     continue;
@@ -308,7 +308,7 @@ public class MenuService {
         // 3-M) 메인 메뉴 신규등록
         try{
             if(newMainMenu != null && newMainMenu.size() != 0){
-                //System.out.println("newMain");
+                System.out.println("newMain");
                 urlItemsNew = convertToUrlFileNames(newMainMenu);
                 int newComplete = menuDao.menuRegister(storeIdx, urlItemsNew, "M");
                 if (newMainCnt != newComplete)
@@ -322,7 +322,7 @@ public class MenuService {
         // 3-S) 사이드 메뉴 신규등록
         try{
             if(newSideMenu != null && newSideMenu.size() != 0){
-                //System.out.println("newSide");
+                System.out.println("newSide");
                 urlItemsNew = convertToUrlFileNames(newSideMenu);
                 int newComplete = menuDao.menuRegister(storeIdx, urlItemsNew, "M");
                 if (newSideCnt != newComplete)
@@ -332,6 +332,10 @@ public class MenuService {
             //System.out.println("2:" + e);
             throw new BaseException(STORE_SIDEMENU_SAVE_ERROR);
         }
+
+        System.out.println(newMainCnt+ "," + updMainCnt);
+        System.out.println(updMainCnt+ "," + updSideCnt);
+        System.out.println(delMainCnt+ "," + delSideCnt);
 
 
         // 4-M) 메인 메뉴 수정
