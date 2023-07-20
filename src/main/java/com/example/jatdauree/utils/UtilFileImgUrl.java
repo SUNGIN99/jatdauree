@@ -23,22 +23,18 @@ public class UtilFileImgUrl {
 
         String fileNanoName = sdf.format(nanos / 1000000L);
 
-        System.out.println(files);
-        System.out.println(files.getContentType());
-        System.out.println(files.getSize());
-        //System.out.println("checkFileIsNullThenName 1:");
+        //System.out.println(files);
+        //System.out.println(files.getContentType());
+        //System.out.println(files.getSize());
         if (files == null) {
             return null;
         } else if (!files.isEmpty()) {
             String contentType = files.getContentType();
             String originalFileExtension;
 
-            //System.out.println("checkFileIsNullThenName 2:");
             if (ObjectUtils.isEmpty(contentType)) {
-                //System.out.println("checkFileIsNullThenName 3:");
                 return null;
             } else {
-                //System.out.println("checkFileIsNullThenName 4:");
                 if (contentType.contains("image/jpeg"))
                     originalFileExtension = ".jpg";
                 else if (contentType.contains("image/png"))
@@ -47,7 +43,6 @@ public class UtilFileImgUrl {
                     originalFileExtension = ".gif";
                 else
                     return null;
-                //System.out.println("checkFileIsNullThenName 5:");
                 return fileNanoName + System.nanoTime() + originalFileExtension;
             }
         }

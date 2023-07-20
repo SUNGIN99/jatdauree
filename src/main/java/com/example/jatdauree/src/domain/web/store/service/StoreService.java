@@ -195,14 +195,14 @@ public class StoreService {
         }catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
-        System.out.println(logoFile);
-        System.out.println(signFile);
+        //System.out.println(logoFile);
+        //System.out.println(signFile);
 
         // s3 파일 보낼준비 및 S3 URL 생성 요청
         try{
             // 파일명을 만들고,
             if(logoFile != null && patchStoreInfoReq.getStoreLogoUrl() != null && !patchStoreInfoReq.getStoreLogoUrl().isEmpty()) {
-                System.out.println("logoFile Updated");
+                //System.out.println("logoFile Updated");
                 patchStoreInfoReq.getStoreLogoUrl().transferTo(logoFile);
                 if(s3Client.doesObjectExist(bucketName, savedFileNames.getLogoFileName()))
                     s3Client.deleteObject(bucketName, savedFileNames.getLogoFileName());
@@ -211,7 +211,7 @@ public class StoreService {
                 logoFile.delete();
             }
             if(signFile != null && patchStoreInfoReq.getSignUrl() != null && !patchStoreInfoReq.getSignUrl().isEmpty()) {
-                System.out.println("signFile Updated");
+                //System.out.println("signFile Updated");
                 patchStoreInfoReq.getSignUrl().transferTo(signFile);
                 if(s3Client.doesObjectExist(bucketName, savedFileNames.getSignFileName()))
                     s3Client.deleteObject(bucketName, savedFileNames.getSignFileName());
