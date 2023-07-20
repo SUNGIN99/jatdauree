@@ -169,6 +169,7 @@ public class StoreService {
             if(patchStoreInfoReq.getStoreLogoUrl()!= null && savedFileNames.getLogoFileName() == null){
                 savedFileNames.setLogoFileName(checkFileIsNullThenName(patchStoreInfoReq.getStoreLogoUrl()));
             }
+
             // 2- 간판 수정 요청이 있고, 서버에 등록이 되지 않은 경우 = 새로운 파일명 생성
             // 간판 새로운 이미지 등록 수정 요청일 경우 && 서버에 수정요청이 이미지를 새로운 등록을 하는 경우
             if(patchStoreInfoReq.getSignUrl()!= null && savedFileNames.getSignFileName() == null){
@@ -196,11 +197,13 @@ public class StoreService {
         // s3 파일 보낼준비 및 S3 URL 생성 요청
         try{
             if(logoFile != null) {
+                System.out.println("logoFile Updated");
                 patchStoreInfoReq.getStoreLogoUrl().transferTo(logoFile);
                 s3Client.putObject(new PutObjectRequest(bucketName, savedFileNames.getLogoFileName(), logoFile));
                 logoFile.delete();
             }
             if(signFile != null) {
+                System.out.println("signFile Updated");
                 patchStoreInfoReq.getSignUrl().transferTo(signFile);
                 s3Client.putObject(new PutObjectRequest(bucketName, savedFileNames.getSignFileName(), signFile));
                 signFile.delete();
