@@ -1,5 +1,6 @@
 package com.example.jatdauree.utils;
 
+import jdk.swing.interop.SwingInterOpUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,9 +23,11 @@ public class UtilFileImgUrl {
 
         String fileNanoName = sdf.format(nanos / 1000000L);
 
+        System.out.println(files);
+        System.out.println(files.getContentType());
+        System.out.println(files.getSize());
         //System.out.println("checkFileIsNullThenName 1:");
         if (files == null) {
-            System.out.println("file is Null");
             return null;
         } else if (!files.isEmpty()) {
             String contentType = files.getContentType();
