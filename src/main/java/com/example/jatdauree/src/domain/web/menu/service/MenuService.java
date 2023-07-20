@@ -320,7 +320,7 @@ public class MenuService {
             if(newSideMenu != null && newSideMenu.size() != 0){
                 //System.out.println("newSide");
                 urlItemsNew = convertToUrlFileNames(newSideMenu);
-                int newComplete = menuDao.menuRegister(storeIdx, urlItemsNew, "M");
+                int newComplete = menuDao.menuRegister(storeIdx, urlItemsNew, "S");
                 /*if (newSideCnt != newComplete)
                     throw new Exception();*/
             }
