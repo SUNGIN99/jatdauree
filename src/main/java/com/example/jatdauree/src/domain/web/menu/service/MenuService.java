@@ -118,10 +118,6 @@ public class MenuService {
             throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
 
-        //System.out.println("메인메뉴 null :" + postMenuReq.getMainMenuItems() == null);
-        //System.out.println("사이드메뉴 null :" + postMenuReq.getSideMenuItems() == null);
-        //System.out.println("원산지 null :" +postMenuReq.getIngredientItems() == null);
-
         // 2) 가게 메뉴/원산지 등록
         int mainMenuItemCount = 0, sideMenuItemCount = 0, ingredientCount = 0;
         List<PostMenuUrlItem> urlItems = null;
@@ -315,7 +311,7 @@ public class MenuService {
                     throw new Exception();*/
             }
         }catch (Exception e){
-            //System.out.println("1:" + e);
+            System.out.println("1:" + e);
             throw new BaseException(STORE_MAINMENU_SAVE_ERROR);
         }
 
@@ -329,7 +325,7 @@ public class MenuService {
                     throw new Exception();*/
             }
         }catch (Exception e){
-            //System.out.println("2:" + e);
+            System.out.println("2:" + e);
             throw new BaseException(STORE_SIDEMENU_SAVE_ERROR);
         }
 
@@ -345,7 +341,7 @@ public class MenuService {
                     throw new Exception();*/
             }
         }catch (Exception e){
-            //System.out.println("3:" + e);
+            System.out.println("3:" + e);
             throw new BaseException(STORE_MAINMENU_SAVE_ERROR);
         }
         // 4-S) 사이드 메뉴 수정
@@ -358,7 +354,7 @@ public class MenuService {
                     throw new Exception();*/
             }
         }catch (Exception e){
-            //System.out.println("4:" + e);
+            System.out.println("4:" + e);
             throw new BaseException(STORE_SIDEMENU_SAVE_ERROR);
         }
 
