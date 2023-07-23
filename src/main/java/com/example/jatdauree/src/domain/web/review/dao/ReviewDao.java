@@ -100,7 +100,7 @@ public class ReviewDao {
                 "      COUNT(CASE WHEN star = 4 THEN 1 END) AS star4_count,\n" +
                 "      COUNT(CASE WHEN star = 5 THEN 1 END) AS star5_count\n" +
                 "      FROM Review\n" +
-                "WHERE storeIdx = ?";
+                "WHERE storeIdx = ? AND status != 'D'";
 
         return this.jdbcTemplate.queryForObject(query,
                 (rs, rowNum) -> new GetReviewStarRes(
