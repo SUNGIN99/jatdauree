@@ -22,7 +22,7 @@ public class SalesDao {
     public TodayTotalSalesRes getTodayTotalSales(int storeIdx) {
         String query = "SELECT\n" +
                 "    DATE_FORMAT(O.created, '%Y-%c-%d') as today,\n" +
-                "    SUM(TM.price * OL.cnt)\n" +
+                "    SUM(TM.price * OL.cnt) as total_price \n" +
                 "FROM Orders O\n" +
                 "LEFT JOIN OrderLists OL on O.orderIdx = OL.orderIdx\n" +
                 "LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
