@@ -75,6 +75,8 @@ public class StoreDao {
                 "                    city,\n" +
                 "                    local,\n" +
                 "                    town,\n" +
+                "                    x,\n" +
+                "                    y,\n" +
                 "                    store_name,\n" +
                 "                    business_phone,\n" +
                 "                    business_email,\n" +
@@ -88,7 +90,7 @@ public class StoreDao {
                 "                    store_address,\n" +
                 "                    store_logo_url,\n" +
                 "                    sign_url)\n" +
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 
         Object[] params = new Object[]{
                 sellerIdx,
@@ -96,6 +98,8 @@ public class StoreDao {
                 postStoresReq.getCity(),
                 postStoresReq.getLocal(),
                 postStoresReq.getTown(),
+                0,
+                0,
                 postStoresReq.getStoreName(),
                 postStoresReq.getBusinessPhone(),
                 postStoresReq.getBusinessEmail(),
