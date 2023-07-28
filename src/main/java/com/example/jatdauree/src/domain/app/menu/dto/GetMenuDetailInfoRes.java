@@ -19,7 +19,4 @@ public class GetMenuDetailInfoRes {
     private int price;
     private int discount;
     private int todayPrice;
-
-
-
 }

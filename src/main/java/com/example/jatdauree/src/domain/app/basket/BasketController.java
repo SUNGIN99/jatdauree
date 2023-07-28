@@ -32,9 +32,14 @@ public class BasketController {
 
     @ResponseBody
     @GetMapping ("/count")
-    BaseResponse<GetBasketCountRes> postBasket(@RequestBody GetBasketCountReq basketReq){
-
-        return null;
+    BaseResponse<GetBasketCountRes> getBasketCount(){
+        try{
+            //int userIdx = jwtService.getCustomerIdx();
+            GetBasketCountRes basketcount = basketService.getBasketCount(0);
+            return new BaseResponse<>(basketcount);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
     }
 
     @ResponseBody
@@ -51,14 +56,20 @@ public class BasketController {
 
     @ResponseBody
     @GetMapping ("/")
-    BaseResponse<GetBasketRes> postBasket(@RequestBody GetBasketReq basketReq){
-        return null;
+    BaseResponse<GetBasketRes> getBasket(){
+        try{
+            //int userIdx = jwtService.getCustomerIdx();
+            GetBasketRes basketRes = basketService.getBasket(0);
+            return new BaseResponse<>(basketRes);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
     }
 
-    @ResponseBody
+    /*@ResponseBody
     @PatchMapping("/")
-    BaseResponse<PatchBasketRes> postBasket(@RequestBody PatchBasketRes basketReq){
+    BaseResponse<PatchBasketRes> patchBasket(@RequestBody GetBasketRes basketReq){
         return null;
-    }
+    }*/
 
 }

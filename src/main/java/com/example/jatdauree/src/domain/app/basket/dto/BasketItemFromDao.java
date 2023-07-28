@@ -1,16 +1,16 @@
 package com.example.jatdauree.src.domain.app.basket.dto;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
-public class BasketItem {
+public class BasketItemFromDao {
     private int storeIdx;
+    private String storeName;
     private int todaymenuIdx;
     private String menuUrl;
     private String menuName;
@@ -18,5 +18,4 @@ public class BasketItem {
     private int price;
     private int discount;
     private int todayPrice;
-
 }
