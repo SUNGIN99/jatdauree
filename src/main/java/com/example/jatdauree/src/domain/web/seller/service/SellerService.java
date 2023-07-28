@@ -138,7 +138,7 @@ public class SellerService {
             String pwd = new SHA256().encrypt(postLoginReq.getPassword(), salt);
             //System.out.println("{SellerService.Class} pwd : " + pwd);
             if (postLoginReq.getUid().equals(seller.getUid()) && pwd.equals(seller.getPassword())){
-                String jwt = jwtTokenProvider.createJwt(seller.getSellerIdx());
+                String jwt = jwtTokenProvider.createJwt(seller.getSellerIdx(), "Merchandiser");
                 return new PostLoginRes(jwt,
                         seller.getSellerIdx(),
                         seller.getName(),
@@ -241,7 +241,7 @@ public class SellerService {
 
             if (smsIdx == 1){
                 int sellerIdx = sellerDao.JwtForRestorePw(receivedNumConfReq);
-                String jwt = jwtTokenProvider.createJwt(sellerIdx);
+                String jwt = jwtTokenProvider.createJwt(sellerIdx, "Merchandiser");
                 return new ReceivedNumConfPwRes(jwt, receivedNumConfReq.getUid(), 1);
             }
             else{
@@ -274,6 +274,7 @@ public class SellerService {
         }
     }
 
+    @Transactional(rollbackFor = BaseException.class)
     public PostSignUpAuthyRes userAuthy(PostSignUpAuthyReq signUpAuthy) throws BaseException {
         // 1) 회원가입 가능한지?? 이미 등록된 회원인지??
         int duplicateUser;
@@ -319,7 +320,7 @@ public class SellerService {
     public PostSignUpAuthyRes userAuthyPass(PostSignUpAuthyReq passReq) throws BaseException{
         try{
             int userPass = smsDao.smsAuthyPass(passReq);
-            System.out.println(userPass);
+
             return new PostSignUpAuthyRes(userPass);
         }catch(Exception exception){
             throw new BaseException(COOLSMS_API_ERROR); // 5010 : SMS 인증번호 발송을 실패하였습니다.

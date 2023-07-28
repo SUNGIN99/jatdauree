@@ -1,5 +1,6 @@
 package com.example.jatdauree.src.domain.web.sms.dao;
 
+import com.example.jatdauree.src.domain.app.customer.dto.UidRecovReq;
 import com.example.jatdauree.src.domain.web.seller.dto.PostSignUpAuthyReq;
 import com.example.jatdauree.src.domain.web.seller.dto.ReceivedNumConfReq;
 import com.example.jatdauree.src.domain.web.seller.dto.SmsCertificateReq;
@@ -71,7 +72,6 @@ public class SmsDao {
         };
 
         return this.jdbcTemplate.queryForObject(query, int.class, params);
-
     }
 
     /**
@@ -149,6 +149,27 @@ public class SmsDao {
                 signUPValid.getName(),
                 signUPValid.getBirth(),
                 signUPValid.getCertificationNum(),
+        };
+
+        return this.jdbcTemplate.queryForObject(query, int.class, params);
+    }
+
+    public int smsCheckIdCustom(UidRecovReq receivedNumConfReq) {
+        String query = "SELECT EXISTS(\n" +
+                "    SELECT\n" +
+                "        * \n" +
+                "    FROM Sms WHERE phone = ?\n" +
+                "               AND name = ?\n" +
+                "               AND certification_num = ?\n" +
+                "               AND status = 'IC'\n" +
+                "               AND created >= DATE_ADD(NOW(), INTERVAL -3 MINUTE) \n" +
+                "            ORDER BY created DESC LIMIT 1" +
+                "    )";
+
+        Object[] params = new Object[]{
+                receivedNumConfReq.getPhoneNum(),
+                receivedNumConfReq.getName(),
+                receivedNumConfReq.getCertificationNum()
         };
 
         return this.jdbcTemplate.queryForObject(query, int.class, params);

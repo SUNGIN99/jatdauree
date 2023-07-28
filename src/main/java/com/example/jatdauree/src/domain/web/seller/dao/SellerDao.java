@@ -92,10 +92,7 @@ public class SellerDao {
                         rs.getString("uid"),
                         rs.getString("name"),
                         rs.getString("birthday"),
-                        rs.getString("p" +
-                                "" +
-                                "" +
-                                "hone"),
+                        rs.getString("phone"),
                         rs.getString("email"),
                         rs.getString("created"),
                         rs.getInt("sms_check"),

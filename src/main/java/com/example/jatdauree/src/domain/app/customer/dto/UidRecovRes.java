@@ -5,16 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostSignUpRes {
-    private String name;
-    private String birthday;
-    private String phone;
-    private String email;
-    private String completeDate;
-
+public class UidRecovRes {
+    private String uid;
+    private String signUpDate;
 }

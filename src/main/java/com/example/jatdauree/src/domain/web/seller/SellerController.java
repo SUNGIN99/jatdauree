@@ -24,13 +24,10 @@ public class SellerController {
     @Autowired
     private final SellerService sellerService;
     @Autowired
-    private final JwtTokenProvider jwtTokenProvider;
-    @Autowired
     private final JwtService jwtService;
 
-    public SellerController(SellerService sellerService, JwtTokenProvider jwtTokenProvider, JwtService jwtService) {
+    public SellerController(SellerService sellerService, JwtService jwtService) {
         this.sellerService = sellerService;
-        this.jwtTokenProvider = jwtTokenProvider;
         this.jwtService = jwtService;
     }
 
