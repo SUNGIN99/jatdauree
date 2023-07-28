@@ -207,7 +207,7 @@ public class CustomerService {
                 throw new BaseException(REQUEST_ERROR); // 2000 : 입력값을 확인해주세요
             }else{
                 smsCertificateReq.setPhoneNum(smsCertificatePwReq.getPhoneNum());
-                smsCertificateReq.setName(smsCertificatePwReq.getUid());
+                smsCertificateReq.setUid(smsCertificatePwReq.getUid());
                 findType = "PC";
             }
         }else{
