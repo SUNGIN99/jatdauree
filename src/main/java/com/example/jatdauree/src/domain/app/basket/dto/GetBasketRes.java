@@ -5,10 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetBasketCountRes {
-    private int basketCount;
+public class GetBasketRes {
+    private int storeIdx;
+    private String storeName;
+    private int totalMenuCount;
+    private int totalMenuPrice;
+    private List<BasketItem> basketItems;
 }
