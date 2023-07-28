@@ -36,7 +36,7 @@ WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // 그외 웹으로 들어오는 요청모두 권한 확인
                 .antMatchers("/jat/**").hasRole("SELLER")
                 // 말고 그냥 들어오는 모든 요청 거절절
-               .anyRequest().denyAll()
+                .anyRequest().denyAll()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()

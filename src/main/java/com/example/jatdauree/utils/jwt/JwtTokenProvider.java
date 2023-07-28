@@ -56,6 +56,12 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
+    public Authentication getAuthenticationCustom(String token){
+       /* UserDetails userDetails = customerService.loadUserByUserIdx(this.getUserId(token));
+        log.info("JwtTokenProvider_customer : {}", userDetails, "", userDetails.getAuthorities());*/
+        return null;
+    }
+
     //토큰에서 회원정보 추출
     public Long getUserId(String token){
         return new Long(Jwts.parser().setSigningKey(JwtSecret.JWT_SECRET_KEY).parseClaimsJws(token).getBody().get("userIdx", Integer.class));
