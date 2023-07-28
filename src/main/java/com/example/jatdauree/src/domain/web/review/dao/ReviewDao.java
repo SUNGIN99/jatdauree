@@ -1,6 +1,7 @@
 package com.example.jatdauree.src.domain.web.review.dao;
 
 import com.example.jatdauree.src.domain.web.review.dto.*;
+import com.example.jatdauree.src.domain.web.review.dto.ReviewReport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -99,7 +100,7 @@ public class ReviewDao {
                 "      COUNT(CASE WHEN star = 4 THEN 1 END) AS star4_count,\n" +
                 "      COUNT(CASE WHEN star = 5 THEN 1 END) AS star5_count\n" +
                 "      FROM Review\n" +
-                "WHERE storeIdx = ?";
+                "WHERE storeIdx = ? AND status != 'D'";
 
         return this.jdbcTemplate.queryForObject(query,
                 (rs, rowNum) -> new GetReviewStarRes(
@@ -122,6 +123,44 @@ public class ReviewDao {
                 "WHERE reviewIdx = ?";
 
         return this.jdbcTemplate.update(query, reportReq.getReviewIdx());
+    }
+
+    public List<ReviewReport> reviewReportAdmin() {
+        String query = "SELECT\n" +
+                "    R.reviewIdx,\n" +
+                "    C.name,\n" +
+                "    R.star,\n" +
+                "    S.store_name,\n" +
+                "    R.contents,\n" +
+                "    R.review_url\n" +
+                "FROM Review R\n" +
+                "LEFT JOIN Stores S on R.storeIdx = S.storeIdx\n" +
+                "LEFT JOIN Customers C on R.customerIdx = C.customerIdx\n" +
+                "WHERE R.status = 'R'";
+
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new ReviewReport(
+                    rs.getInt("reviewIdx"),
+                    rs.getString("name"),
+                    rs.getInt("star"),
+                    rs.getString("store_name"),
+                    rs.getString("contents"),
+                    rs.getString("review_url")
+                ));
+
+    }
+
+    public int reviewReportDone(ReviewReportAdmit reportAdmit) {
+        String query = "UPDATE Review\n" +
+                "    SET status = ?\n" +
+                "WHERE reviewIdx = ?";
+
+        Object[] params = new Object[]{
+                reportAdmit.getStatus(),
+                reportAdmit.getReviewIdx()
+        };
+
+        return this.jdbcTemplate.update(query, params);
     }
 }
 

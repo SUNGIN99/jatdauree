@@ -110,7 +110,7 @@ public class MenuDao {
                 "    price = ?,\n" +
                 "    composition = ?,\n" +
                 "    description = ?, \n" +
-                "    menu_url = ?\n" +
+                "    menu_url = ? \n" +
                 "WHERE menuIdx = ?";
 
         return this.jdbcTemplate.batchUpdate(query,
@@ -123,7 +123,6 @@ public class MenuDao {
                     ps.setString(4, item.getDescription());
                     ps.setString(5, item.getMenuUrl());
                     ps.setInt(6, item.getMenuIdx());
-
                 }
         ).length;
     }

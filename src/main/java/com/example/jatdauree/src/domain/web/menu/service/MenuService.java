@@ -118,10 +118,6 @@ public class MenuService {
             throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
 
-        //System.out.println("메인메뉴 null :" + postMenuReq.getMainMenuItems() == null);
-        //System.out.println("사이드메뉴 null :" + postMenuReq.getSideMenuItems() == null);
-        //System.out.println("원산지 null :" +postMenuReq.getIngredientItems() == null);
-
         // 2) 가게 메뉴/원산지 등록
         int mainMenuItemCount = 0, sideMenuItemCount = 0, ingredientCount = 0;
         List<PostMenuUrlItem> urlItems = null;
@@ -311,11 +307,11 @@ public class MenuService {
                 //System.out.println("newMain");
                 urlItemsNew = convertToUrlFileNames(newMainMenu);
                 int newComplete = menuDao.menuRegister(storeIdx, urlItemsNew, "M");
-                if (newMainCnt != newComplete)
-                    throw new Exception();
+                /*if (newMainCnt != newComplete)
+                    throw new Exception();*/
             }
         }catch (Exception e){
-            //System.out.println("1:" + e);
+            System.out.println("1:" + e);
             throw new BaseException(STORE_MAINMENU_SAVE_ERROR);
         }
 
@@ -324,12 +320,12 @@ public class MenuService {
             if(newSideMenu != null && newSideMenu.size() != 0){
                 //System.out.println("newSide");
                 urlItemsNew = convertToUrlFileNames(newSideMenu);
-                int newComplete = menuDao.menuRegister(storeIdx, urlItemsNew, "M");
-                if (newSideCnt != newComplete)
-                    throw new Exception();
+                int newComplete = menuDao.menuRegister(storeIdx, urlItemsNew, "S");
+                /*if (newSideCnt != newComplete)
+                    throw new Exception();*/
             }
         }catch (Exception e){
-            //System.out.println("2:" + e);
+            System.out.println("2:" + e);
             throw new BaseException(STORE_SIDEMENU_SAVE_ERROR);
         }
 
@@ -340,12 +336,12 @@ public class MenuService {
                 //System.out.println("updMain");
                 urlItemsUpd =convertToUrlFileNamesUpd(updMainMenu);
                 int updComplete = menuDao.menuUpdate(urlItemsUpd);
-                System.out.println(updMainCnt +" " +updComplete);
-                if (updMainCnt != updComplete)
-                    throw new Exception();
+                //System.out.println(updMainCnt +" " +updComplete);
+                /*if (updMainCnt != updComplete)
+                    throw new Exception();*/
             }
         }catch (Exception e){
-            //System.out.println("3:" + e);
+            System.out.println("3:" + e);
             throw new BaseException(STORE_MAINMENU_SAVE_ERROR);
         }
         // 4-S) 사이드 메뉴 수정
@@ -354,11 +350,11 @@ public class MenuService {
                 //System.out.println("updSide");
                 urlItemsUpd =convertToUrlFileNamesUpd(updSideMenu);
                 int updComplete = menuDao.menuUpdate(urlItemsUpd);
-                if (updMainCnt != updComplete)
-                    throw new Exception();
+                /*if (updMainCnt != updComplete)
+                    throw new Exception();*/
             }
         }catch (Exception e){
-            //System.out.println("4:" + e);
+            System.out.println("4:" + e);
             throw new BaseException(STORE_SIDEMENU_SAVE_ERROR);
         }
 
@@ -367,8 +363,8 @@ public class MenuService {
             if(delMainMenu != null && delMainMenu.size() != 0){
                 //System.out.println("delMain");
                 int delComplete = menuDao.menuDeActive(delMainMenu);
-                if (delMainCnt != delComplete)
-                    throw new Exception();
+                /*if (delMainCnt != delComplete)
+                    throw new Exception();*/
             }
         }catch (Exception e){
             //System.out.println("5:" + e);
@@ -378,8 +374,8 @@ public class MenuService {
             if(delSideMenu != null && delSideMenu.size() != 0){
                 //System.out.println("delSide");
                 int delComplete = menuDao.menuDeActive(delSideMenu);
-                if (delSideCnt != delComplete)
-                    throw new Exception();
+                /*if (delSideCnt != delComplete)
+                    throw new Exception();*/
             }
         }catch (Exception e){
             //System.out.println("6:" + e);

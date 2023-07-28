@@ -4,9 +4,13 @@ import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.BaseResponse;
 import com.example.jatdauree.src.domain.web.review.dto.*;
 import com.example.jatdauree.src.domain.web.review.service.ReviewService;
+import com.example.jatdauree.src.domain.web.review.dto.ReviewReport;
+import com.example.jatdauree.src.domain.web.review.dto.ReviewReportAdmit;
 import com.example.jatdauree.utils.jwt.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/jat/review")
@@ -90,5 +94,33 @@ public class ReviewController {
             return new BaseResponse<>(baseException.getStatus());
         }
     }
+
+    @ResponseBody
+    @GetMapping("/admin")
+    public BaseResponse<List<ReviewReport>> reviewReportAdmin(){
+        try{
+            int sellerIdx = jwtService.getUserIdx();
+            List<ReviewReport> reportList = reviewService.reviewReportAdmin();
+
+            return new BaseResponse<>(reportList);
+        }catch(BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @PatchMapping("/admin")
+    public BaseResponse<ReviewReportReq> reviewReportDone(@RequestBody ReviewReportAdmit reportAdmit){
+        try{
+            int sellerIdx = jwtService.getUserIdx();
+            ReviewReportReq reportDone = reviewService.reviewReportDone(reportAdmit);
+
+            return new BaseResponse<>(reportDone);
+        }catch(BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
+
+
 
 }

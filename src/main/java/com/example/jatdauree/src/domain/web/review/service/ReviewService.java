@@ -6,6 +6,7 @@ import com.example.jatdauree.config.BaseResponseStatus;
 import com.example.jatdauree.src.domain.web.review.dao.ReviewDao;
 import com.example.jatdauree.src.domain.web.store.dao.StoreDao;
 import com.example.jatdauree.src.domain.web.review.dto.*;
+import com.example.jatdauree.src.domain.web.review.dto.ReviewReport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class ReviewService {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
-    private AmazonS3 s3Client;
+    private final AmazonS3 s3Client;
 
     @Autowired
     public ReviewService(StoreDao storeDao, ReviewDao reviewDao, AmazonS3 s3Client) {
@@ -154,6 +155,45 @@ public class ReviewService {
             ReviewReportRes reportRes = new ReviewReportRes(reportReq.getReviewIdx(), reportDone);
             return reportRes;
         }else{
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public List<ReviewReport> reviewReportAdmin() throws BaseException{
+
+        // 1) 리뷰 리스트 조회
+        List<ReviewReport> reviewReports;
+        try{
+           reviewReports = reviewDao.reviewReportAdmin();
+        }catch (Exception e){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        // 리뷰 이미지 url 가져오기
+        try{
+            for(ReviewReport report : reviewReports){
+                if(report.getReview_url() != null )
+                    report.setReview_url(""+s3Client.getUrl(bucketName, report.getReview_url()));
+            }
+        }catch (Exception e){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        return reviewReports;
+    }
+
+    public ReviewReportReq reviewReportDone(ReviewReportAdmit reportAdmit) throws BaseException {
+
+        int updated = 0;
+        try{
+            updated = reviewDao.reviewReportDone(reportAdmit);
+        }catch (Exception e){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        if (updated == 1)
+            return new ReviewReportReq(reportAdmit.getReviewIdx());
+        else{
             throw new BaseException(DATABASE_ERROR);
         }
     }

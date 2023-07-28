@@ -75,9 +75,7 @@ public class TodayMenuService {
         List<GetMainPageItem> newTodayMain = new ArrayList<>(), updateTodayMain = new ArrayList<>();
         int newTodayMainCnt = 0, updateTodayMainCnt = 0;
         if (postTodayMenuReq.getMainMenus() != null) {
-            System.out.println("todayMain: " + postTodayMenuReq.getMainMenus().size());
             for (GetMainPageItem pageItem : postTodayMenuReq.getMainMenus()) {
-                System.out.println(pageItem.getTodaymenuIdx() +": "+ pageItem.getMenuName() + ": " + pageItem.getIsUpdated());
                 if (pageItem.getIsUpdated() == 2) { // 2: 새로 등록하는 오늘의 떨이 메뉴 일 경우!
                     newTodayMain.add(pageItem);
                 }
@@ -88,12 +86,8 @@ public class TodayMenuService {
         }
         // 2-2) 메인 떨이메뉴 등록/수정
         try{
-            System.out.println("todayMainParsed1: " + newTodayMain.size());
-            System.out.println("todayMainParsed2: " + updateTodayMain.size());
             newTodayMainCnt = todayMenuDao.registerTodayMenu(storeIdx, newTodayMain, "M");
             updateTodayMainCnt = todayMenuDao.updateTodayMenu(updateTodayMain);
-            System.out.println("newTodayMainCnt: " + newTodayMainCnt);
-            System.out.println("updateTodayMainCnt: " + updateTodayMainCnt);
         } catch (Exception e) {
             throw new BaseException(POST_TODAY_MAINMENU_SAVE_ERROR); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
@@ -102,7 +96,6 @@ public class TodayMenuService {
         List<GetMainPageItem> newTodaySide = new ArrayList<>(), updateTodaySide = new ArrayList<>();
         int newTodaySideCnt = 0, updateTodaySideCnt = 0;
         if (postTodayMenuReq.getSideMenus() != null) {
-            System.out.println("todaySide: " + postTodayMenuReq.getSideMenus().size());
             for (GetMainPageItem pageItem : postTodayMenuReq.getSideMenus()) {
                 if (pageItem.getIsUpdated() == 2) { // 2: 새로 등록하는 오늘의 떨이 메뉴 일 경우!
                     newTodaySide.add(pageItem);
@@ -114,7 +107,6 @@ public class TodayMenuService {
         }
         // 3-2) 사이드 떨이메뉴 등록/수정
         try{
-            System.out.println("todaySideParsed: " + newTodayMain.size());
             newTodaySideCnt = todayMenuDao.registerTodayMenu(storeIdx, newTodaySide, "S");
             updateTodaySideCnt = todayMenuDao.updateTodayMenu(updateTodaySide);
         } catch (Exception e) {
