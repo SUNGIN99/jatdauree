@@ -234,6 +234,7 @@ public class SellerService {
         }
     }
 
+
     public ReceivedNumConfPwRes pwFind(ReceivedNumConfReq receivedNumConfReq) throws BaseException{
         try{
             int smsIdx = smsDao.smsCheckPw(receivedNumConfReq);

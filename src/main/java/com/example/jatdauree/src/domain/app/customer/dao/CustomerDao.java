@@ -34,7 +34,7 @@ public class CustomerDao {
                 "WHERE customerIdx = ?";
         return this.jdbcTemplate.queryForObject(query,
                 (rs, rowNum) -> new CustomerAuthentication(
-                        Long.valueOf(rs.getInt("sellerIdx")),
+                        Long.valueOf(rs.getInt("customerIdx")),
                         rs.getString("uid"),
                         Collections.singletonList(rs.getString("role"))
                 ), userId);
@@ -172,5 +172,33 @@ public class CustomerDao {
                 ),
                 params);
 
+    }
+
+    public int JwtForRestorePw(PwRecovReq receivedNumConfReq) {
+        String query = "SELECT customerIdx FROM Customers\n" +
+                "WHERE uid = ? AND phone = ?";
+
+        Object[] params = new Object[]{
+                receivedNumConfReq.getUid(),
+                receivedNumConfReq.getPhoneNum()
+        };
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> rs.getInt("customerIdx")
+                , params);
+    }
+
+    public void pwRestore(int customerIdx, String salt, String pwd) {
+        String query = "UPDATE Customers\n" +
+                "SET salt = ? , password = ?\n" +
+                "WHERE customerIdx = ?";
+
+        Object[] params = new Object[]{
+                salt,
+                pwd,
+                customerIdx
+        };
+
+        this.jdbcTemplate.update(query, params);
     }
 }

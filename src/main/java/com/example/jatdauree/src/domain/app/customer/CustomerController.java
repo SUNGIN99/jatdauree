@@ -3,11 +3,12 @@ package com.example.jatdauree.src.domain.app.customer;
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.BaseResponse;
 import com.example.jatdauree.src.domain.app.customer.dto.*;
+import com.example.jatdauree.src.domain.app.customer.dto.PostLoginRes;
+import com.example.jatdauree.src.domain.app.customer.dto.PostSignUpReq;
+import com.example.jatdauree.src.domain.app.customer.dto.PostSignUpRes;
 import com.example.jatdauree.src.domain.app.customer.service.CustomerService;
-import com.example.jatdauree.src.domain.web.seller.dto.PostLoginReq;
+import com.example.jatdauree.src.domain.web.seller.dto.*;
 import com.example.jatdauree.src.domain.web.seller.dto.PostSignUpAuthyReq;
-import com.example.jatdauree.src.domain.web.seller.dto.PostSignUpAuthyRes;
-import com.example.jatdauree.src.domain.web.seller.dto.SmsCertificateRes;
 import com.example.jatdauree.utils.jwt.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,12 +123,12 @@ public class CustomerController {
         }
     }
 
-/*
+
     @ResponseBody
-    @PostMapping("/pw-find")
-    public BaseResponse<ReceivedNumConfPwRes> pwFind(@RequestBody ReceivedNumConfReq receivedNumConfReq){
+    @PostMapping("/pw-recovery")
+    public BaseResponse<PwRecovRes> pwFind(@RequestBody PwRecovReq receivedNumConfReq){
         try{
-            ReceivedNumConfPwRes receivedNumConfPwRes = customerService.pwFind(receivedNumConfReq);
+            PwRecovRes receivedNumConfPwRes = customerService.pwFind(receivedNumConfReq);
             return new BaseResponse<>(receivedNumConfPwRes);
         }catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());
@@ -139,11 +140,11 @@ public class CustomerController {
     @PatchMapping("/pw-restore")
     public BaseResponse<RestorePwRes> pwRestore(@RequestBody RestorePwReq restorePwReq){
         try{
-            int sellerIdx = jwtService.getUserIdx();
-            RestorePwRes restorePwRes = customerService.pwRestore(restorePwReq, sellerIdx);
+            int customerIdx = jwtService.getUserIdx();
+            RestorePwRes restorePwRes = customerService.pwRestore(restorePwReq, customerIdx);
             return new BaseResponse<>(restorePwRes);
         }catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());
         }
-    }*/
+    }
 }

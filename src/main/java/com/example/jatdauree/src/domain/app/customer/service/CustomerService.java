@@ -5,11 +5,12 @@ import com.example.jatdauree.config.secret.SmsSecret;
 import com.example.jatdauree.src.domain.app.customer.dao.CustomerDao;
 import com.example.jatdauree.src.domain.app.customer.dto.*;
 
-import com.example.jatdauree.src.domain.web.seller.dto.PostLoginReq;
+import com.example.jatdauree.src.domain.app.customer.dto.PostLoginRes;
+import com.example.jatdauree.src.domain.app.customer.dto.PostSignUpReq;
+import com.example.jatdauree.src.domain.app.customer.dto.PostSignUpRes;
+import com.example.jatdauree.src.domain.web.seller.dto.*;
 
-import com.example.jatdauree.src.domain.web.seller.dto.PostSignUpAuthyRes;
 import com.example.jatdauree.src.domain.web.seller.dto.PostSignUpAuthyReq;
-import com.example.jatdauree.src.domain.web.seller.dto.SmsCertificateReq;
 import com.example.jatdauree.src.domain.web.sms.dao.SmsDao;
 import com.example.jatdauree.utils.SHA256;
 import com.example.jatdauree.utils.jwt.JwtTokenProvider;
@@ -123,7 +124,7 @@ public class CustomerService {
             String pwd = new SHA256().encrypt(postLoginReq.getPassword(), salt);
             //System.out.println("{SellerService.Class} pwd : " + pwd);
             if (postLoginReq.getUid().equals(customer.getUid()) && pwd.equals(customer.getPassword())){
-                String jwt = jwtTokenProvider.createJwt(customer.getCustomerIdx(), "Merchandiser");
+                String jwt = jwtTokenProvider.createJwt(customer.getCustomerIdx(), "Customer");
                 return new PostLoginRes(jwt, customer.getName());
             }
             else{
@@ -269,6 +270,47 @@ public class CustomerService {
 
         }catch(Exception exception){
             throw new BaseException(SMS_DATA_FIND_ERROR); // 4021 : 유효하지 않은 SMS 인증번호 요청입니다.
+        }
+    }
+
+    public PwRecovRes pwFind(PwRecovReq receivedNumConfReq) throws BaseException{
+        try{
+            int smsIdx = smsDao.smsCheckPwCustom(receivedNumConfReq);
+
+            if (smsIdx == 1){
+                int customerIdx = customerDao.JwtForRestorePw(receivedNumConfReq);
+                String jwt = jwtTokenProvider.createJwt(customerIdx, "Customer");
+                return new PwRecovRes(jwt, receivedNumConfReq.getUid(), 1);
+            }
+            else{
+                throw new BaseException(SMS_CERTIFICATE_FAILED); // 4021 : 비밀번호 암호화에 실패하였습니다
+            }
+        }catch(Exception exception){
+            throw new BaseException(SMS_DATA_FIND_ERROR); // 4022 : SMS 인증 실패
+        }
+    }
+
+    @Transactional(rollbackFor = BaseException.class)
+    public RestorePwRes pwRestore(RestorePwReq restorePwReq, int customerIdx) throws BaseException{
+        if (!restorePwReq.getPw().equals(restorePwReq.getPwCheck())){
+            System.out.println(1);
+            throw new BaseException(MODIFY_FAIL_USERPASSWORD); // 4015 : 유저 비밀번호 수정 실패
+        }
+
+        String pwd, salt;
+        try{
+            salt = SHA256.createSalt(restorePwReq.getPw()); // 비밀번호를 이용하여 salt 생성
+            pwd = new SHA256().encrypt(restorePwReq.getPw(), salt); // 비밀번호 암호화
+        }catch(Exception exception){
+            throw new BaseException(PASSWORD_ENCRYPTION_ERROR); // 4011 : 비밀번호 암호화에 실패하였습니다.
+        }
+
+        try{
+            customerDao.pwRestore(customerIdx, salt, pwd);
+            return new RestorePwRes(0,1);
+        }catch(Exception exception){
+            System.out.println(exception);
+            throw new BaseException(MODIFY_FAIL_USERPASSWORD); // 4015 : 유저 비밀번호 수정 실패
         }
     }
 }
