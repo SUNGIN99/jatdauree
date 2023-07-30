@@ -186,7 +186,7 @@ public class ReviewService {
 
     @Transactional(rollbackFor = BaseException.class)
     public ReviewReportReq reviewReportDone(ReviewReportAdmit reportAdmit) throws BaseException {
-
+        System.out.println(reportAdmit.getReviewIdx() +", "+ reportAdmit.getStatus());
         int updated = 0;
         try{
             updated = reviewDao.reviewReportDone(reportAdmit);
