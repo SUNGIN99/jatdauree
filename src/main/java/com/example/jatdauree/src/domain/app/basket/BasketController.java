@@ -22,8 +22,8 @@ public class BasketController {
     @PostMapping("/same-store")
     BaseResponse<BasketStoreCheckRes> storeCheck(@RequestBody BasketStoreCheckReq checkReq){
         try{
-            //int userIdx = jwtService.getCustomerIdx();
-            BasketStoreCheckRes basketRes = basketService.storeCheck(0, checkReq);
+            int userIdx = jwtService.getUserIdx();
+            BasketStoreCheckRes basketRes = basketService.storeCheck(userIdx, checkReq);
             return new BaseResponse<>(basketRes);
         }catch (BaseException e){
             return new BaseResponse<>(e.getStatus());
@@ -34,8 +34,8 @@ public class BasketController {
     @GetMapping ("/count")
     BaseResponse<GetBasketCountRes> getBasketCount(){
         try{
-            //int userIdx = jwtService.getCustomerIdx();
-            GetBasketCountRes basketcount = basketService.getBasketCount(0);
+            int userIdx = jwtService.getUserIdx();
+            GetBasketCountRes basketcount = basketService.getBasketCount(userIdx);
             return new BaseResponse<>(basketcount);
         }catch (BaseException e){
             return new BaseResponse<>(e.getStatus());
@@ -46,8 +46,8 @@ public class BasketController {
     @PostMapping("/")
     BaseResponse<PostBasketRes> postBasket(@RequestBody PostBasketReq basketReq){
         try{
-            //int userIdx = jwtService.getCustomerIdx();
-            PostBasketRes basketRes = basketService.postBasket(0, basketReq);
+            int userIdx = jwtService.getUserIdx();
+            PostBasketRes basketRes = basketService.postBasket(userIdx, basketReq);
             return new BaseResponse<>(basketRes);
         }catch (BaseException e){
             return new BaseResponse<>(e.getStatus());
@@ -58,8 +58,8 @@ public class BasketController {
     @GetMapping ("/")
     BaseResponse<GetBasketRes> getBasket(){
         try{
-            //int userIdx = jwtService.getCustomerIdx();
-            GetBasketRes basketRes = basketService.getBasket(0);
+            int userIdx = jwtService.getUserIdx();
+            GetBasketRes basketRes = basketService.getBasket(userIdx);
             return new BaseResponse<>(basketRes);
         }catch (BaseException e){
             return new BaseResponse<>(e.getStatus());
