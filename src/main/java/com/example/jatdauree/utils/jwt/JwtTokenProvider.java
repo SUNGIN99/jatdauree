@@ -42,7 +42,6 @@ public class JwtTokenProvider {
     // 23.06.27 나중에 구매자, 판매자에 따른 Role 설정 해줘야함
     public String createJwt(int userIdx, String userType){
         Date now = new Date();
-        System.out.println(userType);
         return Jwts.builder()
                 .setHeaderParam("type", "jwt")
                 .claim("userIdx", userIdx) // jwt 토큰 내의 payload 정보 (key, value)
@@ -66,7 +65,7 @@ public class JwtTokenProvider {
             return null;
         }
 
-        log.info("JwtTokenProvider : {}", userDetails.getUsername());
+        log.info("JwtTokenProvider : {}{}", userDetails.getUsername(), userDetails.getAuthorities().toString());
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
@@ -77,7 +76,7 @@ public class JwtTokenProvider {
 
     public String getUserType(String token){
         Jwts.parser().setSigningKey(JwtSecret.JWT_SECRET_KEY).parseClaimsJws(token).getBody();//.get("userType", String.class);;
-        System.out.println("a: " + Jwts.parser().setSigningKey(JwtSecret.JWT_SECRET_KEY).parseClaimsJws(token).getBody());
+        //System.out.println("a: " + Jwts.parser().setSigningKey(JwtSecret.JWT_SECRET_KEY).parseClaimsJws(token).getBody());
         return Jwts.parser().setSigningKey(JwtSecret.JWT_SECRET_KEY).parseClaimsJws(token).getBody().get("userType", String.class);
     }
 

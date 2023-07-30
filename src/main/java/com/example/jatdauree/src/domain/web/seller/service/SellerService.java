@@ -136,7 +136,6 @@ public class SellerService {
         try{
             String salt = seller.getSalt();
             String pwd = new SHA256().encrypt(postLoginReq.getPassword(), salt);
-            //System.out.println("{SellerService.Class} pwd : " + pwd);
             if (postLoginReq.getUid().equals(seller.getUid()) && pwd.equals(seller.getPassword())){
                 String jwt = jwtTokenProvider.createJwt(seller.getSellerIdx(), "Merchandiser");
                 return new PostLoginRes(jwt,

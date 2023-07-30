@@ -31,8 +31,8 @@ WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // app API (전부 요청 허락 23.07.24)
                 .antMatchers("/jat/app/**").permitAll()
                 // 관리자 요청 필터
+                .antMatchers("/jat/review/admin").hasRole("ADMIN")
                 .antMatchers("/jat/stores/admin/**").hasRole("ADMIN")
-                .antMatchers("/jat/reviews/admin").hasRole("ADMIN")
                 // 판매자 회원관련 API는 비밀번호 재설정빼고 토큰 필요 X
                 .antMatchers("/jat/sellers/pw-restore").hasRole("SELLER")
                 .antMatchers("/jat/sellers/**").permitAll()
