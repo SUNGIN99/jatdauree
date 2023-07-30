@@ -10,6 +10,7 @@ import com.example.jatdauree.src.domain.web.review.dto.ReviewReport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +77,7 @@ public class ReviewService {
     }
 
 
-
+    @Transactional(rollbackFor = BaseException.class)
     //리뷰 답글 달기
     public ReviewAnswerRes reviewAnswer(int sellerIdx, ReviewAnswerReq reviewAnswerReq) throws BaseException {
         // 1) 사용자 가게 조회
@@ -144,6 +145,7 @@ public class ReviewService {
 
     }
 
+    @Transactional(rollbackFor = BaseException.class)
     public ReviewReportRes reviewReport(int sellerIdx, ReviewReportReq reportReq) throws BaseException {
         int reportDone;
         try{
@@ -182,18 +184,21 @@ public class ReviewService {
         return reviewReports;
     }
 
+    @Transactional(rollbackFor = BaseException.class)
     public ReviewReportReq reviewReportDone(ReviewReportAdmit reportAdmit) throws BaseException {
 
         int updated = 0;
         try{
             updated = reviewDao.reviewReportDone(reportAdmit);
         }catch (Exception e){
+            System.out.println(e);
             throw new BaseException(DATABASE_ERROR);
         }
 
         if (updated == 1)
             return new ReviewReportReq(reportAdmit.getReviewIdx());
         else{
+            System.out.println(updated);
             throw new BaseException(DATABASE_ERROR);
         }
     }
