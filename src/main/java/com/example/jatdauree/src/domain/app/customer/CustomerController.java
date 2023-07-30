@@ -147,4 +147,16 @@ public class CustomerController {
             return new BaseResponse<>(baseException.getStatus());
         }
     }
+
+    /*@ResponseBody
+    @PostMapping("/address")
+    public BaseResponse<UserAddrRes> userAddress(@RequestBody UserAddrReq userAddrReq){
+        try{
+            int customerIdx = jwtService.getUserIdx();
+            UserAddrRes userAddrRes = customerService.userAddress(userAddrReq, customerIdx);
+            return new BaseResponse<>(userAddrRes);
+        }catch (BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }*/
 }
