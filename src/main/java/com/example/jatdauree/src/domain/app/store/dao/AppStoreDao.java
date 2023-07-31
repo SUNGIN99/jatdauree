@@ -225,7 +225,107 @@ public class AppStoreDao {
 
         }
 
+    public List<StoreListXY> getStoreListByAddr(double[] aroundXY) {
+        String query = "SELECT\n" +
+                "    storeIdx,\n" +
+                "    S.categoryIdx,\n" +
+                "    store_name,\n" +
+                "    store_address,\n" +
+                "    x,y\n" +
+                "FROM Stores S\n" +
+                "LEFT JOIN StroeCategories SC on S.categoryIdx = SC.categoryIdx\n" +
+                "WHERE x BETWEEN ? AND ?\n" +
+                "AND y BETWEEN ? AND ?";
+
+        //aroundXY = {minX, maxX, minY, maxY}
+        Object[] params = new Object[]{aroundXY[0],aroundXY[1],aroundXY[2],aroundXY[3]};
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new StoreListXY(
+                        rs.getInt("storeIdx"),
+                        rs.getInt("categoryIdx"),
+                        rs.getString("store_name"),
+                        rs.getString("store_address"),
+                        rs.getDouble("x"),
+                        rs.getDouble("y")
+                ), params);
+        }
+
+    public StorePreviewDetails getStorePreview(int storeIdx) {
+        String query = "SELECT\n" +
+                "    storeIdx,\n" +
+                "    store_name,\n" +
+                "    store_logo_url,\n" +
+                "    sign_url,\n" +
+                "    x,y\n" +
+                "FROM Stores\n" +
+                "WHERE storeIdx= ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new StorePreviewDetails(
+                        rs.getInt("storeIdx"),
+                        rs.getString("store_name"),
+                        rs.getString("store_logo_url"),
+                        rs.getString("sign_url"),
+                        rs.getDouble("x"),
+                        rs.getDouble("y")
+                ), storeIdx);
     }
+
+    public List<StorePreviewDetails> getAroundPreview(int storeIdx, double nowX, double nowY, double[] aroundXY) {
+        String query =
+                "SELECT\n" +
+                "    storeIdx,\n" +
+                "    store_name,\n" +
+                "    store_logo_url,\n" +
+                "    sign_url,\n" +
+                "    x,y,\n" +
+                "    @dLat = RADIANS(y - ?) as dLat,\n" + // 1
+                "    @dLon = RADIANS(x - ?) as dLon,\n" + // 2
+                "    @a = SIN(@dLat/2) * SIN(@dlat/2) + COS(RADIANS(?)) * COS(RADIANS(y)) * SIN(@dLon/2) * SIN(@dLon/2) as a,\n" + // 3
+                "    @c = 2 * atan2(SQRT(@a), SQRT(1-@a)) as c,\n" +
+                "    @d = 6731 * @c * 1000 as distance\n" +
+                "FROM Stores S\n" +
+                "WHERE storeIdx != ?\n" + // 0
+                "AND x BETWEEN ? AND ?\n" + // 4, 5
+                "AND y BETWEEN ? AND ?\n" + // 6, 7
+                "ORDER BY @d ASC LIMIT 2";
+        Object[] params = new Object[]{
+                nowY, nowX, // 1, 2
+                nowY, // 3
+                storeIdx, // 0
+                aroundXY[0],aroundXY[1],aroundXY[2],aroundXY[3]};
+
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new StorePreviewDetails(
+                        rs.getInt("storeIdx"),
+                        rs.getString("store_name"),
+                        rs.getString("store_logo_url"),
+                        rs.getString("sign_url"),
+                        rs.getDouble("x"),
+                        rs.getDouble("y")
+                ), params);
+    }
+
+    public double getStoreStar(int storeIdx) {
+        String query = "SELECT\n" +
+                "    ROUND(AVG(star),1) AS star_average \n" +
+                "FROM Review\n" +
+                "WHERE storeIdx = ? AND status != 'D'";
+        return this.jdbcTemplate.queryForObject(query, double.class, storeIdx);
+    }
+
+    public int getStoreSubscribed(int customerIdx, int storeIdx) {
+        String query = "SELECT EXISTS(SELECT\n" +
+                "    *\n" +
+                "FROM Subscribe\n" +
+                "WHERE customerIdx = ? AND storeIdx = ?\n" +
+                "AND status != 'D')";
+
+        Object[] params = new Object[]{customerIdx, storeIdx};
+
+        return this.jdbcTemplate.queryForObject(query, int.class, params);
+    }
+}
 
 
 
