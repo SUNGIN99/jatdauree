@@ -127,7 +127,7 @@ public class AppStoreDao {
                 "      COUNT(CASE WHEN star = 4 THEN 1 END) AS star4_count,\n" +
                 "      COUNT(CASE WHEN star = 5 THEN 1 END) AS star5_count\n" +
                 "      FROM Review\n" +
-                "WHERE storeIdx = ?"; //D가 아닌거 넣기
+                "WHERE storeIdx = ? AND status != 'D'"; //D가 아닌거 넣기
 
         return this.jdbcTemplate.queryForObject(query,
                 (rs, rowNum) -> new GetAppReviewStarRes(
@@ -200,30 +200,6 @@ public class AppStoreDao {
 
                 ), storeIdx);
     }
-    //가게 목록보기
-        public List<GetAppStoreRes> getAppStoreList(int storeIdx) {
-            String query = "SELECT s.storeIdx, s.store_logo_url, s.sign_url, s.categoryIdx, s.store_name, s.x AS longitude, s.y AS latitude, ROUND(AVG(r.star), 1) AS star_average, sub.status " +
-                    "FROM Stores s " +
-                    "LEFT JOIN Review r ON s.storeIdx = r.storeIdx " +
-                    "LEFT JOIN Subscribe sub ON s.storeIdx = sub.storeIdx " +
-                    "WHERE s.storeIdx =?";
-
-
-            return this.jdbcTemplate.query(query,
-                    (rs, rowNum) -> new GetAppStoreRes(
-                            rs.getInt("storeIdx"),
-                            rs.getString("store_logo_url"),
-                            rs.getString("sign_url"),
-                            rs.getInt("categoryIdx"),
-                            rs.getString("store_name"),
-                            rs.getDouble("longitude"),
-                            rs.getDouble("latitude"),
-                            rs.getInt("star_average"),
-                            rs.getString("status")
-
-                    ),storeIdx);
-
-        }
 
     public List<StoreListXY> getStoreListByAddr(double[] aroundXY) {
         String query = "SELECT\n" +
@@ -325,6 +301,46 @@ public class AppStoreDao {
 
         return this.jdbcTemplate.queryForObject(query, int.class, params);
     }
+
+    // --- 윤채
+    public GetAppStoreInfo getAppStoreInfo(int storeIdx){
+        String query = "SELECT store_name, store_phone, x, y, store_address FROM Stores WHERE storeIdx = ?";
+        return this.jdbcTemplate.queryForObject(query,(rs, rowNum) -> new GetAppStoreInfo(
+                rs.getString("store_name"),
+                rs.getString("store_phone"),
+                rs.getDouble("x"),
+                rs.getDouble("y"),
+                rs.getString("store_address")
+        ),storeIdx);
+    }
+
+    //가게 목록보기 8/1
+    public List<GetAppStore> getAppStoreList() {
+        String query = "SELECT S.storeIdx, S.store_logo_url, S.sign_url, S.categoryIdx, S.store_name, S.x, S.y, R.star_average\n" +
+                "FROM Stores AS S\n" +
+                "LEFT JOIN (\n" +
+                "    SELECT storeIdx, ROUND(AVG(star), 1) AS star_average\n" +
+                "    FROM Review  WHERE status = 'A'\n" +
+                "    GROUP BY storeIdx\n" +
+                ") AS R\n" +
+                "ON S.storeIdx = R.storeIdx;";
+
+
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new GetAppStore(
+                        rs.getInt("storeIdx"),
+                        rs.getString("store_logo_url"),
+                        rs.getString("sign_url"),
+                        rs.getInt("categoryIdx"),
+                        rs.getString("store_name"),
+                        rs.getDouble("x"),
+                        rs.getDouble("y"),
+                        rs.getFloat("star_average")
+
+                ));
+
+    }
+
 }
 
 

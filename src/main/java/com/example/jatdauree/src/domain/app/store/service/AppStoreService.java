@@ -163,29 +163,6 @@ public class AppStoreService {
 
 
     public List<StoreListXY> getStoreListByAddr(double maxX, double maxY, double minX, double minY) throws BaseException {
-        // 카카오 위치 API 요청(사용자 현재 위치 주소 기반)
-       /* ResponseEntity<LocationInfoRes> apiResponse;
-        try{
-            apiResponse = locationValue.kakaoLocalAPI(query);
-        }catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-
-        // 카카오 위치 API 응답 실패
-        if (apiResponse.getStatusCode() != HttpStatus.OK){
-            throw new BaseException(DATABASE_ERROR);
-        }
-
-        // 응답 값이 1이상이면 결과가 존재함
-        LocationInfoRes currentLoc = apiResponse.getBody();
-        if (currentLoc.getDocuments().length == 0){
-            throw new BaseException(DATABASE_ERROR);
-        }
-
-        // 현재 위/경도 값
-        double nowX = currentLoc.getDocuments()[0].getX();
-        double nowY = currentLoc.getDocuments()[0].getY();*/
-
         // 주변 반경내 1.5km 구하기.. (m단위 입력)
         //{minX, maxX, minY, maxY}
         double[] aroundXY = new double[]{minX, maxX, minY, maxY};
@@ -299,5 +276,61 @@ public class AppStoreService {
         }
 
         return storePreviewRes;
+    }
+
+    public GetAppStoreInfoRes getAppStoreInfo(int storeIdx) throws BaseException {
+        GetAppStoreInfo storeInfo;
+        double starAvg;
+        Integer subscribeCount;
+        List<GetAppStoreDetailIngredientInfo> ingredientInfo;
+        String detailIngredientInfo;
+
+        try {
+            storeInfo = appStoreDao.getAppStoreInfo(storeIdx);
+        } catch (Exception e) {
+            System.out.println("exception1: " + e);
+            throw new BaseException(RESPONSE_ERROR);    // 리뷰 조회에 실패하였습니다.
+        }
+
+        try {
+            starAvg = appStoreDao.getStoreStar(storeIdx);
+        } catch (Exception e) {
+            System.out.println("exception2: " + e);
+            throw new BaseException(RESPONSE_ERROR);    // 리뷰 조회에 실패하였습니다.
+        }
+        try {
+            subscribeCount = appStoreDao.subscribeCount(storeIdx);
+        } catch (Exception e) {
+            System.out.println("exception3: " + e);
+            throw new BaseException(RESPONSE_ERROR);    // 리뷰 조회에 실패하였습니다.
+        }
+        try {
+            ingredientInfo = appStoreDao.getStoreAppDetailIngredientInfo(storeIdx);
+            StringBuilder combinedInfoBuilder = new StringBuilder();
+            for (GetAppStoreDetailIngredientInfo info : ingredientInfo) {
+                combinedInfoBuilder.append(info.getIngredientInfo());
+            }
+            detailIngredientInfo = combinedInfoBuilder.toString();
+        } catch (Exception e) {
+            System.out.println("exception4: " + e);
+            throw new BaseException(RESPONSE_ERROR);    // 리뷰 조회에 실패하였습니다.
+        }
+
+
+        return new GetAppStoreInfoRes(storeIdx, storeInfo, starAvg, subscribeCount, detailIngredientInfo);
+    }
+
+
+    public List<GetAppStore> getAppStoreList() throws BaseException {
+        List<GetAppStore> storeInfo;
+
+        try {
+            storeInfo = appStoreDao.getAppStoreList();
+        } catch (Exception e) {
+            System.out.println("exception1: " + e);
+            throw new BaseException(RESPONSE_ERROR);
+        }
+
+        return storeInfo;
     }
 }

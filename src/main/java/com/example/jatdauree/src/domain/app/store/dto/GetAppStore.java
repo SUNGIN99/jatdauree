@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetAppStoreRes {
+public class GetAppStore {
     private int storeIdx;
     private String storeLogoUrl;
     private String StoreSignUrl;
@@ -18,11 +18,5 @@ public class GetAppStoreRes {
     private String storeName;
     private double longitude;
     private double latitude;
-    private int starAvg;
-    private String SubscribeStatus;
-
-
-
-
-
+    private Float starAvg;
 }

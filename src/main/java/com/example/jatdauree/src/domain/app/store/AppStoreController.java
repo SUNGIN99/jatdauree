@@ -91,6 +91,41 @@ public class AppStoreController {
         }
     }
 
+    /**
+     * 23.07.29 작성자 : 이윤채
+     * 식당 기본정보  (가게이름, 찜수, 별점, 위치정보)
+     * GET//jat/app/stores/info ? storeIdx=
+     * @return GetAppStoreInfoRes
+     */
+
+    @ResponseBody
+    @GetMapping("/info")
+    public BaseResponse<GetAppStoreInfoRes> getAppStoreInfo(@RequestParam("storeIdx") int storeIdx) {
+
+        try {
+            GetAppStoreInfoRes getAppStoreInfoRes = appStoreService.getAppStoreInfo(storeIdx);
+            return new BaseResponse<>(getAppStoreInfoRes);
+        } catch (BaseException baseException) {
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
+
+    /**
+     * 23.08.01작성자 : 이윤채
+     * 식당 목록 보기(거리순)
+     * GET/jat/app/stores
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("")
+    public BaseResponse<List<GetAppStore>>GetAppStore(){
+        try {
+            List<GetAppStore> getAppStoreRes = appStoreService.getAppStoreList();
+            return new BaseResponse<>(getAppStoreRes);
+        }catch (BaseException baseException) {
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
 
 
 
