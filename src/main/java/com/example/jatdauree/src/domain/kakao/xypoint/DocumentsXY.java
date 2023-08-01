@@ -1,4 +1,4 @@
-package com.example.jatdauree.src.domain.kakao;
+package com.example.jatdauree.src.domain.kakao.xypoint;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LocationInfoRes {
-    private Documents[] documents;
-    private Meta meta;
+public class DocumentsXY {
+    private RoadAddressXY road_address;
+    private LocAddressXY address;
 }

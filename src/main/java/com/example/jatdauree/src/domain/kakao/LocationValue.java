@@ -1,6 +1,8 @@
 package com.example.jatdauree.src.domain.kakao;
 
 import com.example.jatdauree.config.secret.KakaoSecret;
+import com.example.jatdauree.src.domain.kakao.address.LocationInfoRes;
+import com.example.jatdauree.src.domain.kakao.xypoint.LocationXYRes;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpEntity;
@@ -41,10 +43,10 @@ public class LocationValue {
         double maxX = seletX +(distanceM* mForLongitude);
         double minX = seletX -(distanceM* mForLongitude);
 
-        System.out.println("maxY: "+ maxY);
+        /*System.out.println("maxY: "+ maxY);
         System.out.println("maxX: "+ maxX);
         System.out.println("minY: "+ minY);
-        System.out.println("minX: "+ minX);
+        System.out.println("minX: "+ minX);*/
 
         return new double[]{minX, maxX, minY, maxY};
     }
@@ -62,6 +64,26 @@ public class LocationValue {
                 HttpMethod.GET,
                 entity,
                 LocationInfoRes.class
+        );
+    }
+
+    public ResponseEntity<LocationXYRes>  kakaoXYAPI(double x, double y){
+        String url = "https://dapi.kakao.com/v2/local/geo/coord2address.json?"
+                + "x=" + x
+                + "&y=" + y
+                + "&input_coord=WGS84";
+
+        RestTemplate restTemplate = new RestTemplate();
+        //HTTPHeader를 설정해줘야 하기때문에 생성함
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "KakaoAK "+ KakaoSecret.kakaoRestAPIKey);
+        headers.set("content-type", "application/json;charset=UTF-8");
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+        return restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                entity,
+                LocationXYRes.class
         );
     }
 }

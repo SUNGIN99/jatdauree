@@ -63,10 +63,14 @@ public class AppStoreController {
 
     @ResponseBody
     @GetMapping("/address")
-    public BaseResponse<List<StoreListXY>> getStoreListByAddr(@RequestParam("query") String query){
+    public BaseResponse<List<StoreListXY>> getStoreListByAddr(
+            @RequestParam("max_lon") double maxX,
+            @RequestParam("max_lat") double maxY,
+            @RequestParam("min_lon") double minX,
+            @RequestParam("min_lat") double minY){
         try{
             int customerIdx = jwtService.getUserIdx();
-            List<StoreListXY> storeList = appStoreService.getStoreListByAddr(query);
+            List<StoreListXY> storeList = appStoreService.getStoreListByAddr(maxX, maxY, minX, minY);
             return new BaseResponse<>(storeList);
         }catch (BaseException baseException) {
             return new BaseResponse<>(baseException.getStatus());
@@ -86,6 +90,7 @@ public class AppStoreController {
             return new BaseResponse<>(baseException.getStatus());
         }
     }
+
 
 
 

@@ -1,4 +1,4 @@
-package com.example.jatdauree.src.domain.kakao;
+package com.example.jatdauree.src.domain.kakao.address;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

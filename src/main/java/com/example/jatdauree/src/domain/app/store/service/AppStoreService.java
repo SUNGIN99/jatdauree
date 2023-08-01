@@ -2,10 +2,9 @@ package com.example.jatdauree.src.domain.app.store.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.example.jatdauree.config.BaseException;
-import com.example.jatdauree.config.secret.KakaoSecret;
 import com.example.jatdauree.src.domain.app.store.dao.*;
 import com.example.jatdauree.src.domain.app.store.dto.*;
-import com.example.jatdauree.src.domain.kakao.LocationInfoRes;
+import com.example.jatdauree.src.domain.kakao.address.LocationInfoRes;
 import com.example.jatdauree.src.domain.kakao.LocationValue;
 import com.example.jatdauree.src.domain.web.review.dto.*;
 import com.example.jatdauree.src.domain.web.review.dao.*;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -164,9 +162,9 @@ public class AppStoreService {
     }
 
 
-    public List<StoreListXY> getStoreListByAddr(String query) throws BaseException {
+    public List<StoreListXY> getStoreListByAddr(double maxX, double maxY, double minX, double minY) throws BaseException {
         // 카카오 위치 API 요청(사용자 현재 위치 주소 기반)
-        ResponseEntity<LocationInfoRes> apiResponse;
+       /* ResponseEntity<LocationInfoRes> apiResponse;
         try{
             apiResponse = locationValue.kakaoLocalAPI(query);
         }catch (Exception e) {
@@ -186,11 +184,11 @@ public class AppStoreService {
 
         // 현재 위/경도 값
         double nowX = currentLoc.getDocuments()[0].getX();
-        double nowY = currentLoc.getDocuments()[0].getY();
+        double nowY = currentLoc.getDocuments()[0].getY();*/
 
         // 주변 반경내 1.5km 구하기.. (m단위 입력)
         //{minX, maxX, minY, maxY}
-        double[] aroundXY = locationValue.aroundDist(nowX, nowY, 1500);
+        double[] aroundXY = new double[]{minX, maxX, minY, maxY};
 
         // 주변 반경 내 현재 좌표로 가게 조회
         try{

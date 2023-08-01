@@ -2,6 +2,7 @@ package com.example.jatdauree.src.domain.app.customer;
 
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.BaseResponse;
+import com.example.jatdauree.config.BaseResponseStatus;
 import com.example.jatdauree.src.domain.app.customer.dto.*;
 import com.example.jatdauree.src.domain.app.customer.dto.PostLoginRes;
 import com.example.jatdauree.src.domain.app.customer.dto.PostSignUpReq;
@@ -148,15 +149,27 @@ public class CustomerController {
         }
     }
 
-    /*@ResponseBody
-    @PostMapping("/address")
-    public BaseResponse<UserAddrRes> userAddress(@RequestBody UserAddrReq userAddrReq){
+    @ResponseBody
+    @GetMapping("/address")
+    public BaseResponse<?> userAddress(
+            @RequestParam(value = "location", required = false) String location,
+            @RequestParam(value = "longitude", required = false) Double longitude,
+            @RequestParam(value = "latitude", required = false) Double latitude){
         try{
-            int customerIdx = jwtService.getUserIdx();
-            UserAddrRes userAddrRes = customerService.userAddress(userAddrReq, customerIdx);
-            return new BaseResponse<>(userAddrRes);
+            //int customerIdx = jwtService.getUserIdx();
+
+            if (location != null && longitude == null && latitude == null){
+                AddressXY addressXY = customerService.userAddress(location);
+                return new BaseResponse<>(addressXY);
+            }else if (location == null && longitude != null && latitude != null){
+                AddressNames addresss = customerService.addrName(longitude, latitude);
+                return new BaseResponse<>(addresss);
+            }else{
+                return new BaseResponse<>(BaseResponseStatus.REQUEST_ERROR);
+            }
+
         }catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());
         }
-    }*/
+    }
 }

@@ -8,6 +8,9 @@ import com.example.jatdauree.src.domain.app.customer.dto.*;
 import com.example.jatdauree.src.domain.app.customer.dto.PostLoginRes;
 import com.example.jatdauree.src.domain.app.customer.dto.PostSignUpReq;
 import com.example.jatdauree.src.domain.app.customer.dto.PostSignUpRes;
+import com.example.jatdauree.src.domain.kakao.xypoint.LocationXYRes;
+import com.example.jatdauree.src.domain.kakao.address.LocationInfoRes;
+import com.example.jatdauree.src.domain.kakao.LocationValue;
 import com.example.jatdauree.src.domain.web.seller.dto.*;
 
 import com.example.jatdauree.src.domain.web.seller.dto.PostSignUpAuthyReq;
@@ -22,6 +25,8 @@ import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,12 +47,16 @@ public class CustomerService {
     private final CustomerDao customerDao;
     private final JwtTokenProvider jwtTokenProvider;
     private final DefaultMessageService messageService;
+
+    private final LocationValue locationValue;
+
     @Autowired
     public CustomerService(SmsDao smsDao, CustomerDao customerDao, @Lazy JwtTokenProvider jwtTokenProvider) {
         this.smsDao = smsDao;
         this.customerDao = customerDao;
         this.jwtTokenProvider = jwtTokenProvider;
         this.messageService = NurigoApp.INSTANCE.initialize(SmsSecret.APIKey, SmsSecret.Secret, "https://api.coolsms.co.kr");
+        this.locationValue = new LocationValue();
     }
 
     public UserDetails loadUserByUserIdx(Long userId) {
@@ -312,5 +321,59 @@ public class CustomerService {
             System.out.println(exception);
             throw new BaseException(MODIFY_FAIL_USERPASSWORD); // 4015 : 유저 비밀번호 수정 실패
         }
+    }
+
+    public AddressXY userAddress(String query) throws BaseException{
+        ResponseEntity<LocationInfoRes> apiResponse;
+        try{
+            apiResponse = locationValue.kakaoLocalAPI(query);
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        // 카카오 위치 API 응답 실패
+        if (apiResponse.getStatusCode() != HttpStatus.OK){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        // 응답 값이 1이상이면 결과가 존재함
+        LocationInfoRes currentLoc = apiResponse.getBody();
+        if (currentLoc.getDocuments().length == 0){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        // 현재 위/경도 값
+        String locAddress = currentLoc.getDocuments()[0].getAddress().getAddress_name();
+        String roadAddress = currentLoc.getDocuments()[0].getRoad_address().getAddress_name();
+        double nowX = currentLoc.getDocuments()[0].getX();
+        double nowY = currentLoc.getDocuments()[0].getY();
+
+        return new AddressXY(locAddress, roadAddress, nowX, nowY);
+    }
+
+
+    public AddressNames addrName(Double longitude, Double latitude) throws BaseException{
+        ResponseEntity<LocationXYRes> apiResponse;
+        try{
+            apiResponse = locationValue.kakaoXYAPI(longitude, latitude);
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        // 카카오 위치 API 응답 실패
+        if (apiResponse.getStatusCode() != HttpStatus.OK){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        // 응답 값이 1이상이면 결과가 존재함
+        LocationXYRes currentLoc = apiResponse.getBody();
+        if (currentLoc.getDocuments().length == 0){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        String locAddress = currentLoc.getDocuments()[0].getAddress().getAddress_name();
+        String roadAddress = currentLoc.getDocuments()[0].getRoad_address().getAddress_name();
+
+        return new AddressNames(locAddress, roadAddress);
     }
 }
