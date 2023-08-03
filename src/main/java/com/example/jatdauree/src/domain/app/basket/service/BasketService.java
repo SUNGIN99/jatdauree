@@ -214,7 +214,7 @@ public class BasketService {
             int basketCount = basketDao.basketItemDone(basketItems);
             //System.out.println("basketCount: " +basketCount);
 
-            return new OrderDoneRes(orderIdx, orderMenuCnt);
+            return new OrderDoneRes(orderIdx, basketItems.size());
         }catch(Exception e){
             throw new BaseException(ORDER_FAILED);
         }
