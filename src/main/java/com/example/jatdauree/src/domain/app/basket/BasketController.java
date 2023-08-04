@@ -43,7 +43,7 @@ public class BasketController {
     }
 
     @ResponseBody
-    @PostMapping("/")
+    @PostMapping("")
     BaseResponse<PostBasketRes> postBasket(@RequestBody PostBasketReq basketReq){
         try{
             int userIdx = jwtService.getUserIdx();
@@ -55,7 +55,7 @@ public class BasketController {
     }
 
     @ResponseBody
-    @GetMapping ("/")
+    @GetMapping ("")
     BaseResponse<GetBasketRes> getBasket(){
         try{
             int userIdx = jwtService.getUserIdx();
