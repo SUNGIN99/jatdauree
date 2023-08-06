@@ -5,6 +5,7 @@ import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.BaseResponse;
 import com.example.jatdauree.src.domain.app.review.dto.*;
 import com.example.jatdauree.src.domain.app.review.service.AppReviewService;
+import com.example.jatdauree.utils.jwt.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,11 +14,16 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/jat/app/reivews")
 public class AppReviewController {
-    private final AppReviewService appReviewService;
 
     @Autowired
-    public AppReviewController(AppReviewService appReviewService){
+    private final AppReviewService appReviewService;
+    @Autowired
+    private final JwtService jwtService;
+
+
+    public AppReviewController(AppReviewService appReviewService, JwtService jwtService){
         this.appReviewService = appReviewService;
+        this.jwtService = jwtService;
     }
 
     /**
@@ -31,7 +37,8 @@ public class AppReviewController {
     @PostMapping("")
     public BaseResponse<PostReviewRes> postReview(PostReviewReq postReviewReq){
         try{
-            PostReviewRes postReviewRes = appReviewService.postReview(postReviewReq);
+            int customerIdx = jwtService.getUserIdx();
+            PostReviewRes postReviewRes = appReviewService.postReview(customerIdx,postReviewReq);
             return new BaseResponse<> (postReviewRes);
         }catch (BaseException baseResponse){
             return new BaseResponse<>(baseResponse.getStatus());
@@ -49,9 +56,10 @@ public class AppReviewController {
      *
      */
     @ResponseBody
-    @GetMapping("/{customerIdx}")
-    public BaseResponse<GetReviewRes> myReviews(@PathVariable int customerIdx){
+    @GetMapping("")
+    public BaseResponse<GetReviewRes> myReviews(){
         try{
+            int customerIdx = jwtService.getUserIdx();
             GetReviewRes getReviewRes = appReviewService.myReviews(customerIdx);
             return new BaseResponse<>(getReviewRes);
         }catch (BaseException baseResponse){
@@ -69,7 +77,8 @@ public class AppReviewController {
     @PatchMapping("")
     public BaseResponse<PatchReviewRes> deleteReview(@RequestBody PatchReviewReq patchReviewReq){
         try{
-            PatchReviewRes patchReviewRes = appReviewService.deleteReview(patchReviewReq);
+            int customerIdx = jwtService.getUserIdx();
+            PatchReviewRes patchReviewRes = appReviewService.deleteReview(customerIdx,patchReviewReq);
             return new BaseResponse<>(patchReviewRes);
         }catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());

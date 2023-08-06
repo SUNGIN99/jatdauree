@@ -2,7 +2,6 @@ package com.example.jatdauree.src.domain.app.review.dao;
 
 import com.example.jatdauree.src.domain.app.review.dto.MyReviews;
 import com.example.jatdauree.src.domain.app.review.dto.PostReviewReq;
-import com.example.jatdauree.src.domain.app.review.dto.ReviewMenu;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -25,14 +24,14 @@ public class AppReviewDao {
      * 23.07.20 작성자 : 윤다은
      * 리뷰 작성하기
      */
-    public void reviewPost(PostReviewReq postReviewReq, String fileName) {
+    public void reviewPost(int customerIdx, PostReviewReq postReviewReq, String fileName) {
         String query = "INSERT INTO Review " +
                 "(storeIdx, orderIdx, customerIdx, star, contents, review_url) " +
                 "VALUES (?,?,?,?,?,?)";
         Object[] params = new Object[]{
                 postReviewReq.getStoreIdx(),
                 postReviewReq.getOrderIdx(),
-                postReviewReq.getCustomerIdx(),
+                customerIdx,
                 postReviewReq.getStars(),
                 postReviewReq.getContents(),
                 fileName != null ? fileName : null //fileName이 없는 경우 null로 들어감.
@@ -60,7 +59,7 @@ public class AppReviewDao {
         String query = "SELECT " +
                 "R.reviewIdx," +
                 "C.name, C.customerIdx," +
-                "R.star,R.created,R.review_url,R.contents,R.comment \n" +  //DATE_FORMAT(R.created, '%Y-%m') AS created
+                "R.star,R.created,R.review_url,R.contents,R.comment \n" +
                 "FROM Review R \n" +
                 "JOIN Customers C on C.customerIdx = R.customerIdx\n" +
                 "WHERE R.customerIdx = ? ;";
@@ -117,10 +116,10 @@ public class AppReviewDao {
      * 리뷰 신고하기
      */
 
-    public int reportReview(int storeIdx, int reviewIdx) {
+    public int reportReview(int reviewIdx) {
         String reportquery = "UPDATE Review " +
                 "SET status = 'R'\n" +
-                "WHERE storeIdx =? AND reviewIdx = ?";
-        return this.jdbcTemplate.update(reportquery,storeIdx,reviewIdx);
+                "WHERE reviewIdx = ?";
+        return this.jdbcTemplate.update(reportquery,reviewIdx);
     }
 }

@@ -9,6 +9,7 @@ import com.example.jatdauree.src.domain.web.order.dao.OrderDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +40,8 @@ public class AppReviewService {
 
 
     //리뷰 작성하기
-    public PostReviewRes postReview(PostReviewReq postReviewReq) throws BaseException,IOException {
+    @Transactional(rollbackFor = BaseException.class)
+    public PostReviewRes postReview(int customerIdx, PostReviewReq postReviewReq) throws BaseException,IOException {
         // 1. 별점이 0점 이하이거나, 5점 이상인 경우는 예외처리
         if(postReviewReq.getStars() < 0 || postReviewReq.getStars() > 5){
             throw new BaseException(REQUEST_ERROR); // 별의 개수가 올바르지 않습니다.
@@ -102,7 +104,7 @@ public class AppReviewService {
 
         //5. 리뷰 작성하기
         try{
-            appReviewDao.reviewPost(postReviewReq,fileName);
+            appReviewDao.reviewPost(customerIdx,postReviewReq,fileName);
             return new PostReviewRes(postReviewReq.getStars(), postReviewReq.getContents());
         }catch (Exception e){
             //System.out.println("exception2: " + e);
@@ -118,7 +120,6 @@ public class AppReviewService {
         try {
             totalReviews= appReviewDao.countReviews(customerIdx);
         }catch (Exception e){
-            //System.out.println("exception1: " + e);
             throw new BaseException(DATABASE_ERROR); // 리뷰의 개수를 세지 못함
         }
         //2. 리뷰들을 조회해 온다.
@@ -140,12 +141,12 @@ public class AppReviewService {
 
         // 4. 리뷰의 날짜는 방금 전, 몇일 전, 몇개월 전, 몇년 전으로 표시
         try{
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now(); //현재 시간
             for(MyReviews reviews : myReviews){
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); //DAO에서 받아오는 getDate와 형식을 맞추어 준다.
                 LocalDateTime reviewDate = LocalDateTime.parse(reviews.getDate(),formatter);
 
-                Duration duration = Duration.between(reviewDate, now);
+                Duration duration = Duration.between(reviewDate, now); // 현재 시간과 DB에서 가져온 getDate 사이의 시간
 
                 long years = duration.toDays() / 365;
                 long months = duration.toDays() / 30;
@@ -168,7 +169,7 @@ public class AppReviewService {
                 }
             }
         }catch (Exception e){
-            System.out.println(e);
+            //System.out.println(e);
             throw new BaseException(DATABASE_ERROR); //날짜를 잘못 출력했습니다.
         }
 
@@ -187,7 +188,8 @@ public class AppReviewService {
 
 
     //리뷰 삭제하기
-    public PatchReviewRes deleteReview(PatchReviewReq patchReviewReq) throws BaseException{
+    @Transactional(rollbackFor = BaseException.class)
+    public PatchReviewRes deleteReview(int customerIdx, PatchReviewReq patchReviewReq) throws BaseException{
         //1. 리뷰 상태 확인하고 상태가 A인 경우만 삭제가능, D인 경우와 R인 경우도 존재
         String status;
         try {
@@ -203,7 +205,7 @@ public class AppReviewService {
         //2. 리뷰 삭제하기
         int reivewDel;
         try {
-            reivewDel = appReviewDao.reviewDelete(patchReviewReq.getReviewIdx(),patchReviewReq.getCustomerIdx());
+            reivewDel = appReviewDao.reviewDelete(patchReviewReq.getReviewIdx(),customerIdx);
         }catch (Exception e){
             //System.out.println("exception2: " + e);
             throw new BaseException(DATABASE_ERROR);// 리뷰가 삭제되지 않음
@@ -216,6 +218,7 @@ public class AppReviewService {
     }
 
     //리뷰 신고하기
+    @Transactional(rollbackFor = BaseException.class)
     public ReportReviewRes reportReview(ReportReviewReq reportReviewReq) throws BaseException{
         //1.리뷰의 상태가 A인 경우만 작성가능하다. (D이거나 R인 경우 신고 못함)
         String status;
@@ -228,10 +231,10 @@ public class AppReviewService {
             throw new BaseException(DATABASE_ERROR); //이미 신고/삭제 된 리뷰이다.
         }
 
-        //2.리뷰를 신고 상태"R"로 바꾸기
+        //2.리뷰를 신고 상태"R"로 바꾸기 (원래 storeIdx도 있었는데 필요없는 것 같아서 뺐다.)
         int reviewReport;
         try {
-            reviewReport = appReviewDao.reportReview(reportReviewReq.getStoreIdx(),reportReviewReq.getReviewIdx());
+            reviewReport = appReviewDao.reportReview(reportReviewReq.getReviewIdx());
         }catch (Exception e){
             throw new BaseException(DATABASE_ERROR);
         }

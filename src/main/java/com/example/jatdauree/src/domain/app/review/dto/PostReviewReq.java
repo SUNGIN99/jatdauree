@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostReviewReq {
-    private int customerIdx;
     private int storeIdx;
     private int orderIdx;
     private int stars;
