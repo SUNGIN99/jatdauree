@@ -23,16 +23,15 @@ public class AppMenuService {
         this.s3Client = s3Client;
     }
 
-    public GetMenuDetailInfoRes getMenuDetailInfo (int todaymenuIdx) throws BaseException{//getMenuDetailInfo
+    public GetMenuDetailInfoRes getMenuDetailInfo(int todaymenuIdx) throws BaseException{//getMenuDetailInfo
         //메뉴 클릭했을때 정보 가지고 오기
         //쿼라스트링으로 하나의 떨이메뉴와 해당 스토어 idx를 가지고 와야함 가지고 와야함
         try {
             GetMenuDetailInfoRes getMenuDetailInfoRes= appMenuDao.getMenuDetailInfo(todaymenuIdx);
-            if (getMenuDetailInfoRes.getMenuUrl() != null)
+            if (getMenuDetailInfoRes.getMenuUrl() != null && !getMenuDetailInfoRes.equals(""))
                 getMenuDetailInfoRes.setMenuUrl("" + s3Client.getUrl(bucketName, getMenuDetailInfoRes.getMenuUrl()));
            return getMenuDetailInfoRes;
         }catch (Exception e){
-            System.out.println("exception2: " + e);
             throw new BaseException(POST_STORES_NOT_REGISTERD); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
     }

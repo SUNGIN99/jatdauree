@@ -240,7 +240,7 @@ public class AppStoreDao {
                 "    store_name,\n" +
                 "    store_logo_url,\n" +
                 "    sign_url,\n" +
-                "    x,y\n" +
+                "    x, y\n" +
                 "FROM Stores\n" +
                 "WHERE storeIdx= ?";
 

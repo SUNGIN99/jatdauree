@@ -27,7 +27,7 @@ public class AppMenuController {
     @GetMapping("/detail")
     public BaseResponse<GetMenuDetailInfoRes> getMenuDetailInfo(@RequestParam("todaymenuIdx") int todaymenuIdx) {
         try {
-            GetMenuDetailInfoRes getMenuDetailInfoRes = appMenuService.getMenuDetailInfo (todaymenuIdx);
+            GetMenuDetailInfoRes getMenuDetailInfoRes = appMenuService.getMenuDetailInfo(todaymenuIdx);
             return new BaseResponse<>(getMenuDetailInfoRes);
 
         } catch (BaseException baseException) {

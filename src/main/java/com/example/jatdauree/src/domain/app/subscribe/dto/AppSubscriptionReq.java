@@ -11,4 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AppSubscriptionReq {
     private int storeIdx;
+    private int yn;
 }

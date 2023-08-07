@@ -11,4 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AppSubscriptionRes {
     private int subIdx;
+    private String status;
 }

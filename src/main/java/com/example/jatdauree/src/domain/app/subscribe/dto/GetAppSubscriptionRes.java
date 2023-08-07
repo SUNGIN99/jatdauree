@@ -12,12 +12,13 @@ import lombok.Setter;
 @NoArgsConstructor
 public class GetAppSubscriptionRes {
     private int storeIdx;
-    private String storeLogoUrl;
-    private String StoreSignUrl;
-    private int categoryIdx;
     private String storeName;
+    private String storeLogoUrl;
+    private String storeSignUrl;
     private double x;
     private double y;
+    private int distance;
+    private int duration;
     private double starAvg;
-    private String subSatus;
+    private int subscribed;
 }

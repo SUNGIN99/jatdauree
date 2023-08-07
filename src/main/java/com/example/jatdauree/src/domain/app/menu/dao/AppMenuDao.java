@@ -24,10 +24,10 @@ public class AppMenuDao {
      */
     public GetMenuDetailInfoRes getMenuDetailInfo(int todaymenuIdx){
 
-        String query ="SELECT m.storeIdx, tm.todaymenuIdx, m.menu_url, m.menu_name, tm.remain, " +
-                "m.composition, m.description, m.price, tm.discount, tm.price AS price_today " +
-                "FROM Menu m " +
-                "JOIN TodayMenu tm ON m.menuIdx = tm.menuIdx " +
+        String query ="SELECT m.storeIdx, tm.todaymenuIdx, m.menu_url, m.menu_name, tm.remain,\n" +
+                "    m.composition, m.description, m.price, tm.discount, tm.price AS price_today\n" +
+                "FROM TodayMenu tm\n" +
+                "JOIN Menu m ON m.menuIdx = tm.menuIdx\n" +
                 "WHERE tm.todaymenuIdx = ?"; //조인할때는 투데이메뉴아이디엑스 기준
 
         return this.jdbcTemplate.queryForObject(query,

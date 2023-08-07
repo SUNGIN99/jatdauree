@@ -16,7 +16,7 @@ public class GetMenuDetailInfoRes {
     private int remain;
     private String composition;
     private String description;
-    private int price;
+    private int originPrice;
     private int discount;
     private int todayPrice;
 }

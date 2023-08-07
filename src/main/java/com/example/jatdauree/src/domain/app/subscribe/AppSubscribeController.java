@@ -1,5 +1,6 @@
 package com.example.jatdauree.src.domain.app.subscribe;
 import com.example.jatdauree.config.BaseException;
+import com.example.jatdauree.src.domain.app.store.dto.StorePreviewRes;
 import com.example.jatdauree.src.domain.app.subscribe.service.AppSubscribeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class AppSubscribeController {
     /**
      * 23.08.03 작성자 : 이운채
      * 식당 구독 하기 / 구독취소
-     * POST/jat/app/subscription
+     * POST /jat/app/subscription
      *
      */
     @ResponseBody
@@ -43,14 +44,16 @@ public class AppSubscribeController {
     /**
      * 23.08.03 작성자 : 이운채
      * 구독 한 가게 리스트
-     * GET/jat/app/subscription
+     * GET /jat/app/subscription
      */
     @ResponseBody
     @GetMapping("")
-    public BaseResponse<List<GetAppSubscriptionRes>>getSubscription(){
+    public BaseResponse<List<GetAppSubscriptionRes>>getSubscription(
+            @RequestParam("longitude") Double longitude,
+            @RequestParam("latitude") Double latitude){
         try {
             int customerIdx = jwtService.getUserIdx();
-            List<GetAppSubscriptionRes> getAppSubscriptionRes =appSubscribeService.getSubscriptionList(customerIdx);
+            List<GetAppSubscriptionRes> getAppSubscriptionRes =appSubscribeService.getSubscriptionList(customerIdx, longitude, latitude);
             return new BaseResponse<>(getAppSubscriptionRes);
 
         }catch (BaseException baseException) {
