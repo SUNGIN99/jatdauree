@@ -172,4 +172,42 @@ public class CustomerController {
             return new BaseResponse<>(baseException.getStatus());
         }
     }
+
+    /**
+     * 23.08.03 작성자 : 정주현
+     * 닉네임(이름) 조회
+     * Post /jat/app/users/my-tteoli
+     *
+     * @return BaseResponse<GetNicknameRes>
+     */
+    @ResponseBody
+    @GetMapping("/my-tteoli")
+    public BaseResponse<GetNicknameRes> nicknameSearch() {
+        try {
+            int customerIdx = jwtService.getUserIdx();
+            GetNicknameRes getNicknameRes = customerService.nicknameSearch(customerIdx);
+            return new BaseResponse<>(getNicknameRes);
+        } catch (BaseException baseException) {
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
+
+    /**
+     * 23.08.03 작성자 : 정주현
+     * 내 정보 조회
+     * Post /jat/app/users/info
+     *
+     * @return BaseResponse<GetMyInfoRes>
+     */
+    @ResponseBody
+    @GetMapping("/info")
+    public BaseResponse<GetMyInfoRes> myInfoSearch() {
+        try {
+            int customerIdx = jwtService.getUserIdx();
+            GetMyInfoRes getMyInfoRes = customerService.myInfoSearch(customerIdx);
+            return new BaseResponse<>(getMyInfoRes);
+        } catch (BaseException baseException) {
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
 }

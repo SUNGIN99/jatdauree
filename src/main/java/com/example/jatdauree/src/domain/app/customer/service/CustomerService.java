@@ -376,4 +376,25 @@ public class CustomerService {
 
         return new AddressNames(locAddress, roadAddress);
     }
+
+    //마이 닉네임 조회
+    public GetNicknameRes nicknameSearch(int customerIdx) throws BaseException {
+        try{
+            GetNicknameRes getNicknameRes = customerDao.nicknameSearch(customerIdx);
+            return getNicknameRes;
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+    }
+
+    //내 정보 조회
+    public GetMyInfoRes myInfoSearch(int customerIdx) throws BaseException {
+        try {
+            GetMyInfoRes getMyInfoRes = customerDao.myInfoSearch(customerIdx);
+            return getMyInfoRes;
+        }catch(Exception e){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }
