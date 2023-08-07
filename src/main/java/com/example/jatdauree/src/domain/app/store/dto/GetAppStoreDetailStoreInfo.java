@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetAppStoreDetailStoreInfo {//가게상세-정보에서 1.가게정보 반환값
+public class GetAppStoreDetailStoreInfo {
 
     private String storeName;
     private String storeOpen;

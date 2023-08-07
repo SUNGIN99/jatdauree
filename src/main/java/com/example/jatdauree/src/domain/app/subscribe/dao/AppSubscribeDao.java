@@ -42,6 +42,13 @@ public class AppSubscribeDao {
         return this.jdbcTemplate.queryForObject(query, int.class, params);
     }
 
+    public int checkSubscribeValid(int customerIdx, int storeIdx) {
+        String query = "SELECT EXISTS (SELECT * FROM Subscribe WHERE customerIdx=? AND storeIdx=? AND status = 'A');";
+
+        Object[] params = new Object[]{customerIdx, storeIdx};
+        return this.jdbcTemplate.queryForObject(query, int.class, params);
+    }
+
     //구독상태 확인
     public String checkSubscribeStatus(int customerIdx, int storeIdx) {
         String query = "SELECT status FROM Subscribe WHERE customerIdx=? AND storeIdx=?;";

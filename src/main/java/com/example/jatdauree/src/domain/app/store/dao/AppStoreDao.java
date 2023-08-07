@@ -24,24 +24,25 @@ public class AppStoreDao {
      */
     public List<GetAppStoreDetailMenuItem> getAppStoreDetailMenuList(int storeIdx, String status){ //getAppStoreDetailMenuList
 
-        String query ="SELECT m.storeIdx, m.menuIdx, tm.todaymenuIdx, m.menu_name, tm.remain, m.menu_url," +
-                "m.composition, m.price, tm.discount, tm.price AS today_price "  +
-                "FROM Menu m "  +
-                "JOIN TodayMenu tm ON m.menuIdx = tm.menuIdx "  +
-                "WHERE m.storeIdx = ? AND m.status = ?";
+        String query ="SELECT m.storeIdx, m.menuIdx, tm.todaymenuIdx, m.menu_name, tm.remain, m.menu_url,\n" +
+                "   m.composition, m.price, tm.discount, tm.price AS today_price \n" +
+                "   FROM TodayMenu tm \n" +
+                "   JOIN Menu m ON m.menuIdx = tm.menuIdx \n" +
+                "   WHERE tm.storeIdx = ? AND m.status = ?";
         Object[] params = new Object[]{storeIdx,status};
-        return this.jdbcTemplate.query(query,(rs, rowNum) -> new GetAppStoreDetailMenuItem(
-                rs.getInt("storeIdx"),
-                rs.getInt("menuIdx"),
-                rs.getInt("todaymenuIdx"),
-                rs.getString("menu_name"),
-                rs.getString("menu_url"),
-                rs.getString("composition"),
-                rs.getInt("price"),
-                rs.getInt("remain"),
-                rs.getInt("discount"),
-                rs.getInt("today_price")
-        ),params);
+
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new GetAppStoreDetailMenuItem(
+                    rs.getInt("menuIdx"),
+                    rs.getInt("todaymenuIdx"),
+                    rs.getString("menu_name"),
+                    rs.getString("menu_url"),
+                    rs.getString("composition"),
+                    rs.getInt("price"),
+                    rs.getInt("remain"),
+                    rs.getInt("discount"),
+                    rs.getInt("today_price")
+            ),params);
     }
 
     /**
@@ -71,19 +72,30 @@ public class AppStoreDao {
     }
     //가게통계
 
-    public Integer orderCount(int storeIdx){
-        String orderCountQuery = "SELECT COUNT(storeIdx) AS Order_Count FROM Orders WHERE storeIdx = ? AND status = 'A';"; // dao로 3개로 나눠서 가지고 오고 리뷰 카운트 D아닌거 조건 포함
-        return  this.jdbcTemplate.queryForObject(orderCountQuery, Integer.class, storeIdx);
+    public int orderCount(int storeIdx){
+        String orderCountQuery = "SELECT " +
+                "COUNT(storeIdx) AS Order_Count " +
+                "FROM Orders " +
+                "WHERE storeIdx = ? AND status = 'A';";
+
+        return  this.jdbcTemplate.queryForObject(orderCountQuery, int.class, storeIdx);
     }
 
-    public Integer reviewCount(int storeIdx){
-        String reviewCountQuery ="SELECT COUNT(storeIdx) AS Review_Count FROM Review WHERE storeIdx = ? AND status <> 'D';"; //리뷰에 상태가 D(삭제 된 리뷰)가 아닌것 만 COUNT 잠시만 R이 삭제 아닌가? 그럼 A만 인것만 couont하면 되는거 아닌가?
-        return  this.jdbcTemplate.queryForObject(reviewCountQuery, Integer.class, storeIdx);
+    public int reviewCount(int storeIdx){
+        String reviewCountQuery ="SELECT " +
+                "COUNT(storeIdx) AS Review_Count " +
+                "FROM Review " +
+                "WHERE storeIdx = ? AND status <> 'D';";
+
+        return  this.jdbcTemplate.queryForObject(reviewCountQuery, int.class, storeIdx);
     }
 
-    public Integer subscribeCount(int storeIdx) {
-        String subscribeCountQuery = "SELECT COUNT(storeIdx) AS Subscribe_Count FROM Subscribe WHERE storeIdx = ? AND status = 'A';"; //생각해 보니까 구독을 한번도 안하면 테이블에 값이 없고 그 뒤로 부터는 상태값 A,D로 여부를 확인하니까 A인것만 count
-        return this.jdbcTemplate.queryForObject(subscribeCountQuery, Integer.class, storeIdx);
+    public int subscribeCount(int storeIdx) {
+        String subscribeCountQuery = "SELECT " +
+                "COUNT(storeIdx) AS Subscribe_Count " +
+                "FROM Subscribe WHERE storeIdx = ? AND status = 'A';";
+
+        return this.jdbcTemplate.queryForObject(subscribeCountQuery, int.class, storeIdx);
     }
 
 
@@ -98,17 +110,20 @@ public class AppStoreDao {
                 (rs, rowNum) -> new GetAppStoreDetailSellerInfo(
                         rs.getString("seller_name"),
                         rs.getString("store_name"),
-                        rs.getString("store_address")
+                        rs.getString("store_address"),
+                        "123-456-789"
                 ),storeIdx);
     }
 
     //원산지 표기
-    public List<GetAppStoreDetailIngredientInfo> getStoreAppDetailIngredientInfo(int storeIdx){ //자바 문법으로 하나로 문자열  합치기 //getStoreAppDetailIngredientInfo
-        String query = "SELECT CONCAT(ingredient_name, '(', origin, ')') AS ingredient_info FROM Ingredients WHERE storeIdx = ?";
-        return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new GetAppStoreDetailIngredientInfo(
-                        rs.getString("ingredient_info")
-                ),storeIdx);
+    public String getStoreAppDetailIngredientInfo(int storeIdx){ //자바 문법으로 하나로 문자열  합치기 //getStoreAppDetailIngredientInfo
+        String query = "SELECT\n" +
+                "    group_concat(ingredient_name, '(', origin, ') ') AS ingredient_info\n" +
+                "FROM Ingredients\n" +
+                "WHERE storeIdx = ?";
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> rs.getString("ingredient_info"),
+                storeIdx);
     }
 
     /**
@@ -147,24 +162,17 @@ public class AppStoreDao {
 
 
 
-    public List<String> appOrderTodayMenus(int storeIdx, int orderIdx) { //근데 List String으로 하면 todaymenuIdx는 필요없나?
+    public List<String> appOrderTodayMenus(int orderIdx) { //근데 List String으로 하면 todaymenuIdx는 필요없나?
         String query = "SELECT\n" +
                 "    M.menu_name\n" +
-                "FROM\n" +
-                "    Orders O\n" +
-                "JOIN\n" +
-                "    OrderLists OL ON O.orderIdx = OL.orderIdx\n" +
-                "JOIN\n" +
-                "    TodayMenu TM ON OL.todaymenuIdx = TM.todaymenuIdx\n" +
-                "JOIN\n" +
-                "    Menu M ON TM.menuIdx = M.menuIdx\n" +
-                "WHERE\n" +
-                "    O.storeIdx = ? AND O.orderIdx = ? AND O.status = 'A'\n" +
-                "GROUP BY\n" +
-                "    M.menu_name;";
+                "FROM Orders O\n" +
+                "LEFT JOIN OrderLists OL on O.orderIdx = OL.orderIdx\n" +
+                "LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
+                "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
+                "WHERE O.orderIdx = ?\n" +
+                "AND O.status = 'A'";
 
-        Object[] params = new Object[]{storeIdx, orderIdx};
-        return this.jdbcTemplate.queryForList(query, String.class, params);
+        return this.jdbcTemplate.queryForList(query, String.class, orderIdx);
     }
 
 
@@ -284,10 +292,12 @@ public class AppStoreDao {
 
     public double getStoreStar(int storeIdx) {
         String query = "SELECT\n" +
-                "    ROUND(AVG(star),1) AS star_average \n" +
+                "    ROUND(AVG(star), 1) AS star_average \n" +
                 "FROM Review\n" +
                 "WHERE storeIdx = ? AND status != 'D'";
-        return this.jdbcTemplate.queryForObject(query, double.class, storeIdx);
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> rs.getDouble("star_average")
+                , storeIdx);
     }
 
     public int getStoreSubscribed(int customerIdx, int storeIdx) {
@@ -305,12 +315,13 @@ public class AppStoreDao {
     // --- 윤채
     public GetAppStoreInfo getAppStoreInfo(int storeIdx){
         String query = "SELECT store_name, store_phone, x, y, store_address FROM Stores WHERE storeIdx = ?";
-        return this.jdbcTemplate.queryForObject(query,(rs, rowNum) -> new GetAppStoreInfo(
-                rs.getString("store_name"),
-                rs.getString("store_phone"),
-                rs.getDouble("x"),
-                rs.getDouble("y"),
-                rs.getString("store_address")
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new GetAppStoreInfo(
+                    rs.getString("store_name"),
+                    rs.getString("store_phone"),
+                    rs.getDouble("x"),
+                    rs.getDouble("y"),
+                    rs.getString("store_address")
         ),storeIdx);
     }
 

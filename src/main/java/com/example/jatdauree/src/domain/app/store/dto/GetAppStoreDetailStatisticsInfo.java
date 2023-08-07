@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetAppStoreDetailStatisticsInfo {
-    private Integer orderCount;
-    private Integer reviewCount;
-    private Integer subscribeCount;
+    private int orderCount;
+    private int reviewCount;
+    private int subscribeCount;
 }

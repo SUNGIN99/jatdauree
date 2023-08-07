@@ -15,4 +15,5 @@ public class GetAppStoreDetailSellerInfo { //가게상세 -정보에서 3.사업
     private String sellerName;
     private String storeName;
     private String storeAddress;
+    private String businessRegiNum;
 }

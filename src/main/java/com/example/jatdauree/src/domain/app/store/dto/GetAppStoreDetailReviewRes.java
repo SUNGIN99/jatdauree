@@ -13,12 +13,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class GetAppStoreDetailReviewRes {
     private int storeIdx;
-    private double star_average;
-    private int reviews_total;
-    private int comment_total;
+    private double starAverage;
+    private int reviewsTotal;
+    private int commentTotal;
     private List<StarCountRatio> starCountRatios;
     private List<AppReviewItems> reviewItems;
-    //private List<String> appOrderTodayMenus;
 
 
 

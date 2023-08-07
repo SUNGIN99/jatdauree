@@ -27,29 +27,28 @@ public class AppStoreController {
         this.jwtService = jwtService;
     }
 
-
-////이게 최종
     /**
      * 23.07.20 작성자 : 이윤채
      * 식당 세부정보 ( 메뉴, 정보, 리뷰) Query String
      * GET/jat/app/stores/info/details ? storeIdx= & type=
      * @return BaseResponse menu=<GetAppMenuItemRes>,info=<GetAppStoreDetailInfoRes>,review=< GetAppStoreReviewRes>
      */
-
     // jat/app/stores/info/details?storeIdx=2&type=menu
     // jat/app/stores/info/details?storeIdx=58&type=info
     //// jat/app/stores/info/details?storeIdx=1&type=review
     @ResponseBody
     @GetMapping("/info/details")
-    public BaseResponse<?> getAppStoreDetails(@RequestParam("storeIdx") int storeIdx, @RequestParam("type") String type) {
+    public BaseResponse<?> getAppStoreDetails(
+            @RequestParam("storeIdx") int storeIdx,
+            @RequestParam("type") String type) {
         try {
-            if ("menu".equalsIgnoreCase(type)) {
+            if (type.equalsIgnoreCase("menu")) {
                 GetAppStoreDetailMenuRes getAppStoreDetailMenuRes = appStoreService.getAppStoreDetailMenu(storeIdx);
                 return new BaseResponse<>(getAppStoreDetailMenuRes);
-            } else if ("info".equalsIgnoreCase(type)) {
+            } else if (type.equalsIgnoreCase("info")) {
                 GetAppStoreDetailInfoRes getAppStoreDetailInfoRes = appStoreService.getAppStoreDetailInfo(storeIdx);
                 return new BaseResponse<>(getAppStoreDetailInfoRes);
-            } else if ("review".equalsIgnoreCase(type)) {
+            } else if (type.equalsIgnoreCase("review")) {
                 GetAppStoreDetailReviewRes getAppStoreDetailReviewRes = appStoreService.getAppStoreDetailReview(storeIdx);
                 return new BaseResponse<>(getAppStoreDetailReviewRes);
             }else {
@@ -100,10 +99,14 @@ public class AppStoreController {
 
     @ResponseBody
     @GetMapping("/info")
-    public BaseResponse<GetAppStoreInfoRes> getAppStoreInfo(@RequestParam("storeIdx") int storeIdx) {
+    public BaseResponse<GetAppStoreInfoRes> getAppStoreInfo(
+            @RequestParam("storeIdx") int storeIdx,
+            @RequestParam("longitude") Double longitude,
+            @RequestParam("latitude") Double latitude){
 
         try {
-            GetAppStoreInfoRes getAppStoreInfoRes = appStoreService.getAppStoreInfo(storeIdx);
+            int userIdx = jwtService.getUserIdx();
+            GetAppStoreInfoRes getAppStoreInfoRes = appStoreService.getAppStoreInfo(userIdx, storeIdx, longitude, latitude);
             return new BaseResponse<>(getAppStoreInfoRes);
         } catch (BaseException baseException) {
             return new BaseResponse<>(baseException.getStatus());

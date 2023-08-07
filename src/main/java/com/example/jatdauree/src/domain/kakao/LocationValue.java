@@ -31,6 +31,10 @@ public class LocationValue {
         return d;
     }
 
+    public int getDuration(int distance){
+        return distance / 100 * 96 / 60;
+    }
+
     public double[] aroundDist(double seletX, double selectY, int distance){
         //m당 y 좌표 이동 값
         double mForLatitude =(1 /(EARTH_RADIUS* 1 *(Math.PI/ 180)))/ 1000;

@@ -12,13 +12,17 @@ import lombok.Setter;
 public class GetAppStoreInfoRes {
 
     private int storeIdx;
-    private GetAppStoreInfo storeInfo;
+    private String storeName;
+    private String storePhone;
+    private double x;
+    private double y;
+    private String storeAddress;
+    private int distance;
+    private int duration;
     private double starAvg;
-    private Integer subscribeCount;
-    //private String ingredientInfo;
-    //private List<GetAppStoreDetailIngredientInfo> ingredientInfo;
+    private int subscribeCount;
     private String detailIngredientInfo;
-    //여기에 구독 state도 필요할 듯 추가하기
+    private int subscribeCheck;
 
 
 }

@@ -13,7 +13,7 @@ public class GetAppStoreDetailInfoRes {// 가게상세 - 정보(1,2,3,4 클래�
     private GetAppStoreDetailStoreInfo detailStoreInfo;
     private GetAppStoreDetailStatisticsInfo detailStatisticsInfo;
     private GetAppStoreDetailSellerInfo detailSellerInfo;
-    private String detailIngredientInfo;//combinedDetailIngredientInfo
+    private String detailIngredientInfo;
 
 
 }

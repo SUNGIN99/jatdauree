@@ -19,6 +19,6 @@ public class AppReviewItems  {
     private String contents;
     private String comment;
     private String review_url;
-   private List<String> OrderTodayMenu; //AppOrderTodayMenu이게 app에서 수정된 코드이기 때문에 이 reviewDao에서 ReviewItems못가지고 옴
+    private List<String> OrderTodayMenu;
 
 }
