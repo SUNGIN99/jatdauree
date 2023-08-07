@@ -10,6 +10,5 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReportReviewReq {
-    int storeIdx;
     int reviewIdx;
 }
