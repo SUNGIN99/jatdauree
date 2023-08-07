@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import static com.example.jatdauree.config.BaseResponseStatus.DATABASE_ERROR;
@@ -45,9 +46,8 @@ public class OrderService {
         } catch (Exception e){
             throw new BaseException(BaseResponseStatus.RESPONSE_ERROR); // 주문 대기 조회에 실패하였습니다.
         }
-
         // 3) 주문관련 정보 조합하기
-        HashMap<Integer, GetOrderRes> orderHash = new HashMap<Integer, GetOrderRes>();
+        HashMap<Integer, GetOrderRes> orderHash = new LinkedHashMap<>();
         try{
             for(GetOrderItemRes orders : getOrdersResList){
                 if (!orderHash.containsKey(orders.getOrderIdx())){

@@ -43,7 +43,7 @@ public class BasketController {
     }
 
     @ResponseBody
-    @PostMapping("/")
+    @PostMapping("")
     BaseResponse<PostBasketRes> postBasket(@RequestBody PostBasketReq basketReq){
         try{
             int userIdx = jwtService.getUserIdx();
@@ -55,7 +55,7 @@ public class BasketController {
     }
 
     @ResponseBody
-    @GetMapping ("/")
+    @GetMapping ("")
     BaseResponse<GetBasketRes> getBasket(){
         try{
             int userIdx = jwtService.getUserIdx();
@@ -71,5 +71,31 @@ public class BasketController {
     BaseResponse<PatchBasketRes> patchBasket(@RequestBody GetBasketRes basketReq){
         return null;
     }*/
+
+    @ResponseBody
+    @GetMapping ("/order")
+    BaseResponse<BasketOrderRes> getBasketOrder(){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            BasketOrderRes basketRes = basketService.getBasketOrder(userIdx);
+            return new BaseResponse<>(basketRes);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @PostMapping ("/order")
+    BaseResponse<OrderDoneRes> postBasketOrder(@RequestBody OrderDoneReq orderReq){
+        // 결제 관련 방식도 로직처리를 나중에 꼭해야함!
+        // Portone..!
+        try{
+            int userIdx = jwtService.getUserIdx();
+            OrderDoneRes basketRes = basketService.postBasketOrder(userIdx, orderReq);
+            return new BaseResponse<>(basketRes);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 
 }

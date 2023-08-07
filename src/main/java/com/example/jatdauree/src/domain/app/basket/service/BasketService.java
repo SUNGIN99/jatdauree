@@ -5,12 +5,16 @@ import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.src.domain.app.basket.dao.BasketDao;
 import com.example.jatdauree.src.domain.app.basket.dto.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import static com.example.jatdauree.config.BaseResponseStatus.DATABASE_ERROR;
+import static com.example.jatdauree.config.BaseResponseStatus.*;
 
 @Service
 public class BasketService {
@@ -63,6 +67,7 @@ public class BasketService {
         }
     }
 
+    @Transactional(rollbackFor = BaseException.class)
     public PostBasketRes postBasket(int customerIdx, PostBasketReq basketReq) throws BaseException {
         int basketIdx = 0;
         try{
@@ -145,6 +150,73 @@ public class BasketService {
             return new GetBasketCountRes(basketcount);
         }catch (Exception e){
             throw new BaseException(DATABASE_ERROR); // 장바구니 결과 에러
+        }
+    }
+
+    public BasketOrderRes getBasketOrder(int userIdx) throws BaseException{
+        try{
+            BasketOrderRes orderRes = basketDao.getBasketOrder(userIdx);
+            return orderRes;
+        }catch (IncorrectResultSizeDataAccessException error) { // 쿼리문에 해당하는 결과가 없거나 2개 이상일 때
+            throw new BaseException(NO_BASKET_ITEMS);// 장바구니에 담긴 항목없이 주문 불가능합니다.
+        }catch(Exception e){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    @Transactional(rollbackFor = BaseException.class)
+    public OrderDoneRes postBasketOrder(int userIdx, OrderDoneReq orderReq) throws BaseException {
+        // 1) 주문하기 전 장바구니에 담긴 품목 리스트 가져오기
+        int storeIdx = orderReq.getStoreIdx();
+        List<BasketOrderItem> basketItems;
+        try {
+            basketItems = basketDao.getBasketOrderItems(userIdx);
+        } catch(Exception e){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        // 2) 해당 장바구니 목록들이 가게에 충분히 남아있는지 확인인
+        try{
+            for (BasketOrderItem bItem : basketItems){
+                BasketTodayMenu bTodayMenu = basketDao.checkItemRemain(storeIdx, bItem.getTodayMenuIdx(), bItem.getCnt());
+                // 조회한 개수가 가게에 남아있는 개수보다 크다면..?
+                if(bTodayMenu.getRemain() < bItem.getCnt() || bTodayMenu.getTodayMenuIdx() != bItem.getTodayMenuIdx()){
+                    throw new IncorrectResultSizeDataAccessException(0);
+                }
+            }
+        }catch (IncorrectResultSizeDataAccessException error) { // 쿼리문에 해당하는 결과가 없거나 2개 이상일 때
+            throw new BaseException(STORE_TODAY_MENU_LACK); // 가게의 떨이메뉴 개수가 부족하여 주문이 불가능합니다.
+        }catch(Exception e){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd ");
+        String pickupDate = sdf.format(new Date());
+        orderReq.setPickupTime(pickupDate + orderReq.getPickupTime());
+
+        try{
+            // 주문 정보
+            int orderIdx = basketDao.postBasketOrder(userIdx, orderReq);
+
+            // 주문에 들어가는 메뉴 정보
+            int orderMenuCnt = basketDao.postBasketOrderItems(orderIdx, basketItems);
+            /*System.out.println("orderMenuCnt: " +orderMenuCnt);
+            if (orderMenuCnt != basketItems.size())
+                throw new Exception();*/
+
+            // 주문한만큼 오늘의 메뉴 개수 감소
+            int tmDescCnt = basketDao.todayMenuDecrease(basketItems);
+            /*System.out.println("tmDescCnt: " +tmDescCnt);
+            if (tmDescCnt != basketItems.size())
+                throw new Exception();*/
+
+            // 주문햇으면 장바구니에 있는 아이템 전부 비활성화
+            int basketCount = basketDao.basketItemDone(basketItems);
+            //System.out.println("basketCount: " +basketCount);
+
+            return new OrderDoneRes(orderIdx, basketItems.size());
+        }catch(Exception e){
+            throw new BaseException(ORDER_FAILED);
         }
     }
 }

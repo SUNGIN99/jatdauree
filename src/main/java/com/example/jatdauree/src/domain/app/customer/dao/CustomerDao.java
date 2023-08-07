@@ -201,4 +201,28 @@ public class CustomerDao {
 
         this.jdbcTemplate.update(query, params);
     }
+
+    //닉네임 조회
+    public GetNicknameRes nicknameSearch(int customerIdx) {
+        String query = "SELECT nickname, profileImageUrl from Customers where customerIdx =? ";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new GetNicknameRes(
+                        rs.getString("nickname"),
+                        rs.getString("profileImageUrl")
+                ), customerIdx);
+    }
+
+    //마이 떨이 조회
+    public GetMyInfoRes myInfoSearch(int customerIdx){
+        String query = "SELECT nickname, profileImage, email, phone from Customers WHERE customerIdx =?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs,rowNum) -> new GetMyInfoRes(
+                        rs.getString("nickname"),
+                        rs.getString("profileImageUrl"),
+                        rs.getString("email"),
+                        rs.getString("phone")
+                ),customerIdx);
+    }
 }

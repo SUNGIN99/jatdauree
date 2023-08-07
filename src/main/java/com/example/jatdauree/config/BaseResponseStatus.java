@@ -60,6 +60,10 @@ public enum BaseResponseStatus {
     //2050~) 리뷰 답글 등록
     POST_REVIEW_COMMENT_DATA_UNVALID(false,2051,"리뷰 답글을 작성하지 않았습니다."),
 
+    NO_BASKET_ITEMS(false, 2060, "장바구니에 담긴 항목없이 주문 불가능합니다."),
+    STORE_TODAY_MENU_LACK(false, 2061, "가게의 떨이메뉴 개수가 부족하여 주문이 불가능합니다."),
+    ORDER_FAILED(false, 2062, "주문에 실패하였습니다."),
+
     //2050
     /**
      * 3000 : Response 오류

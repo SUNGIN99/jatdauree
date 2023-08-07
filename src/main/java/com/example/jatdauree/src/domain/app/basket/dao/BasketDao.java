@@ -1,14 +1,13 @@
 package com.example.jatdauree.src.domain.app.basket.dao;
 
-import com.example.jatdauree.src.domain.app.basket.dto.BasketExist;
-import com.example.jatdauree.src.domain.app.basket.dto.BasketItem;
-import com.example.jatdauree.src.domain.app.basket.dto.BasketItemFromDao;
-import com.example.jatdauree.src.domain.app.basket.dto.PostBasketReq;
+import com.example.jatdauree.src.domain.app.basket.dto.*;
+import com.example.jatdauree.src.domain.web.todaymenu.dto.GetMainPageItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.PreparedStatement;
 import java.util.List;
 
 @Repository
@@ -98,5 +97,127 @@ public class BasketDao {
                 "  AND status = 'A' ";
 
         return this.jdbcTemplate.queryForObject(query, int.class, customerIdx);
+    }
+
+    public BasketOrderRes getBasketOrder(int userIdx) {
+        String query = "SELECT\n" +
+                "    S.storeIdx,\n" +
+                "    S.store_name,\n" +
+                "    S.store_address,\n" +
+                "    S.store_phone,\n" +
+                "    SUM(B.cnt * TM.price) as orderPrice\n" +
+                "FROM Basket B\n" +
+                "LEFT JOIN TodayMenu TM on B.todaymenuIdx = TM.todaymenuIdx\n" +
+                "LEFT JOIN Stores S on B.storeIdx = S.storeIdx\n" +
+                "WHERE customerIdx = ?\n" +
+                "AND B.status != 'D'";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new BasketOrderRes(
+                        rs.getInt("storeIdx"),
+                        rs.getString("store_name"),
+                        rs.getString("store_address"),
+                        rs.getString("store_phone"),
+                        rs.getInt("orderPrice")
+                ), userIdx);
+    }
+
+    public int postBasketOrder(int userIdx, OrderDoneReq orderReq) {
+        String query = "INSERT INTO Orders(storeIdx, customerIdx, request, order_time, pickup_time, payment_status)\n" +
+                "VALUES(?, ?, ?, NOW(), ?, ?)";
+
+        Object[] params = new Object[]{
+                orderReq.getStoreIdx(),
+                userIdx,
+                orderReq.getRequest(),
+                orderReq.getPickupTime(),
+                orderReq.getPaymentStatus()
+        };
+
+        this.jdbcTemplate.update(query, params);
+
+        String lastInsertIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInsertIdQuery,int.class);
+    }
+
+    public List<BasketOrderItem> getBasketOrderItems(int userIdx) {
+        String query = "SELECT * FROM Basket WHERE customerIdx = ? AND status = 'A'";
+
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new BasketOrderItem(
+                        rs.getInt(1),
+                        rs.getInt(2),
+                        rs.getInt(3),
+                        rs.getInt(4),
+                        rs.getInt(5)
+                ), userIdx);
+
+    }
+
+    public BasketTodayMenu checkItemRemain(int storeIdx, int todayMenuIdx, int cnt) {
+        String query = "SELECT\n" +
+                "    *\n" +
+                "FROM TodayMenu\n" +
+                "WHERE storeIdx = ?\n" +
+                "AND todaymenuIdx = ?\n" +
+                "AND remain >= ?";
+
+        Object[] params = new Object[]{
+                storeIdx,
+                todayMenuIdx,
+                cnt
+        };
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new BasketTodayMenu(
+                        rs.getInt("todaymenuIdx"),
+                        rs.getInt("remain")
+                ),params);
+    }
+
+    public int postBasketOrderItems(int orderIdx, List<BasketOrderItem> basketItems) {
+        String query = "INSERT INTO OrderLists(orderIdx, todaymenuIdx, cnt)\n" +
+                "VALUES(?, ?, ?)";
+
+        return this.jdbcTemplate.batchUpdate(query,
+                basketItems,
+                basketItems.size(),
+                (PreparedStatement ps, BasketOrderItem bItem) ->{
+                    ps.setInt(1, orderIdx);
+                    ps.setInt(2, bItem.getTodayMenuIdx());
+                    ps.setInt(3, bItem.getCnt());
+                }).length;
+
+    }
+
+    public int todayMenuDecrease(List<BasketOrderItem> basketItems) {
+        String query = "UPDATE TodayMenu\n" +
+                "    SET remain = remain - ?\n" +
+                "WHERE todaymenuIdx = ?\n" +
+                "AND remain >= ?";
+
+        return this.jdbcTemplate.batchUpdate(query,
+                basketItems,
+                basketItems.size(),
+                (PreparedStatement ps, BasketOrderItem bItem) ->{
+                    ps.setInt(1, bItem.getCnt());
+                    ps.setInt(2, bItem.getTodayMenuIdx());
+                    ps.setInt(3, bItem.getCnt());
+                }).length;
+
+    }
+
+
+    public int basketItemDone(List<BasketOrderItem> basketItems) {
+        String query = "UPDATE Basket\n" +
+                "    SET status = 'D'\n" +
+                "WHERE basketIdx = ?";
+
+        return this.jdbcTemplate.batchUpdate(query,
+                basketItems,
+                basketItems.size(),
+                (PreparedStatement ps, BasketOrderItem bItem) ->{
+                    ps.setInt(1, bItem.getBasketIdx());
+                }).length;
     }
 }
