@@ -104,7 +104,7 @@ public class AppReviewController {
      * POST /jat/app/reivews/report
      */
     @ResponseBody
-    @PostMapping("/report")
+    @PatchMapping("/report")
     public BaseResponse<ReportReviewRes> reportReview(@RequestBody ReportReviewReq reportReviewReq){
         try{
             ReportReviewRes reportReviewRes = appReviewService.reportReview(reportReviewReq);
