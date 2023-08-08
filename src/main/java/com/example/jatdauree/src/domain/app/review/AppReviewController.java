@@ -26,6 +26,18 @@ public class AppReviewController {
         this.jwtService = jwtService;
     }
 
+    @ResponseBody
+    @GetMapping("/pre")
+    public BaseResponse<ReviewReady> reviewReady(@RequestParam("reviewIdx") int reviewIdx){
+        try{
+            int customerIdx = jwtService.getUserIdx();
+            return new BaseResponse<>(appReviewService.reviewReady(reviewIdx));
+        }catch (BaseException baseResponse){
+            return new BaseResponse<>(baseResponse.getStatus());
+        }
+    }
+
+
     /**
      * Controller -1
      * 23.07.19 작성자 : 윤다은
@@ -84,6 +96,7 @@ public class AppReviewController {
             return new BaseResponse<>(baseException.getStatus());
         }
     }
+
     /**
      * Controller -4
      * 23.07.20 작성자 : 윤다은
@@ -100,6 +113,8 @@ public class AppReviewController {
             return new BaseResponse<>(baseException.getStatus());
         }
     }
+
+
 
 
 

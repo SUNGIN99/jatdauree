@@ -3,6 +3,7 @@ package com.example.jatdauree.src.domain.app.review.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.jatdauree.config.BaseException;
+import com.example.jatdauree.config.BaseResponse;
 import com.example.jatdauree.src.domain.app.review.dao.AppReviewDao;
 import com.example.jatdauree.src.domain.app.review.dto.*;
 import com.example.jatdauree.src.domain.web.order.dao.OrderDao;
@@ -236,6 +237,15 @@ public class AppReviewService {
             throw new BaseException(DATABASE_ERROR);
         }
 
+
+    }
+
+    public ReviewReady reviewReady(int reviewIdx) throws BaseException{
+        try{
+            return appReviewDao.reviewReady(reviewIdx);
+        }catch (Exception e){
+            throw new BaseException(DATABASE_ERROR);
+        }
 
     }
 }

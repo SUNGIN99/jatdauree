@@ -1,7 +1,9 @@
 package com.example.jatdauree.src.domain.app.review.dao;
 
+import com.example.jatdauree.config.BaseResponse;
 import com.example.jatdauree.src.domain.app.review.dto.MyReviews;
 import com.example.jatdauree.src.domain.app.review.dto.PostReviewReq;
+import com.example.jatdauree.src.domain.app.review.dto.ReviewReady;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -85,8 +87,8 @@ public class AppReviewDao {
         String query = "SELECT\n" +
                 "    M.menu_name\n" +
                 "FROM Review R\n" +
-                "LEFT JOIN Orders O on R.orderIdx = O.orderIdx\n" +
-                "LEFT JOIN TodayMenu TM on O.storeIdx = TM.storeIdx\n" +
+                "LEFT JOIN OrderLists OL on R.orderIdx = OL.orderIdx\n" +
+                "LEFT JOIN TodayMenu TM on TM.todaymenuIdx = OL.todaymenuIdx\n" +
                 "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
                 "WHERE R.reviewIdx = ?";
 
@@ -125,5 +127,26 @@ public class AppReviewDao {
                 "SET status = 'R'\n" +
                 "WHERE reviewIdx = ?";
         return this.jdbcTemplate.update(reportquery,reviewIdx);
+    }
+
+    public ReviewReady reviewReady(int reviewIdx) {
+        String query = "SELECT\n" +
+                "    R.orderIdx, R.reviewIdx,\n" +
+                "    S.store_name,\n" +
+                "    GROUP_CONCAT(M.menu_name, ' ') as menuNames\n" +
+                "FROM Review R\n" +
+                "LEFT JOIN Stores S on S.storeIdx = R.storeIdx\n" +
+                "LEFT JOIN OrderLists OL on R.orderIdx = OL.orderIdx\n" +
+                "LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
+                "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
+                "WHERE R.reviewIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new ReviewReady(
+                        rs.getInt("orderIdx"),
+                        rs.getInt("reviewIdx"),
+                        rs.getString("store_name"),
+                        rs.getString("menuNames")
+                ), reviewIdx);
     }
 }
