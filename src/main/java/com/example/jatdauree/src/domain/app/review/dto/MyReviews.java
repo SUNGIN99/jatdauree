@@ -21,7 +21,6 @@ public class MyReviews implements Serializable {
     @Nullable private String reviewUrl;
     private String contents;
     @Nullable private String sellerComment;
-    //List<ReviewMenu> reviewMenus;
-    List<String> reviewMenus;
+    private List<String> reviewMenus;
 
 }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/jat/app/reivews")
+@RequestMapping("/jat/app/reviews")
 public class AppReviewController {
 
     @Autowired
@@ -52,7 +52,7 @@ public class AppReviewController {
      * Controller -2
      * 23.07.20 작성자 : 윤다은
      * 마이 떨이에서 모든 리뷰 조회
-     * POST /jat/app/reivews 모든 리뷰 조회하기
+     * GET /jat/app/reivews 모든 리뷰 조회하기
      *
      */
     @ResponseBody
