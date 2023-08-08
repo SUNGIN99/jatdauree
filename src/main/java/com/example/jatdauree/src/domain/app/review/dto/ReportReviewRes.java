@@ -11,5 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ReportReviewRes {
     int reviewIdx;
-    int reviewReport;
+    int reviewReported;
 }

@@ -13,7 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetReviewRes implements Serializable {
-    int customerIdx;
-    int totalReviews;
-    List<MyReviews> myReviews;
+    private int totalReviews;
+    private List<MyReviews> myReviews;
 }

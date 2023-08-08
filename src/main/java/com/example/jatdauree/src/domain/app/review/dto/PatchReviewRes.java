@@ -11,5 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PatchReviewRes {
     int reviewIdx;
-    int reviewDel;
+    int reviewDeleted;
 }

@@ -14,8 +14,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MyReviews implements Serializable {
+    private int storeIdx;
+    private String storeName;
     private int reviewIdx;
-    private String name;
     private int star;
     private String date;
     @Nullable private String reviewUrl;

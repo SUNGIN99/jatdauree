@@ -48,7 +48,7 @@ public class AppReviewService {
         }
 
         // 2. 글을 작성하지 않은 경우 예외처리
-        if(postReviewReq.getContents() == null){
+        if(postReviewReq.getContents() == null || postReviewReq.getContents().equals("") ){
             throw new BaseException(REQUEST_ERROR); // 리뷰를 작성하지 않았습니다.
         }
 
@@ -64,16 +64,13 @@ public class AppReviewService {
         }
 
         // 4. getpostReivewReq.picture이 null이 아닌경우 S3 사용해서 Post하기
-        String fileName = null;
+        String fileName;
         File file = null;
         // S3에 업로드될 고유한 이름 만들어 준다.
         try {
             fileName = checkFileIsNullThenName(postReviewReq.getReviewFile()); //S3에 업로드 할 이름을 지정해 준다.
-            System.out.println(fileName);
             if (fileName != null) {
-                //System.out.println("file 생성1");
                 file = new File(absolutePath + fileName); // 업로드될 경로를 지정해 준다.
-                System.out.println(fileName + ": " + file);
             }
         }catch (Exception e){
             throw new BaseException(REQUEST_ERROR); // 리뷰 파일의 형태가 잘못됨
@@ -82,7 +79,6 @@ public class AppReviewService {
         //서버에 업로드 하는 과정, S3에 업로드 하기 전에 서버에 임시로 저장해준다.
         try {
              if (file != null) {  //file의 이름이 만들어졌다면(client가 파일을 전송해서 이름이 만들어짐)
-                 //System.out.println("file 생성2");
                  postReviewReq.getReviewFile().transferTo(file); //postReviewReq.getReviewFile 메서드를 호출해서 file에 transferTo로 서버에 업로드
              }
         }catch (Exception e){
@@ -90,13 +86,10 @@ public class AppReviewService {
         }
 
         // S3에 업로드 해주기
-        //String url = null;
         try {
             if (fileName!= null) {
-                //System.out.println("file 생성3");
                 s3Client.putObject(new PutObjectRequest(bucketName, fileName, file)); // s3Client.putObject로 버킷에 파일 업로드 fileName은 bucket에 저장 될 이름
-                //url = "" + s3Client.getUrl(bucketName, fileName); //업로드된 파일의 url을 생성한다.
-                //file.delete(); //url이 생성되면 file을 삭제한다.
+                file.delete(); //url이 생성되면 file을 삭제한다.
             }
         } catch (Exception e) {
             throw new BaseException(S3_ACCESS_API_ERROR); // 5030: 이미지 URL 생성에 실패하였습니다.
@@ -104,10 +97,9 @@ public class AppReviewService {
 
         //5. 리뷰 작성하기
         try{
-            appReviewDao.reviewPost(customerIdx,postReviewReq,fileName);
-            return new PostReviewRes(postReviewReq.getStars(), postReviewReq.getContents());
+            int reviewIdx = appReviewDao.reviewPost(customerIdx, postReviewReq, fileName);
+            return new PostReviewRes(reviewIdx);
         }catch (Exception e){
-            //System.out.println("exception2: " + e);
             throw new BaseException(POST_REVIEW_COMMENT_DATA_UNVALID); // 리뷰를 등록하지 못했다.
         }
     }
@@ -129,11 +121,12 @@ public class AppReviewService {
         } catch (Exception e){
             throw new BaseException(RESPONSE_ERROR); // 리뷰를 조회에 실패함
         }
+
         //3. 리뷰를 가져오는 중 사진이 !null인 경우 사진 가져옴
         try {
             for(MyReviews review : myReviews){
-                if(review.getReviewUrl() != null)
-                    review.setReviewUrl(""+s3Client.getUrl(bucketName,review.getReviewUrl())); //버킷 이름과 String Key(FileName)으로
+                if(review.getReviewUrl() != null && review.getReviewUrl().length() != 0)
+                    review.setReviewUrl(""+s3Client.getUrl(bucketName, review.getReviewUrl())); //버킷 이름과 String Key(FileName)으로
             }
         }catch (Exception e){
             throw new BaseException(RESPONSE_ERROR); // 사진 조회에 실패하였습니다.
@@ -169,19 +162,17 @@ public class AppReviewService {
                 }
             }
         }catch (Exception e){
-            //System.out.println(e);
             throw new BaseException(DATABASE_ERROR); //날짜를 잘못 출력했습니다.
         }
 
         //5. 리뷰의 메뉴를 리스트로 받아온다.
         try {
             for(MyReviews review : myReviews){
-                List<String> reviewMenus = appReviewDao.myReviewsMenu(customerIdx, review.getReviewIdx());
+                List<String> reviewMenus = appReviewDao.myReviewsMenu(review.getReviewIdx());
                 review.setReviewMenus(reviewMenus);
             }
-            return new GetReviewRes(customerIdx,totalReviews,myReviews);
+            return new GetReviewRes(totalReviews, myReviews);
         }catch (Exception e){
-            //System.out.println("exception4: " + e);
             throw new BaseException(RESPONSE_ERROR); //메뉴 리스트 조회에 실패 함.
         }
     }
@@ -195,21 +186,20 @@ public class AppReviewService {
         try {
             status = appReviewDao.checkReviewStatus(patchReviewReq.getReviewIdx());
         }catch (Exception e){
-            //System.out.println("exception1: " + e);
             throw new BaseException(DATABASE_ERROR); //리뷰의 상태를 알 수 없다.
         }
 
-        if(!"A".equals(status)){
+        if("D".equals(status)){
             throw new BaseException(DATABASE_ERROR); //이미 신고/삭제 된 리뷰이다.
         }
         //2. 리뷰 삭제하기
         int reivewDel;
         try {
-            reivewDel = appReviewDao.reviewDelete(patchReviewReq.getReviewIdx(),customerIdx);
+            reivewDel = appReviewDao.reviewDelete(patchReviewReq.getReviewIdx());
         }catch (Exception e){
-            //System.out.println("exception2: " + e);
             throw new BaseException(DATABASE_ERROR);// 리뷰가 삭제되지 않음
         }
+
         //3. 리뷰가 삭제되었는지 확인하기
         if (reivewDel == 1)
             return new PatchReviewRes(patchReviewReq.getReviewIdx(), reivewDel);

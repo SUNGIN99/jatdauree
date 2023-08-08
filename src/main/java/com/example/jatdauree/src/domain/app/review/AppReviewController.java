@@ -78,7 +78,7 @@ public class AppReviewController {
     public BaseResponse<PatchReviewRes> deleteReview(@RequestBody PatchReviewReq patchReviewReq){
         try{
             int customerIdx = jwtService.getUserIdx();
-            PatchReviewRes patchReviewRes = appReviewService.deleteReview(customerIdx,patchReviewReq);
+            PatchReviewRes patchReviewRes = appReviewService.deleteReview(customerIdx, patchReviewReq);
             return new BaseResponse<>(patchReviewRes);
         }catch (BaseException baseException){
             return new BaseResponse<>(baseException.getStatus());

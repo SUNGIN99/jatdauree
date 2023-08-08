@@ -10,6 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostReviewRes {
-    private int stars;
-    private String contents;
+    private int reviewIdx;
 }
