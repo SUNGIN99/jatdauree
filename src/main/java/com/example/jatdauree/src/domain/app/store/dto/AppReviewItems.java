@@ -14,6 +14,7 @@ import java.util.List;
 public class AppReviewItems  {
     private int orderIdx;
     private int reviewIdx;
+    private String customerProfileUrl;
     private String customerName;
     private int star;
     private String contents;

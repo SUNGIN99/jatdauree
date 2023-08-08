@@ -38,8 +38,8 @@ public class AppStoreDao {
                     rs.getString("menu_name"),
                     rs.getString("menu_url"),
                     rs.getString("composition"),
-                    rs.getInt("price"),
                     rs.getInt("remain"),
+                    rs.getInt("price"),
                     rs.getInt("discount"),
                     rs.getInt("today_price")
             ),params);
@@ -199,6 +199,7 @@ public class AppStoreDao {
                 (rs, rowNum) -> new AppReviewItems(
                         rs.getInt("orderIdx"),
                         rs.getInt("reviewIdx"),
+                        null,
                         rs.getString("name"),
                         rs.getInt("star"),
                         rs.getString("contents"),
