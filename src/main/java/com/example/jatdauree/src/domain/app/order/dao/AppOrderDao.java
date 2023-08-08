@@ -26,6 +26,7 @@ public class AppOrderDao {
                 "    S.storeIdx,\n" +
                 "    S.store_name,\n" +
                 "    M.menu_name,\n" +
+                "    M.menu_url,\n" +
                 "    TM.price,\n" +
                 "    COUNT(OL.orderIdx) as orerItemCount\n" +
                 "FROM Orders O\n" +
@@ -33,8 +34,9 @@ public class AppOrderDao {
                 "LEFT JOIN TodayMenu TM on TM.todaymenuIdx = OL.todaymenuIdx\n" +
                 "LEFT JOIN Menu M on M.menuIdx = TM.menuIdx\n" +
                 "LEFT JOIN Stores S on O.storeIdx = S.storeIdx\n" +
-                "WHERE O.customerIdx = ? AND O.status = 'A'\n" +
-                "GROUP BY O.orderIdx";
+                "WHERE O.customerIdx = ?  AND O.status = 'A'\n" +
+                "GROUP BY O.orderIdx\n" +
+                "ORDER BY O.created";
 
         return this.jdbcTemplate.query(query,
                 (rs, rowNum) -> new GetOrderListRes(
@@ -45,6 +47,7 @@ public class AppOrderDao {
                         rs.getInt("storeIdx"),
                         rs.getString("store_name"),
                         rs.getString("menu_name"),
+                        rs.getString("menu_url"),
                         rs.getInt("price"),
                         rs.getInt("orerItemCount")
                 ), customerIdx);

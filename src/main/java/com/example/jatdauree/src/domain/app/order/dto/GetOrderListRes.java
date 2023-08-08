@@ -17,6 +17,7 @@ public class GetOrderListRes{
     private int storeIdx;
     private String storeName;
     private String menuName;
+    private String menuUrl;
     private int price;
     private int orderItemCount;
 

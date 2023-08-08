@@ -30,11 +30,24 @@ public class AppOrderService {
 
     public List<GetOrderListRes> getOrderList(int customerIdx) throws BaseException {
         String[] weekDays = new String[]{"일", "월", "화", "수", "목", "금", "토"};
-
+        // 주문 내역 가져오기
+        List<GetOrderListRes> orderList;
         try{
-            return appOrderDao.getOrderList(customerIdx, weekDays);
+            orderList = appOrderDao.getOrderList(customerIdx, weekDays);
         }catch (Exception e){
             throw new BaseException(DATABASE_ERROR);
         }
+        // 주문내역 s3
+        try{
+            for(GetOrderListRes order : orderList){
+                if(order.getMenuUrl() != null && !order.getMenuUrl().equals("")){
+                    order.setMenuUrl(""+s3Client.getUrl(bucketName, order.getMenuUrl()));
+                }
+            }
+        }catch (Exception e){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        return orderList;
     }
 }
