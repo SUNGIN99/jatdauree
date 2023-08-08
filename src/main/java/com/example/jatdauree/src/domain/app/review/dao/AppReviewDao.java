@@ -66,7 +66,7 @@ public class AppReviewDao {
                 "FROM Review R\n" +
                 "LEFT JOIN Customers C on R.customerIdx = C.customerIdx\n" +
                 "LEFT JOIN Stores S on R.storeIdx = S.storeIdx\n" +
-                "WHERE R.customerIdx = ? AND status != 'D'";
+                "WHERE R.customerIdx = ? AND R.status != 'D'";
 
         return this.jdbcTemplate.query(query,
                 (rs, rowNum) -> new MyReviews(
@@ -79,7 +79,7 @@ public class AppReviewDao {
                         rs.getString("contents"),
                         rs.getString("comment"),
                         null
-                ),customerIdx);
+                ), customerIdx);
     }
 
     // 메뉴 리스트 조회하기
