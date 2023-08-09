@@ -69,13 +69,10 @@ public class BasketDao {
                 "    TM.discount\n" +
                 "FROM Basket B\n" +
                 "LEFT JOIN TodayMenu TM on B.todaymenuIdx = TM.todaymenuIdx\n" +
-                "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
-                "LEFT JOIN Stores S on B.storeIdx = S.storeIdx\n" +
+                "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx AND M.status != 'D'\n" +
+                "LEFT JOIN Stores S on B.storeIdx = S.storeIdx AND S.status = 'A'\n" +
                 "WHERE customerIdx = ?\n" +
-                "    AND B.status = 'A'\n" +
-                "    AND TM.status = 'A'\n" +
-                "    AND M.status = 'A'\n" +
-                "    AND S.status = 'A'";
+                "    AND B.status = 'A'";
 
         return this.jdbcTemplate.query(query,
                 (rs, rowNum) -> new BasketItemFromDao(
