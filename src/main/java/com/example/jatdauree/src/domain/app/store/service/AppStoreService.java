@@ -169,7 +169,6 @@ public class AppStoreService {
 
 
     public List<StoreListXY> getStoreListByAddr(double maxX, double maxY, double minX, double minY) throws BaseException {
-        // 주변 반경내 1.5km 구하기.. (m단위 입력)
         //{minX, maxX, minY, maxY}
         double[] aroundXY = new double[]{minX, maxX, minY, maxY};
 
