@@ -3,7 +3,7 @@ package com.example.jatdauree.src.domain.app.order.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.src.domain.app.order.dao.AppOrderDao;
-import com.example.jatdauree.src.domain.app.order.dto.GetOrderListRes;
+import com.example.jatdauree.src.domain.app.order.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -49,5 +49,38 @@ public class AppOrderService {
         }
 
         return orderList;
+    }
+
+    public OrderDetailRes getOrderDetail(int orderIdx) throws BaseException{
+
+        // 1. 주문 상세 기본정보 가져오기
+        OrderDetailRes orderDetails;
+        try{
+            orderDetails = appOrderDao.getOrderDetail(orderIdx);
+        }catch (Exception e){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        // 2. 주문에 딸린 메뉴 상세 정봅 가져오기
+        try{
+            List<OrderMenuItem> orderItems = appOrderDao.getOrderItems(orderIdx);
+
+            orderDetails.setOrderMenus(orderItems);
+
+            return orderDetails;
+        }catch (Exception e){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public OrderDeleted orderDelete(OrderDeleteReq delReq) throws BaseException{
+        try{
+            int removed = appOrderDao.orderDelete(delReq);
+            appOrderDao.orderListDelete(delReq);
+
+            return new OrderDeleted(removed);
+        }catch (Exception e){
+            throw new BaseException(DATABASE_ERROR);
+        }
     }
 }

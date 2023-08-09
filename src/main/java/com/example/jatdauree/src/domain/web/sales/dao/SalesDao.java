@@ -29,7 +29,7 @@ public class SalesDao {
                 "WHERE O.storeIdx = ?\n" +
                 "  AND O.created >= CONCAT(DATE_FORMAT(NOW(), '%Y-%c-%d'), ' 00:00:00')\n" +
                 "  AND O.created <= CONCAT(DATE_FORMAT(NOW(), '%Y-%c-%d'), ' 23:59:59')\n" +
-                "  AND O.status = 'A'";
+                "  AND O.status LIKE '%A%'";
 
         return this.jdbcTemplate.queryForObject(query,
                 (rs, rowNum) -> new TodayTotalSalesRes(
@@ -51,7 +51,7 @@ public class SalesDao {
                 "WHERE O.storeIdx = ? \n" +
                 "  AND O.created >= ? \n" +
                 "  AND O.created <= ? \n" +
-                "AND O.status = 'A'\n" +
+                "AND O.status LIKE '%A%'\n" +
                 "GROUP BY dayTime \n" +
                 "ORDER BY dayTime";
 
@@ -77,7 +77,7 @@ public class SalesDao {
                 "WHERE  O.storeIdx = ?\n" +
                 "  AND O.created >= ?\n" +
                 "  AND O.created <= ?\n" +
-                "  AND O.status = 'A'\n" +
+                "  AND O.status LIKE '%A%'\n" +
                 "GROUP BY weekDayId\n" +
                 "ORDER BY weekDayId";
 
@@ -105,7 +105,7 @@ public class SalesDao {
                 "LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
                 "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
                 "WHERE O.storeIdx = ?\n" +
-                "  AND O.status = 'A'\n" +
+                "  AND O.status LIKE '%A%'\n" +
                 "  AND DATE_FORMAT(O.created, '%c') = ?\n" +
                 "GROUP BY `month`, M.menuIdx\n" +
                 "HAVING COUNT(O.customerIdx) " + (reOrder == 1 ? ">= 2" : "= 1");
@@ -135,7 +135,7 @@ public class SalesDao {
                 "LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
                 "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
                 "WHERE O.storeIdx = ?\n" +
-                "  AND O.status = 'A'";
+                "  AND O.status LIKE '%A%'";
         return this.jdbcTemplate.queryForObject(query, int.class, storeIdx);
     }
 
@@ -149,7 +149,7 @@ public class SalesDao {
                 "LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
                 "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
                 "WHERE O.storeIdx = ?\n" +
-                "  AND O.status = 'A'\n" +
+                "  AND O.status LIKE '%A%'\n" +
                 "  AND DATE_FORMAT(O.created, '%c') = ?\n" +
                 "GROUP BY M.menuIdx";
 
