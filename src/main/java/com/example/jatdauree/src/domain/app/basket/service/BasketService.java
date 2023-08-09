@@ -42,7 +42,6 @@ public class BasketService {
             basketExist = basketDao.checkBaketAlreadyExists(customerIdx);
         }
         catch (Exception e){
-            System.out.println("1:" + e);
             throw new BaseException(DATABASE_ERROR); // 장바구니 조회 실패
         }
 

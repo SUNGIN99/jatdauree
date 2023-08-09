@@ -18,6 +18,11 @@ public class BasketController {
         this.basketService = basketService;
     }
 
+    /**
+     * 같은 가게의 장바구니인지 조회
+     * @param checkReq
+     * @return
+     */
     @ResponseBody
     @PostMapping("/same-store")
     BaseResponse<BasketStoreCheckRes> storeCheck(@RequestBody BasketStoreCheckReq checkReq){
@@ -30,6 +35,11 @@ public class BasketController {
         }
     }
 
+    /**
+     * 장바구니 개수
+     * @param checkReq
+     * @return
+     */
     @ResponseBody
     @GetMapping ("/count")
     BaseResponse<GetBasketCountRes> getBasketCount(){
@@ -42,6 +52,11 @@ public class BasketController {
         }
     }
 
+    /**
+     * 장바구니 담기
+     * @param checkReq
+     * @return
+     */
     @ResponseBody
     @PostMapping("")
     BaseResponse<PostBasketRes> postBasket(@RequestBody PostBasketReq basketReq){
