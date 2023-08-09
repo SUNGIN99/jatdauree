@@ -219,7 +219,7 @@ public class AppReviewService {
             throw new BaseException(DATABASE_ERROR); // 리뷰 상태를 알 수 없음
         }
         if(!"A".equals(status)){
-            throw new BaseException(DATABASE_ERROR); //이미 신고/삭제 된 리뷰이다.
+            throw new BaseException(REVIEW_ALREADY_DONE); //이미 신고/삭제 된 리뷰이다.
         }
 
         //2.리뷰를 신고 상태"R"로 바꾸기 (원래 storeIdx도 있었는데 필요없는 것 같아서 뺐다.)

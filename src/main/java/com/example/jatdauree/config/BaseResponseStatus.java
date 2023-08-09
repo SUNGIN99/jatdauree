@@ -64,6 +64,8 @@ public enum BaseResponseStatus {
     STORE_TODAY_MENU_LACK(false, 2061, "가게의 떨이메뉴 개수가 부족하여 주문이 불가능합니다."),
     ORDER_FAILED(false, 2062, "주문에 실패하였습니다."),
 
+    REVIEW_ALREADY_DONE(false, 2063, "이미 처리가 완료된 리뷰입니다."),
+
     //2050
     /**
      * 3000 : Response 오류
