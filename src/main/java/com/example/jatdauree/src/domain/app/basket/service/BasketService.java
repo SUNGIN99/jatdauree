@@ -85,6 +85,7 @@ public class BasketService {
 
 
     public GetBasketRes getBasket(int customerIdx) throws BaseException{
+        // 1. 장바구니 조회
         List<BasketItemFromDao> basketItemsDao;
         try{
             basketItemsDao = basketDao.getBasket(customerIdx);
@@ -100,7 +101,7 @@ public class BasketService {
             if(basketItemsDao.size() != 0){
                 for (BasketItemFromDao basketItem :basketItemsDao){
                     totalMenuCount += 1; // 메뉴 종류 개수
-                    totalMenuCount += basketItem.getTodayPrice() * basketItem.getCount(); // 총 주문 가격
+                    totalMenuPrice += basketItem.getTodayPrice() * basketItem.getCount(); // 총 주문 가격
                     basketItems.add(
                             new BasketItem(basketItem.getStoreIdx(),
                                     basketItem.getTodaymenuIdx(),
