@@ -240,9 +240,9 @@ public class AppReviewService {
 
     }
 
-    public ReviewReady reviewReady(int reviewIdx) throws BaseException{
+    public ReviewReady reviewReady(int orderIdx) throws BaseException{
         try{
-            return appReviewDao.reviewReady(reviewIdx);
+            return appReviewDao.reviewReady(orderIdx);
         }catch (Exception e){
             throw new BaseException(DATABASE_ERROR);
         }

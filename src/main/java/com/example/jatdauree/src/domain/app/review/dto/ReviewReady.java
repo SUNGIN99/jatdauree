@@ -12,8 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReviewReady {
-    private int orderIdx;
-    private int reviewIdx;
     private String storeName;
     private String menuNames;
 }

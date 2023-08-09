@@ -129,24 +129,21 @@ public class AppReviewDao {
         return this.jdbcTemplate.update(reportquery,reviewIdx);
     }
 
-    public ReviewReady reviewReady(int reviewIdx) {
+    public ReviewReady reviewReady(int orderIdx) {
         String query = "SELECT\n" +
-                "    R.orderIdx, R.reviewIdx,\n" +
                 "    S.store_name,\n" +
                 "    GROUP_CONCAT(M.menu_name, ' ') as menuNames\n" +
-                "FROM Review R\n" +
-                "LEFT JOIN Stores S on S.storeIdx = R.storeIdx\n" +
-                "LEFT JOIN OrderLists OL on R.orderIdx = OL.orderIdx\n" +
+                "FROM Orders O\n" +
+                "LEFT JOIN Stores S on S.storeIdx = O.storeIdx\n" +
+                "LEFT JOIN OrderLists OL on O.orderIdx = OL.orderIdx\n" +
                 "LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
                 "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
-                "WHERE R.reviewIdx = ?";
+                "WHERE O.orderIdx = ?";
 
         return this.jdbcTemplate.queryForObject(query,
                 (rs, rowNum) -> new ReviewReady(
-                        rs.getInt("orderIdx"),
-                        rs.getInt("reviewIdx"),
                         rs.getString("store_name"),
                         rs.getString("menuNames")
-                ), reviewIdx);
+                ), orderIdx);
     }
 }

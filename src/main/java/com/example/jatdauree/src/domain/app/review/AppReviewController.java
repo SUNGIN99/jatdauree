@@ -28,10 +28,10 @@ public class AppReviewController {
 
     @ResponseBody
     @GetMapping("/pre")
-    public BaseResponse<ReviewReady> reviewReady(@RequestParam("reviewIdx") int reviewIdx){
+    public BaseResponse<ReviewReady> reviewReady(@RequestParam("orderIdx") int orderIdx){
         try{
             int customerIdx = jwtService.getUserIdx();
-            return new BaseResponse<>(appReviewService.reviewReady(reviewIdx));
+            return new BaseResponse<>(appReviewService.reviewReady(orderIdx));
         }catch (BaseException baseResponse){
             return new BaseResponse<>(baseResponse.getStatus());
         }
