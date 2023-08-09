@@ -365,19 +365,26 @@ public class CustomerService {
             throw new BaseException(DATABASE_ERROR);
         }
 
-        // 응답 값이 1이상이면 결과가 존재함
-        LocationXYRes currentLoc = apiResponse.getBody();
-        if (currentLoc.getDocuments().length == 0){
+        try{
+            // 응답 값이 1이상이면 결과가 존재함
+            LocationXYRes currentLoc = apiResponse.getBody();
+            if (currentLoc.getDocuments().length == 0){
+                throw new BaseException(DATABASE_ERROR);
+            }
+
+            if (currentLoc.getDocuments()[0] != null){
+                String locAddress = currentLoc.getDocuments()[0].getAddress().getAddress_name();
+                String roadAddress = currentLoc.getDocuments()[0].getRoad_address().getAddress_name();
+
+                return new AddressNames(locAddress, roadAddress);
+            }
+            return new AddressNames("지도를 조금만 옮겨주세요", "좌표가 정확하지 않음.");
+        }catch(NullPointerException ne){
+            return new AddressNames("지도를 조금만 옮겨주세요", "좌표가 정확하지 않음.");;
+        }catch (Exception e){
             throw new BaseException(DATABASE_ERROR);
         }
 
-        if (currentLoc.getDocuments()[0] != null){
-            String locAddress = currentLoc.getDocuments()[0].getAddress().getAddress_name();
-            String roadAddress = currentLoc.getDocuments()[0].getRoad_address().getAddress_name();
-
-            return new AddressNames(locAddress, roadAddress);
-        }
-        return new AddressNames("좌표가 정확하지 않음.", "좌표가 정확하지 않음.");
     }
 
     //마이 닉네임 조회
