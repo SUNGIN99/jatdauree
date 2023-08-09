@@ -131,11 +131,21 @@ public class BasketService {
             throw new BaseException(DATABASE_ERROR); // 메뉴 사진 조회 실패
         }
 
+        // 가게 url 가져오기
+        String storeUrl;
         try{
-            GetBasketRes basketRes = new GetBasketRes(0, null, 0,0, null);
+            storeUrl = basketDao.getStoreUrl(basketItemsDao.get(0).getStoreIdx());
+            storeUrl = ""+s3Client.getUrl(bucketName, storeUrl);
+        }catch (Exception e){
+            throw new BaseException(DATABASE_ERROR); // 메뉴 사진 조회 실패
+        }
+
+        try{
+            GetBasketRes basketRes = new GetBasketRes(0, null, null, 0,0, null);
             if(basketItemsDao.size() != 0){
                 basketRes.setStoreIdx(basketItemsDao.get(0).getStoreIdx());
                 basketRes.setStoreName(basketItemsDao.get(0).getStoreName());
+                basketRes.setStoreUrl(storeUrl);
                 basketRes.setTotalMenuCount(totalMenuCount);
                 basketRes.setTotalMenuPrice(totalMenuPrice);
                 basketRes.setBasketItems(basketItems);

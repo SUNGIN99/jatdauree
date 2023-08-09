@@ -14,6 +14,7 @@ import java.util.List;
 public class GetBasketRes {
     private int storeIdx;
     private String storeName;
+    private String storeUrl;
     private int totalMenuCount;
     private int totalMenuPrice;
     private List<BasketItem> basketItems;

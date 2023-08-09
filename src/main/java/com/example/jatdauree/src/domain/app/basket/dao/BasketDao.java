@@ -217,4 +217,14 @@ public class BasketDao {
                     ps.setInt(1, bItem.getBasketIdx());
                 }).length;
     }
+
+    public String getStoreUrl(int storeIdx) {
+        String query = "SELECT\n" +
+                "    store_logo_url\n" +
+                "FROM Stores\n" +
+                "WHERE storeIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query, String.class, storeIdx);
+
+    }
 }
