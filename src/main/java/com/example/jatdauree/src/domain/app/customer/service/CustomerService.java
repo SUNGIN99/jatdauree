@@ -380,7 +380,7 @@ public class CustomerService {
             }
             return new AddressNames("지도를 조금만 옮겨주세요", "좌표가 정확하지 않음.");
         }catch(NullPointerException ne){
-            return new AddressNames("지도를 조금만 옮겨주세요", "좌표가 정확하지 않음.");;
+            return new AddressNames("지도를 조금만 옮겨주세요", "좌표가 정확하지 않음.");
         }catch (Exception e){
             throw new BaseException(DATABASE_ERROR);
         }
