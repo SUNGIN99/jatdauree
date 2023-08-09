@@ -181,31 +181,11 @@ public class AppStoreService {
         }
     }
 
-    public List<StorePreviewRes> getStorePreview(int customerIdx, StorePreviewReq previewReq) throws BaseException{
-        // 1. 현재 사용자의 위치
-        ResponseEntity<LocationInfoRes> apiResponse;
-        try{
-            apiResponse = locationValue.kakaoLocalAPI(previewReq.getCurrentAddress());
-        }catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-        // 카카오 위치 API 응답 실패
-        if (apiResponse.getStatusCode() != HttpStatus.OK){
-            throw new BaseException(DATABASE_ERROR);
-        }
-        // 응답 값이 1이상이면 결과가 존재함
-        LocationInfoRes currentLoc = apiResponse.getBody();
-        if (currentLoc.getDocuments().length == 0){
-            throw new BaseException(DATABASE_ERROR);
-        }
-        // 현재 위/경도 값
-        double nowX = currentLoc.getDocuments()[0].getX();
-        double nowY = currentLoc.getDocuments()[0].getY();
-
+    public List<StorePreviewRes> getStorePreview(int customerIdx, int storeIdx, Double longitude, Double latitude) throws BaseException{
         // 2. 선택한 가게 미리보기 정보 일단 가져오기
         StorePreviewDetails storePreview;
         try{
-            storePreview = appStoreDao.getStorePreview(previewReq.getStoreIdx());
+            storePreview = appStoreDao.getStorePreview(storeIdx);
         }catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
@@ -220,13 +200,15 @@ public class AppStoreService {
         double[] aroundXY = locationValue.aroundDist(seletX, selectY, 1500);
 
         // 가게에서 가장 가까운 최대 두 곳 더 미리보기
-        List<StorePreviewDetails> aroundStoreList;
+        List<StorePreviewDetails> aroundStoreList = new ArrayList<>();
+        /*-------
         try{
             aroundStoreList = appStoreDao.getAroundPreview(previewReq.getStoreIdx(),
                     seletX, selectY, aroundXY);
         }catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
+        */
 
         // 선택한 가게 까지 포함하기기
         aroundStoreList.add(0, storePreview);
@@ -252,7 +234,7 @@ public class AppStoreService {
             }
 
             // ** 내 위치에서 해당 가게까지의 거리 **
-            int distance = (int) locationValue.getDistance(nowY, nowX, prevDetail.getY(), prevDetail.getX());
+            int distance = (int) locationValue.getDistance(latitude, longitude, prevDetail.getY(), prevDetail.getX());
 
             // 1Km (1000M) 16분 평군 소요
             // 100M : 1분 36초(96초) ,  10M : 9.6초

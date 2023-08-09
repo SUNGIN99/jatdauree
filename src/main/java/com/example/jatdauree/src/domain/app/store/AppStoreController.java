@@ -78,12 +78,15 @@ public class AppStoreController {
 
     @ResponseBody
     @GetMapping("/preview")
-    public BaseResponse<List<StorePreviewRes>> getStorePreview(@RequestBody StorePreviewReq previewReq){
+    public BaseResponse<List<StorePreviewRes>> getStorePreview(
+            @RequestParam("storeIdx") int storeIdx,
+            @RequestParam("longitude") Double longitude,
+            @RequestParam("latitude") Double latitude){
         try{
             int customerIdx = jwtService.getUserIdx();
 
             // 가게 Idx, 가게 이름, 가게 로고/간판 사진 url, 별점, 거리, 시간, 구독 여부
-            List<StorePreviewRes> storeList = appStoreService.getStorePreview(customerIdx, previewReq);
+            List<StorePreviewRes> storeList = appStoreService.getStorePreview(customerIdx, storeIdx, longitude, latitude);
             return new BaseResponse<>(storeList);
         }catch (BaseException baseException) {
             return new BaseResponse<>(baseException.getStatus());
