@@ -28,7 +28,7 @@ public class BasketDao {
                         rs.getInt("basketIdx"),
                         rs.getInt("storeIdx"),
                         rs.getInt("todaymenuIdx"),
-                        rs.getInt("remain"),
+                        rs.getInt("cnt"),
                         rs.getString("status")
                 ), customerIdx);
     }
