@@ -371,10 +371,13 @@ public class CustomerService {
             throw new BaseException(DATABASE_ERROR);
         }
 
-        String locAddress = currentLoc.getDocuments()[0].getAddress().getAddress_name();
-        String roadAddress = currentLoc.getDocuments()[0].getRoad_address().getAddress_name();
+        if (currentLoc.getDocuments()[0] != null){
+            String locAddress = currentLoc.getDocuments()[0].getAddress().getAddress_name();
+            String roadAddress = currentLoc.getDocuments()[0].getRoad_address().getAddress_name();
 
-        return new AddressNames(locAddress, roadAddress);
+            return new AddressNames(locAddress, roadAddress);
+        }
+        return new AddressNames("좌표가 정확하지 않음.", "좌표가 정확하지 않음.");
     }
 
     //마이 닉네임 조회
