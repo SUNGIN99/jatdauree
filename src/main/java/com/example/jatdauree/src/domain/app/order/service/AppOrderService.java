@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.example.jatdauree.config.BaseResponseStatus.DATABASE_ERROR;
+import static com.example.jatdauree.config.BaseResponseStatus.REQUEST_ERROR;
 
 @Service
 public class AppOrderService {
@@ -74,13 +75,24 @@ public class AppOrderService {
     }
 
     public OrderDeleted orderDelete(OrderDeleteReq delReq) throws BaseException{
+        String status;
         try{
-            int removed = appOrderDao.orderDelete(delReq);
-            appOrderDao.orderListDelete(delReq);
-
-            return new OrderDeleted(removed);
+            status = appOrderDao.orderStatusCheck(delReq.getOrderIdx());
         }catch (Exception e){
             throw new BaseException(DATABASE_ERROR);
+        }
+
+        try{
+            if(status.equals("A")){
+                int removed = appOrderDao.orderDelete(delReq);
+                //appOrderDao.orderListDelete(delReq);
+                return new OrderDeleted(removed);
+            }
+            else{
+                throw new Exception();
+            }
+        }catch (Exception e){
+            throw new BaseException(REQUEST_ERROR);
         }
     }
 }

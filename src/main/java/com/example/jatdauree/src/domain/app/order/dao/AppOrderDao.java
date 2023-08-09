@@ -131,4 +131,10 @@ public class AppOrderDao {
         return this.jdbcTemplate.update(query, delReq.getOrderIdx());
 
     }
+
+    public String orderStatusCheck(int orderIdx) {
+        String query = "SELECT status FROM Orders WHERE orderIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query, String.class, orderIdx);
+    }
 }
