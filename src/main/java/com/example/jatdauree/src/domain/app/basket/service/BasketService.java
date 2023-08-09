@@ -134,7 +134,7 @@ public class BasketService {
             GetBasketRes basketRes = new GetBasketRes(0, null, 0,0, null);
             if(basketItemsDao.size() != 0){
                 basketRes.setStoreIdx(basketItemsDao.get(0).getStoreIdx());
-                basketRes.setStoreName(basketRes.getStoreName());
+                basketRes.setStoreName(basketItemsDao.get(0).getStoreName());
                 basketRes.setTotalMenuCount(totalMenuCount);
                 basketRes.setTotalMenuPrice(totalMenuPrice);
                 basketRes.setBasketItems(basketItems);
