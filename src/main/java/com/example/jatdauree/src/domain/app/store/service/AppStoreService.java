@@ -2,17 +2,16 @@ package com.example.jatdauree.src.domain.app.store.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.example.jatdauree.config.BaseException;
+import com.example.jatdauree.src.domain.app.basket.dto.GetStoreList;
 import com.example.jatdauree.src.domain.app.store.dao.*;
 import com.example.jatdauree.src.domain.app.store.dto.*;
 import com.example.jatdauree.src.domain.app.subscribe.dao.AppSubscribeDao;
-import com.example.jatdauree.src.domain.kakao.address.LocationInfoRes;
 import com.example.jatdauree.src.domain.kakao.LocationValue;
 import com.example.jatdauree.src.domain.web.review.dto.*;
 import com.example.jatdauree.src.domain.web.review.dao.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -271,7 +270,6 @@ public class AppStoreService {
         try {
             storeInfo = appStoreDao.getAppStoreInfo(storeIdx);
         } catch (Exception e) {
-            System.out.println("1:" + e);
             throw new BaseException(RESPONSE_ERROR);    // 리뷰 조회에 실패하였습니다.
         }
 
@@ -324,16 +322,53 @@ public class AppStoreService {
     }
 
 
-    public List<GetAppStore> getAppStoreList() throws BaseException {
-        List<GetAppStore> storeInfo;
+    public List<StorePreviewRes> getAppStoreList(int userIdx, Double longitude, Double latitude) throws BaseException {
+        // 1. 주변 반경 구하기 (1500미터)
+        //{minX, maxX, minY, maxY}
+        double[] aroundXY = locationValue.aroundDist(longitude, latitude, 1500);
 
+        // 2. 주변 가게 목록 가져오기
+        // 가게Idx, 가게이름, 가게주소, 좌표
+        // 별점, 구독여부
+        List<GetStoreList> storeList;
         try {
-            storeInfo = appStoreDao.getAppStoreList();
+            storeList = appStoreDao.getAppStoreList(userIdx, aroundXY);
         } catch (Exception e) {
-            System.out.println("exception1: " + e);
             throw new BaseException(RESPONSE_ERROR);
         }
 
-        return storeInfo;
+        // 3. URL, 가게까지 거리 구하기
+        List<StorePreviewRes> storePreviewRes = new ArrayList<>();
+        for(GetStoreList store : storeList){
+            // 가게 사진 URL
+            if(store.getStoreLogoUrl() != null && store.getStoreLogoUrl().length() != 0){
+                store.setStoreLogoUrl(""+s3Client.getUrl(bucketName, store.getStoreLogoUrl()));
+            }
+            if(store.getStoreSignUrl() != null && store.getStoreSignUrl().length() != 0){
+                store.setStoreSignUrl(""+s3Client.getUrl(bucketName, store.getStoreSignUrl()));
+            }
+
+            // ** 내 위치에서 해당 가게까지의 거리 **
+            int distance = (int) locationValue.getDistance(latitude, longitude, store.getY(), store.getX());
+
+            // 1Km (1000M) 16분 평군 소요
+            // 100M : 1분 36초(96초) ,  10M : 9.6초
+            // 거리 / 100M * 96초 / 1분 =
+            int duration = locationValue.getDuration(distance); // 분
+
+            storePreviewRes.add(
+                    new StorePreviewRes(
+                            store.getStoreIdx(),
+                            store.getStoreName(),
+                            store.getStoreLogoUrl(),
+                            store.getStoreSignUrl(),
+                            store.getStar(),
+                            distance, duration,
+                            store.getStoreIdx() != 0 ? 1:0
+                    )
+            );
+        }
+
+        return storePreviewRes;
     }
 }

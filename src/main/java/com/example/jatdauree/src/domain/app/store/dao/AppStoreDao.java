@@ -1,5 +1,6 @@
 package com.example.jatdauree.src.domain.app.store.dao;
 
+import com.example.jatdauree.src.domain.app.basket.dto.GetStoreList;
 import com.example.jatdauree.src.domain.app.store.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -326,30 +327,45 @@ public class AppStoreDao {
         ),storeIdx);
     }
 
-    //가게 목록보기 8/1
-    public List<GetAppStore> getAppStoreList() {
-        String query = "SELECT S.storeIdx, S.store_logo_url, S.sign_url, S.categoryIdx, S.store_name, S.x, S.y, R.star_average\n" +
-                "FROM Stores AS S\n" +
-                "LEFT JOIN (\n" +
-                "    SELECT storeIdx, ROUND(AVG(star), 1) AS star_average\n" +
-                "    FROM Review  WHERE status = 'A'\n" +
-                "    GROUP BY storeIdx\n" +
-                ") AS R\n" +
-                "ON S.storeIdx = R.storeIdx;";
+    public List<GetStoreList> getAppStoreList(int userIdx, double[] aroundXY) {
+        String query = "SELECT\n" +
+                "    S.storeIdx,\n" +
+                "    store_name,\n" +
+                "    store_logo_url,\n" +
+                "    sign_url,\n" +
+                "    store_address,\n" +
+                "    x, y,\n" +
+                "    ROUND(AVG(star), 1) as star,\n" +
+                "    SUB.customerIdx\n" +
+                "FROM Stores S\n" +
+                "LEFT JOIN Review R on S.storeIdx = R.storeIdx AND R.status != 'D'\n" +
+                "LEFT JOIN Subscribe SUB on S.storeIdx = SUB.storeIdx AND SUB.status != 'D' AND SUB.customerIdx = ?\n" +
+                "WHERE x BETWEEN ? AND ?\n" +
+                "AND y BETWEEN ? AND ?\n" +
+                "GROUP BY (S.storeIdx)\n" +
+                "ORDER BY ABS(?+?/2 - x) DESC , ABS(?+?/2 - y) DESC ;";
+
+        Object[] params = new Object[]{
+                userIdx,
+                aroundXY[0], aroundXY[1],
+                aroundXY[2], aroundXY[3],
+                aroundXY[1], aroundXY[0],
+                aroundXY[3], aroundXY[2],
+        };
 
 
         return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new GetAppStore(
+                (rs, rowNum) -> new GetStoreList(
                         rs.getInt("storeIdx"),
+                        rs.getString("store_name"),
                         rs.getString("store_logo_url"),
                         rs.getString("sign_url"),
-                        rs.getInt("categoryIdx"),
-                        rs.getString("store_name"),
+                        rs.getString("store_address"),
                         rs.getDouble("x"),
                         rs.getDouble("y"),
-                        rs.getFloat("star_average")
-
-                ));
+                        rs.getDouble("star"),
+                        rs.getInt("customerIdx")
+                ), params);
 
     }
 

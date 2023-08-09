@@ -119,14 +119,17 @@ public class AppStoreController {
     /**
      * 23.08.01작성자 : 이윤채
      * 식당 목록 보기(거리순)
-     * GET/jat/app/stores
+     * GET /jat/app/stores
      * @return
      */
     @ResponseBody
     @GetMapping("")
-    public BaseResponse<List<GetAppStore>>GetAppStore(){
+    public BaseResponse<List<StorePreviewRes>>GetAppStore(
+            @RequestParam("longitude") Double longitude,
+            @RequestParam("latitude") Double latitude){
         try {
-            List<GetAppStore> getAppStoreRes = appStoreService.getAppStoreList();
+            int userIdx = jwtService.getUserIdx();
+            List<StorePreviewRes> getAppStoreRes = appStoreService.getAppStoreList(userIdx, longitude, latitude);
             return new BaseResponse<>(getAppStoreRes);
         }catch (BaseException baseException) {
             return new BaseResponse<>(baseException.getStatus());
