@@ -31,12 +31,14 @@ public class AppOrderDao {
                 "    M.menu_name,\n" +
                 "    M.menu_url,\n" +
                 "    TM.price,\n" +
-                "    COUNT(OL.orderIdx) as orerItemCount\n" +
+                "    COUNT(OL.orderIdx) as orerItemCount,\n" +
+                "    reviewIdx\n" +
                 "FROM Orders O\n" +
                 "LEFT JOIN OrderLists OL on O.orderIdx = OL.orderIdx\n" +
                 "LEFT JOIN TodayMenu TM on TM.todaymenuIdx = OL.todaymenuIdx\n" +
                 "LEFT JOIN Menu M on M.menuIdx = TM.menuIdx\n" +
                 "LEFT JOIN Stores S on O.storeIdx = S.storeIdx\n" +
+                "LEFT JOIN Review R on O.orderIdx = R.orderIdx\n" +
                 "WHERE O.customerIdx = ?  AND O.status = 'A'\n" +
                 "GROUP BY O.orderIdx\n" +
                 "ORDER BY O.created";
@@ -52,7 +54,8 @@ public class AppOrderDao {
                         rs.getString("menu_name"),
                         rs.getString("menu_url"),
                         rs.getInt("price"),
-                        rs.getInt("orerItemCount")
+                        rs.getInt("orerItemCount"),
+                        rs.getInt("reviewIdx") != 0 ? 1 : 0
                 ), customerIdx);
     }
 

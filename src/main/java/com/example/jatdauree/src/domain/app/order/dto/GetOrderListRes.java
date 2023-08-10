@@ -20,6 +20,7 @@ public class GetOrderListRes{
     private String menuUrl;
     private int price;
     private int orderItemCount;
+    private int reviewExist;
 
 
 
