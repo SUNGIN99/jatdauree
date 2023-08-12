@@ -32,6 +32,9 @@ public class LocationValue {
     }
 
     public int getDuration(int distance){
+        // 1Km (1000M) 16분 평군 소요
+        // 100M : 1분 36초(96초) ,  10M : 9.6초
+        // 거리 / 100M * 96초 / 1분 =
         return distance / 100 * 96 / 60;
     }
 
