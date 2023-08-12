@@ -104,6 +104,7 @@ public class BasketService {
                     basketItems.add(
                             new BasketItem(basketItem.getStoreIdx(),
                                     basketItem.getTodaymenuIdx(),
+                                    basketItem.getBaksetIdx(),
                                     basketItem.getMenuUrl(),
                                     basketItem.getMenuName(),
                                     basketItem.getCount(),
@@ -229,5 +230,21 @@ public class BasketService {
         }catch(Exception e){
             throw new BaseException(ORDER_FAILED);
         }
+    }
+
+    public GetBasketRes patchBasket(int userIdx, PatchBasketReq basketReq) throws BaseException {
+        try{
+            if(basketReq.getPatchStatus().equals("count")){
+                basketDao.patchBasketCount(basketReq.getBasketIdx(), basketReq.getInDecrease());
+            } else if (basketReq.getPatchStatus().equals("remove")) {
+                // 장바구니 항목 삭제
+                basketDao.removeBasketItem(basketReq.getBasketIdx());
+            }
+
+        }catch(Exception e){
+            throw new BaseException(ORDER_FAILED);
+        }
+
+        return getBasket(userIdx);
     }
 }

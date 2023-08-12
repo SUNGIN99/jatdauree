@@ -136,6 +136,18 @@ public class AppStoreController {
         }
     }
 
+    @ResponseBody
+    @GetMapping("/map")
+    public BaseResponse<StorePoint> storePoint(@RequestParam("storeIdx") int storeIdx){
+        try {
+            int userIdx = jwtService.getUserIdx();
+            StorePoint storeP = appStoreService.storePoint(storeIdx);
+            return new BaseResponse<>(storeP);
+        }catch (BaseException baseException) {
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
+
 
 
 

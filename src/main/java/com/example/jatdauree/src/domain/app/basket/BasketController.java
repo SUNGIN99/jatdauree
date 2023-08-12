@@ -81,11 +81,17 @@ public class BasketController {
         }
     }
 
-    /*@ResponseBody
-    @PatchMapping("/")
-    BaseResponse<PatchBasketRes> patchBasket(@RequestBody GetBasketRes basketReq){
-        return null;
-    }*/
+    @ResponseBody
+    @PatchMapping("")
+    BaseResponse<GetBasketRes> patchBasket(@RequestBody PatchBasketReq basketReq){
+        try{
+            int userIdx = jwtService.getUserIdx();
+            GetBasketRes basketRes = basketService.patchBasket(userIdx, basketReq);
+            return new BaseResponse<>(basketRes);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 
     @ResponseBody
     @GetMapping ("/order")

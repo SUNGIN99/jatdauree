@@ -68,7 +68,7 @@ public class StoreDao {
      */
     //가게등록
     @Transactional
-    public int storeRegister(int sellerIdx, PostStoreReq postStoresReq, String[] urls) {
+    public int storeRegister(int sellerIdx, PostStoreReq postStoresReq, String[] urls, double nowX, double nowY) {
 
         String query = "INSERT INTO Stores (sellerIdx,\n" +
                 "                    categoryIdx,\n" +
@@ -98,8 +98,8 @@ public class StoreDao {
                 postStoresReq.getCity(),
                 postStoresReq.getLocal(),
                 postStoresReq.getTown(),
-                0,
-                0,
+                nowX,
+                nowY,
                 postStoresReq.getStoreName(),
                 postStoresReq.getBusinessPhone(),
                 postStoresReq.getBusinessEmail(),

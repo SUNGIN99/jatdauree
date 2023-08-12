@@ -369,6 +369,16 @@ public class AppStoreDao {
 
     }
 
+    public StorePoint storePoint(int storeIdx) {
+        String query = "SELECT store_name, x, y FROM Stores WHERE storeIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) ->  new StorePoint(
+                        rs.getString("store_name"),
+                        rs.getDouble("x"),
+                        rs.getDouble("y")
+                ), storeIdx);
+    }
 }
 
 

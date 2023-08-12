@@ -62,7 +62,7 @@ public class BasketDao {
         String query ="" +
                 "SELECT\n" +
                 "    B.storeIdx, store_name,\n" +
-                "    B.todaymenuIdx, B.cnt,\n" +
+                "    B.todaymenuIdx, B.basketIdx, B.cnt,\n" +
                 "    M.price as originPrice,\n" +
                 "    M.menu_url, M.menu_name,\n" +
                 "    TM.price as discountedPrice,\n" +
@@ -79,6 +79,7 @@ public class BasketDao {
                         rs.getInt("storeIdx"),
                         rs.getString("store_name"),
                         rs.getInt("todaymenuIdx"),
+                        rs.getInt("basketIdx"),
                         rs.getString("menu_url"),
                         rs.getString("menu_name"),
                         rs.getInt("cnt"),
@@ -225,6 +226,28 @@ public class BasketDao {
                 "WHERE storeIdx = ?";
 
         return this.jdbcTemplate.queryForObject(query, String.class, storeIdx);
+
+    }
+
+    public void patchBasketCount(int basketIdx, int inDecrease) {
+        String query = "UPDATE Basket \n" +
+                "SET cnt = cnt + ?\n" +
+                "WHERE basketIdx = ?";
+
+        Object[] params = new Object[]{
+                inDecrease == 1 ? 1: -1,
+                basketIdx
+        };
+
+        this.jdbcTemplate.update(query, params);
+    }
+
+    public void removeBasketItem(int basketIdx) {
+        String query = "UPDATE Basket\n" +
+                "SET status = 'D'\n" +
+                "WHERE basketIdx = ?";
+
+        this.jdbcTemplate.update(query, basketIdx);
 
     }
 }

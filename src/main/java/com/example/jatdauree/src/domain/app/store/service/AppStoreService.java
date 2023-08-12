@@ -371,4 +371,13 @@ public class AppStoreService {
 
         return storePreviewRes;
     }
+
+    public StorePoint storePoint(int storeIdx) throws BaseException{
+        try{
+            return appStoreDao.storePoint(storeIdx);
+        }catch (Exception e) {
+            throw new BaseException(RESPONSE_ERROR);
+        }
+
+    }
 }

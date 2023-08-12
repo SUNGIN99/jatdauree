@@ -4,6 +4,8 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.config.secret.SmsSecret;
+import com.example.jatdauree.src.domain.kakao.LocationValue;
+import com.example.jatdauree.src.domain.kakao.address.LocationInfoRes;
 import com.example.jatdauree.src.domain.web.store.dao.StoreDao;
 import com.example.jatdauree.src.domain.web.store.dto.*;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,8 @@ import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,10 +42,13 @@ public class StoreService {
 
     private final DefaultMessageService messageService;
 
+    private final LocationValue locationValue;
+
     @Autowired
     public StoreService(StoreDao storeDao, AmazonS3 s3Client) {
         this.storeDao = storeDao;
         this.s3Client = s3Client;
+        this.locationValue = new LocationValue();
         this.messageService = NurigoApp.INSTANCE.initialize(SmsSecret.APIKey, SmsSecret.Secret, "https://api.coolsms.co.kr");
     }
 
@@ -110,8 +117,32 @@ public class StoreService {
             throw new BaseException(S3_ACCESS_API_ERROR); // 5030 : 이미지 url 생성에 실패하였습니다.
         }
 
+        // 가게 좌표 구하기(경/위도)
+        ResponseEntity<LocationInfoRes> apiResponse;
+        try{
+            apiResponse = locationValue.kakaoLocalAPI(postStoreReq.getStoreAddress());
+        }catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        // 카카오 위치 API 응답 실패
+        if (apiResponse.getStatusCode() != HttpStatus.OK){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        // 응답 값이 1이상이면 결과가 존재함
+        LocationInfoRes currentLoc = apiResponse.getBody();
+        if (currentLoc.getDocuments().length == 0){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        String locAddress = currentLoc.getDocuments()[0].getAddress().getAddress_name();
+        String roadAddress = currentLoc.getDocuments()[0].getRoad_address().getAddress_name();
+        double nowX = currentLoc.getDocuments()[0].getX();
+        double nowY = currentLoc.getDocuments()[0].getY();
+
         try{ // url 저장
-           return new PostStoreRes(storeDao.storeRegister(sellerIdx, postStoreReq, fileNames));
+           return new PostStoreRes(storeDao.storeRegister(sellerIdx, postStoreReq, fileNames, nowX, nowY));
         } catch (Exception e){
             throw new BaseException(DATABASE_ERROR);
         }
