@@ -95,7 +95,7 @@ public class SellerService {
 
             return postSignUpres;
         } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(SIGNUP_FAILED);
         }
     }
 
@@ -281,7 +281,7 @@ public class SellerService {
         try{
             duplicateUser = sellerDao.userAuthy(signUpAuthy);
         }catch(Exception exception){
-            throw new BaseException(MODIFY_FAIL_USERPASSWORD); // 4015 : 유저 비밀번호 수정 실패
+            throw new BaseException(POST_USERS_NOT_FOUND); // 2021 : 가입하지 않은 회원입니다.
         }
 
         if (duplicateUser == 1){
@@ -313,7 +313,7 @@ public class SellerService {
             }
         }
         else{
-            throw new BaseException(POST_USERS_ALREADY_EXISTS);
+            throw new BaseException(POST_USERS_ALREADY_EXISTS); // 2016 : 이미 가입한 회원입니다.
         }
     }
 

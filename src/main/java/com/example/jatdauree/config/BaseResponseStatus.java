@@ -39,10 +39,8 @@ public enum BaseResponseStatus {
     // 회원가입 > 중복닉네임 체크
     POST_USERS_EXISTS_NICK_NAME(false,2019,"중복된 닉네임입니다."),
     POST_USERS_NOT_FOUND(false,2021,"가입하지 않은 회원입니다."),
-    // 시험과제게시판 등록
-    POST_EXAM_SUB_TITLE_ISEMPTY(false,2022,"제목을 등록해주세요."),
-    // 시험과제게시판 수정
-    PATCH_EXAM_SUB_TITLE_ISEMPTY(false,2023,"제목을 등록해주세요."),
+
+
 
     // 2030~) 가게관련 및 메인메뉴/원산지 등록
     POST_STORES_NOT_REGISTERD(false, 2030, "사용자의 가게가 등록되어있지 않습니다."),
@@ -50,6 +48,8 @@ public enum BaseResponseStatus {
     STORE_SIDEMENU_DATA_UNVALID(false, 2032, "사이드 메뉴 등록 정보가 올바르지 않습니다."),
     STORE_INGREDIENT_DATA_UNVALID(false, 2033, "원산지 등록 정보가 올바르지 않습니다."),
     STORE_ALREADY_REGISTERD(false, 2034, "가게 등록 요청을 이미 하였습니다(메뉴 등록 또는 관리자의 승인을 기다리세요)."),
+    STORE_XY_CODE_FAILED(false, 2035, "가게주소가 올바르지 않습니다."),
+    STORE_REGISTER_FAILED(false, 2036, "가게 등록 요청 실패."),
 
     // 2040~) 오늘의 떨이메뉴 등록 요청
     POST_TODAY_MAINMENU_DATA_UNVALID(false, 2041, "오늘의 떨이메뉴(메인) 등록 정보가 올바르지 않습니다."),
@@ -63,7 +63,6 @@ public enum BaseResponseStatus {
     NO_BASKET_ITEMS(false, 2060, "장바구니에 담긴 항목없이 주문 불가능합니다."),
     STORE_TODAY_MENU_LACK(false, 2061, "가게의 떨이메뉴 개수가 부족하여 주문이 불가능합니다."),
     ORDER_FAILED(false, 2062, "주문에 실패하였습니다."),
-
     REVIEW_ALREADY_DONE(false, 2063, "이미 처리가 완료된 리뷰입니다."),
 
     //2050
@@ -85,6 +84,7 @@ public enum BaseResponseStatus {
     SERVER_ERROR(false, 4001, "서버와의 연결에 실패하였습니다."),
 
     //[PATCH] /users/{userIdx}
+    SIGNUP_FAILED(false,4002,"회원 가입 실패."),
     MODIFY_FAIL_USERNAME(false,4014,"유저네임 수정 실패"),
     MODIFY_FAIL_USERPASSWORD(false,4015,"유저 비밀번호 수정 실패"),
     MODIFY_FAIL_USERSTATUS_OFF(false,4016,"회원탈퇴 실패"),
@@ -105,6 +105,9 @@ public enum BaseResponseStatus {
     STORE_MENU_ALREADY_SAVED(false, 4034, "메뉴등록이 이미 이루어진 판매자입니다."),
     STORE_REGISTER_NOT_PERMITTED(false, 4035, "관리자에게 가게 승인되지 않은 판매자 계정입니다."),
     STORE_URL_POST_ERROR(false, 4036, "등록하는 이미지의 형태가 잘못 처리되었습니다."),
+    GET_STORE_FAILED(false, 4037, "가게 조회 실패"),
+    PATCH_STORE_FAILED(false, 4038, "가게 정보 수정 실패"),
+    STORE_END_FAILED(false, 4039, "가게 종료 실패"),
 
     // 4040~) 오늘의 떨이메뉴 등록
     POST_TODAY_MAINMENU_SAVE_ERROR(false, 4041, "오늘의 떨이메뉴(메인) 등록에 실패하였습니다."),

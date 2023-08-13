@@ -63,7 +63,7 @@ public class StoreService {
         //0) 가게 중복 등록 방지
         int storeRegistredCheck = storeDao.storeAlreadyRegister(sellerIdx);
         if (storeRegistredCheck == 1){
-            throw new BaseException(STORE_ALREADY_REGISTERD);
+            throw new BaseException(STORE_ALREADY_REGISTERD); // 2034:"가게 등록 요청을 이미 하였습니다(메뉴 등록 또는 관리자의 승인을 기다리세요).
         }
 
         // 1) 가게 이미지 등록정보 URL 발생
@@ -122,18 +122,18 @@ public class StoreService {
         try{
             apiResponse = locationValue.kakaoLocalAPI(postStoreReq.getStoreAddress());
         }catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(STORE_XY_CODE_FAILED); // 2035 : 가게주소가 올바르지 않습니다.
         }
 
         // 카카오 위치 API 응답 실패
         if (apiResponse.getStatusCode() != HttpStatus.OK){
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(STORE_XY_CODE_FAILED); // 2035 : 가게주소가 올바르지 않습니다.
         }
 
         // 응답 값이 1이상이면 결과가 존재함
         LocationInfoRes currentLoc = apiResponse.getBody();
         if (currentLoc.getDocuments().length == 0){
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(STORE_XY_CODE_FAILED); //2036 :가게 등록 요청 실패.
         }
 
         String locAddress = currentLoc.getDocuments()[0].getAddress().getAddress_name();
@@ -144,7 +144,7 @@ public class StoreService {
         try{ // url 저장
            return new PostStoreRes(storeDao.storeRegister(sellerIdx, postStoreReq, fileNames, nowX, nowY));
         } catch (Exception e){
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(STORE_REGISTER_FAILED);
         }
     }
 
@@ -175,7 +175,7 @@ public class StoreService {
 
             return  getStoreInfoRes;
         }catch (Exception e){
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(GET_STORE_FAILED); // 4037 : 가게 조회 실패
         }
     }
 
@@ -213,8 +213,8 @@ public class StoreService {
         }catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
-        System.out.println(savedFileNames.getLogoFileName());
-        System.out.println(savedFileNames.getSignFileName());
+        //System.out.println(savedFileNames.getLogoFileName());
+        //System.out.println(savedFileNames.getSignFileName());
 
         // 파일명 생성 (checkFileIsNullThenName 에서 파일이 null 이면 가게정보 수정요청들어와도 파일이름 null)
         File logoFile = null, signFile = null;
@@ -253,13 +253,12 @@ public class StoreService {
             throw new BaseException(S3_ACCESS_API_ERROR); // 5030 : 이미지 url 생성에 실패하였습니다.
         }
 
-
         // 2) 가게 정보 수정
         try {
             storeDao.storeUpdate(storeIdx, patchStoreInfoReq, savedFileNames);
             return new PatchStoreInfoRes(storeIdx);
         } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(PATCH_STORE_FAILED); // 4038 : 가게 정보 수정실패
         }
     }
 
@@ -268,7 +267,6 @@ public class StoreService {
     //(뺸 조건)가게 주인이 맞는지 ---> storeIdx로 sellerIdx를 조회해서 떨이 메뉴 테이블에서의 storeIdx와 동일한지 확인  error---> 사장님의 가게가 아닙니다. 다시 한번 선택한 가게를
     //생각해보니 2번은 할 필요가 없는게 애초에 sellerIdx를 조회하면 storeIdx 조회 가능하니까 로그인한 사장님의 가게가 아닐 수 없음
     //2.이미 영업종료가 됐는데 한번 더 눌렀을때--> 이미 영업 종료 되었습니다
-
     public PatchStoreEndRes storeEnd(int sellerIdx) throws BaseException{
         // 1) 사용자 가게 조회
         int storeIdx;
@@ -282,7 +280,7 @@ public class StoreService {
         try {
             return new PatchStoreEndRes(storeDao.storeEnd(storeIdx));
         }catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR); //값을 바꾸는데 실패
+            throw new BaseException(STORE_END_FAILED); // 4039 : 가게 종료 실패
         }
     }
 

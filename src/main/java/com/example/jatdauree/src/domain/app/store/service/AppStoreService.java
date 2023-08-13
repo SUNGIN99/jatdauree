@@ -364,7 +364,7 @@ public class AppStoreService {
                             store.getStoreSignUrl(),
                             store.getStar(),
                             distance, duration,
-                            store.getStoreIdx() != 0 ? 1:0
+                            store.getCustomerIdx() != 0 ? 1:0
                     )
             );
         }
