@@ -102,12 +102,13 @@ public class BasketDao {
                 "    S.storeIdx,\n" +
                 "    S.store_name,\n" +
                 "    S.store_address,\n" +
-                "    S.store_phone,\n" +
+                "    C.phone,\n" +
                 "    SUM(B.cnt * TM.price) as orderPrice\n" +
                 "FROM Basket B\n" +
                 "LEFT JOIN TodayMenu TM on B.todaymenuIdx = TM.todaymenuIdx\n" +
                 "LEFT JOIN Stores S on B.storeIdx = S.storeIdx\n" +
-                "WHERE customerIdx = ?\n" +
+                "LEFT JOIN Customers C on B.customerIdx = C.customerIdx\n" +
+                "WHERE B.customerIdx = ?\n" +
                 "AND B.status != 'D'";
 
         return this.jdbcTemplate.queryForObject(query,
@@ -115,7 +116,7 @@ public class BasketDao {
                         rs.getInt("storeIdx"),
                         rs.getString("store_name"),
                         rs.getString("store_address"),
-                        rs.getString("store_phone"),
+                        rs.getString("phone"),
                         rs.getInt("orderPrice")
                 ), userIdx);
     }
