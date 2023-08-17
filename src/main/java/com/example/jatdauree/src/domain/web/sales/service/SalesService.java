@@ -328,7 +328,7 @@ public class SalesService {
         // 1) 가게의 메뉴 총 주문 수 조회
         int totalMenuOrderCount = 0;
         try{
-            totalMenuOrderCount = salesDao.getStoresTotalOrderCount(storeIdx);
+            totalMenuOrderCount = salesDao.getStoresTotalOrderCount(storeIdx, month);
         }catch (Exception e) {
             throw new BaseException(DATABASE_ERROR); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
@@ -355,6 +355,8 @@ public class SalesService {
             throw new BaseException(DATABASE_ERROR); // 2030 : 사용자의 가게가 등록되어있지 않습니다.
         }
         if(tempTotalCount != totalMenuOrderCount){
+            System.out.println("tempTotalCount: "+ tempTotalCount);
+            System.out.println("totalMenuOrderCount: "+ totalMenuOrderCount);
             throw new BaseException(DATABASE_ERROR);
         }
 

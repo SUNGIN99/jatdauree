@@ -127,7 +127,7 @@ public class SalesDao {
 
     }
 
-    public int getStoresTotalOrderCount(int storeIdx) {
+    public int getStoresTotalOrderCount(int storeIdx, int month) {
         String query = "SELECT\n" +
                 "    COUNT(M.menuIdx) as total_menu_orders\n" +
                 "FROM Orders O\n" +
@@ -135,8 +135,14 @@ public class SalesDao {
                 "LEFT JOIN TodayMenu TM on OL.todaymenuIdx = TM.todaymenuIdx\n" +
                 "LEFT JOIN Menu M on TM.menuIdx = M.menuIdx\n" +
                 "WHERE O.storeIdx = ?\n" +
-                "  AND O.status LIKE '%A%'";
-        return this.jdbcTemplate.queryForObject(query, int.class, storeIdx);
+                "  AND O.status LIKE '%A%'\n" +
+                "  AND DATE_FORMAT(O.created, '%c') = ?";
+
+        Object[] params = new Object[] {
+                storeIdx, month
+        };
+
+        return this.jdbcTemplate.queryForObject(query, int.class, params);
     }
 
     public List<ItemSalesOrderRatio> getMontlyMenuOrders(int storeIdx, int month) {
