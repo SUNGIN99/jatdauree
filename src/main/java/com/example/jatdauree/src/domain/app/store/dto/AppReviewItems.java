@@ -17,6 +17,7 @@ public class AppReviewItems  {
     private String customerProfileUrl;
     private String customerName;
     private int star;
+    private String date;
     private String contents;
     private String comment;
     private String review_url;

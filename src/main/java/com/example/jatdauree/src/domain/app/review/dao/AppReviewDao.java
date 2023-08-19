@@ -66,7 +66,8 @@ public class AppReviewDao {
                 "FROM Review R\n" +
                 "LEFT JOIN Customers C on R.customerIdx = C.customerIdx\n" +
                 "LEFT JOIN Stores S on R.storeIdx = S.storeIdx\n" +
-                "WHERE R.customerIdx = ? AND R.status != 'D'";
+                "WHERE R.customerIdx = ? AND R.status != 'D' \n" +
+                "ORDER BY R.created DESC";
 
         return this.jdbcTemplate.query(query,
                 (rs, rowNum) -> new MyReviews(

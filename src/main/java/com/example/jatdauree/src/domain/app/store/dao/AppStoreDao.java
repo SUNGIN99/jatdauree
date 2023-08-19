@@ -186,6 +186,7 @@ public class AppStoreDao {
                 "    R.reviewIdx,\n" +
                 "    C.name,\n" +
                 "    R.star ,\n" +
+                "    R.created,\n" +
                 "    R.contents, R.comment, R.review_url\n" +
                 "FROM Orders O\n" +
                 "JOIN Review R on O.orderIdx = R.orderIdx\n" +
@@ -194,7 +195,7 @@ public class AppStoreDao {
                 "    R.storeIdx = ?\n" +
                 "  AND O.status = 'A'\n" +
                 "  AND R.status <> 'D'\n" +
-                "ORDER BY reviewIdx;";
+                "ORDER BY created DESC;";
 
         return this.jdbcTemplate.query(query,
                 (rs, rowNum) -> new AppReviewItems(
@@ -203,6 +204,7 @@ public class AppStoreDao {
                         null,
                         rs.getString("name"),
                         rs.getInt("star"),
+                        rs.getString("created"),
                         rs.getString("contents"),
                         rs.getString("comment") == null ? "" : rs.getString("comment"),
                         rs.getString("review_url"),
@@ -316,11 +318,15 @@ public class AppStoreDao {
 
     // --- 윤채
     public GetAppStoreInfo getAppStoreInfo(int storeIdx){
-        String query = "SELECT store_name, store_phone, x, y, store_address FROM Stores WHERE storeIdx = ?";
+        String query = "SELECT \n" +
+                "    store_name, store_phone, x, y, store_address, categoryIdx \n" +
+                "FROM Stores  S\n" +
+                "WHERE storeIdx = ?";
         return this.jdbcTemplate.queryForObject(query,
                 (rs, rowNum) -> new GetAppStoreInfo(
                     rs.getString("store_name"),
                     rs.getString("store_phone"),
+                    rs.getInt("categoryIdx"),
                     rs.getDouble("x"),
                     rs.getDouble("y"),
                     rs.getString("store_address")

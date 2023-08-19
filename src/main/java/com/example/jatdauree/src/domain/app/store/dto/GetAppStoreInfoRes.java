@@ -13,6 +13,7 @@ public class GetAppStoreInfoRes {
 
     private int storeIdx;
     private String storeName;
+    private int categoryIdx;
     private String storePhone;
     private double x;
     private double y;

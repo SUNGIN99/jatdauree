@@ -3,6 +3,7 @@ package com.example.jatdauree.src.domain.app.store.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.example.jatdauree.config.BaseException;
 import com.example.jatdauree.src.domain.app.basket.dto.GetStoreList;
+import com.example.jatdauree.src.domain.app.review.dto.MyReviews;
 import com.example.jatdauree.src.domain.app.store.dao.*;
 import com.example.jatdauree.src.domain.app.store.dto.*;
 import com.example.jatdauree.src.domain.app.subscribe.dao.AppSubscribeDao;
@@ -14,6 +15,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,7 +137,6 @@ public class AppStoreService {
         try {
             reviewStar = appStoreDao.reviewStarTotal(storeIdx);
         } catch (Exception e) {
-            System.out.println("1: " + e);
             throw new BaseException(DATABASE_ERROR);
         }
 
@@ -144,7 +147,7 @@ public class AppStoreService {
         starCountRatios.add(new StarCountRatio("별 2개", reviewStar.getStar2(), (int) (reviewStar.getStar2() * 1.0  / reviewStar.getReviews_total() * 100)));
         starCountRatios.add(new StarCountRatio("별 1개", reviewStar.getStar1(), (int) (reviewStar.getStar1() * 1.0  / reviewStar.getReviews_total() * 100)));
 
-        // 2. 리뷰 목록
+        // 2. 리뷰 목록 조회 및 url 가져오기
         List<AppReviewItems> reviewItems;
         try {
             reviewItems = appStoreDao.reviewItems(storeIdx);
@@ -154,8 +157,39 @@ public class AppStoreService {
                 item.setOrderTodayMenu(appStoreDao.appOrderTodayMenus(item.getOrderIdx()));
             }
         } catch (Exception e) {
-            System.out.println("2: " + e);
             throw new BaseException(RESPONSE_ERROR);    // 리뷰 조회에 실패하였습니다.
+        }
+
+        try{
+            LocalDateTime now = LocalDateTime.now(); //현재 시간
+            for(AppReviewItems reviews : reviewItems){
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); //DAO에서 받아오는 getDate와 형식을 맞추어 준다.
+                LocalDateTime reviewDate = LocalDateTime.parse(reviews.getDate(),formatter);
+
+                Duration duration = Duration.between(reviewDate, now); // 현재 시간과 DB에서 가져온 getDate 사이의 시간
+
+                long years = duration.toDays() / 365;
+                long months = duration.toDays() / 30;
+                long days = duration.toDays();
+                long hours = duration.toHours();
+                long minutes = duration.toMinutes();
+
+                if (years > 0) {
+                    reviews.setDate(years + "년 전");
+                } else if (months > 0) {
+                    reviews.setDate(months + "개월 전");;
+                } else if (days > 0) {
+                    reviews.setDate(days + "일 전");
+                } else if (hours > 0) {
+                    reviews.setDate(hours + "시간 전");
+                } else if (minutes > 0) {
+                    reviews.setDate(minutes + "분 전");
+                } else {
+                    reviews.setDate("방금 전");
+                }
+            }
+        }catch (Exception e){
+            throw new BaseException(DATABASE_ERROR); //날짜를 잘못 출력했습니다.
         }
 
         return new GetAppStoreDetailReviewRes(storeIdx,
@@ -311,6 +345,7 @@ public class AppStoreService {
 
         return new GetAppStoreInfoRes(storeIdx,
                 storeInfo.getStoreName(),
+                storeInfo.getStoreCategory(),
                 storeInfo.getStorePhone(),
                 storeInfo.getX(), storeInfo.getY(),
                 storeInfo.getStoreAddress(),
