@@ -41,7 +41,7 @@ public class AppOrderDao {
                 "LEFT JOIN Review R on O.orderIdx = R.orderIdx\n" +
                 "WHERE O.customerIdx = ?  AND O.status LIKE '%A%'\n" +
                 "GROUP BY O.orderIdx\n" +
-                "ORDER BY O.created";
+                "ORDER BY O.created DESC";
 
         return this.jdbcTemplate.query(query,
                 (rs, rowNum) -> new GetOrderListRes(
