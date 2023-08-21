@@ -44,7 +44,7 @@ public class OrderDao {
                 "    LEFT JOIN Customers C on O.customerIdx = C.customerIdx\n" +
                 "    WHERE O.storeIdx = ? AND O.status = ?\n" +
                 "    GROUP BY O.orderIdx, OL.orderlistIdx) R\n" +
-                "    ORDER BY R.order_time;";
+                "    ORDER BY R.order_sequence;";
         return this.jdbcTemplate.query(OrdersQuery,
                 (rs, rowNum) -> new GetOrderItemRes(
                         rs.getInt("orderIdx"),
