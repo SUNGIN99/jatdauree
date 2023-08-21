@@ -78,7 +78,7 @@ public class TodayMenuDao {
                 "    IF(T.status = 'D' , null, T.remain) as remain,\n" +
                 "    IF(T.status = 'D' , null, T.status) as status\n" +
                 "FROM Menu M\n" +
-                "LEFT JOIN TodayMenu T on M.menuIdx = T.menuIdx\n" +
+                "LEFT JOIN TodayMenu T on M.menuIdx = T.menuIdx AND T.status != 'D'\n" +
                 "WHERE M.storeIdx = ?\n" +
                 "AND M.status = ?";
 
