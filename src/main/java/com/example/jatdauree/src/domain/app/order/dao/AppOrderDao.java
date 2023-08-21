@@ -39,7 +39,7 @@ public class AppOrderDao {
                 "LEFT JOIN Menu M on M.menuIdx = TM.menuIdx\n" +
                 "LEFT JOIN Stores S on O.storeIdx = S.storeIdx\n" +
                 "LEFT JOIN Review R on O.orderIdx = R.orderIdx\n" +
-                "WHERE O.customerIdx = ?  AND O.status = '%A%'\n" +
+                "WHERE O.customerIdx = ?  AND O.status LIKE '%A%'\n" +
                 "GROUP BY O.orderIdx\n" +
                 "ORDER BY O.created";
 
