@@ -134,6 +134,7 @@ public class OrderService {
             else if (patchReceReq.getStatus().equals("P"))
                 updated = orderDao.orderAccepted(storeIdx, patchReceReq.getOrderIdx(), patchReceReq.getStatus(), orderSequence);
         }catch (Exception e){
+            //System.out.println("1: "+ e);
             throw new BaseException(DATABASE_ERROR);// 데이터를 업데이트 하는데 오류가 있음
         }
 
@@ -142,6 +143,7 @@ public class OrderService {
         if(updated == 1){
             return new PatchReceRes(storeIdx, orderSequence);
         }else{
+            //System.out.println("2: ");
             throw new BaseException(DATABASE_ERROR);
         }
     }

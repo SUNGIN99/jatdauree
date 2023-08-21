@@ -80,7 +80,7 @@ public class OrderDao {
 
     public int orderAccepted(int storeIdx, int orderIdx, String status, int orderSequence){
         String updateQuery = "UPDATE Orders SET " +
-                "status = ? " +
+                "status = ?, " +
                 "order_sequence = ? " +
                 "WHERE storeIdx = ? AND orderIdx = ?";
         return jdbcTemplate.update(updateQuery, status, orderSequence, storeIdx, orderIdx);
