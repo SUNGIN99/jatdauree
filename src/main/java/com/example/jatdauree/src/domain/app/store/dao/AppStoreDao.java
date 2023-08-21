@@ -29,7 +29,8 @@ public class AppStoreDao {
                 "   m.composition, m.price, tm.discount, tm.price AS today_price \n" +
                 "   FROM TodayMenu tm \n" +
                 "   JOIN Menu m ON m.menuIdx = tm.menuIdx \n" +
-                "   WHERE tm.storeIdx = ? AND m.status = ?";
+                "   WHERE tm.storeIdx = ? AND tm.status = ?";
+
         Object[] params = new Object[]{storeIdx,status};
 
         return this.jdbcTemplate.query(query,
