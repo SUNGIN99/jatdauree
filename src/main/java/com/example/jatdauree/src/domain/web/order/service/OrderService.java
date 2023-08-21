@@ -6,16 +6,14 @@ import com.example.jatdauree.src.domain.web.order.dao.OrderDao;
 import com.example.jatdauree.src.domain.web.order.dto.*;
 import com.example.jatdauree.src.domain.web.store.dao.StoreDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
-import static com.example.jatdauree.config.BaseResponseStatus.DATABASE_ERROR;
-import static com.example.jatdauree.config.BaseResponseStatus.POST_STORES_NOT_REGISTERD;
+import static com.example.jatdauree.config.BaseResponseStatus.*;
 
 @Service
 public class OrderService {
@@ -114,14 +112,30 @@ public class OrderService {
             throw new BaseException(DATABASE_ERROR); // 이미 처리 되거나, 처리 되지 않은 주문입니다.
         }
 
-        // 4) 주문 접수 혹은 취소
-        // ******************** 여기서 구매정보 발생 시켜서 처리해야함 ********************
-        int updated;
+        // 4) 주문번호 확인
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String date = sdf.format(new Date());
+        int orderSequence;
         try{
-            updated = orderDao.updateOrderStatus(storeIdx, patchReceReq.getOrderIdx(), patchReceReq.getStatus());
+            orderSequence = orderDao.getOrderSequence(storeIdx, date);
+        }catch (IncorrectResultSizeDataAccessException error) { // 쿼리문에 해당하는 결과가 없거나 2개 이상일 때
+            orderSequence = 1;
         }catch (Exception e){
             throw new BaseException(DATABASE_ERROR);// 데이터를 업데이트 하는데 오류가 있음
         }
+
+        // 5) 주문 접수 혹은 취소
+        // ******************** 여기서 구매정보 발생 시켜서 처리해야함 ********************
+        int updated = 0;
+        try{
+            if (patchReceReq.getStatus().equals("D"))
+                updated = orderDao.orderDenied(storeIdx, patchReceReq.getOrderIdx(), patchReceReq.getStatus());
+            else if (patchReceReq.getStatus().equals("P"))
+                updated = orderDao.orderAccepted(storeIdx, patchReceReq.getOrderIdx(), patchReceReq.getStatus(), orderSequence);
+        }catch (Exception e){
+            throw new BaseException(DATABASE_ERROR);// 데이터를 업데이트 하는데 오류가 있음
+        }
+
 
         // *********** 주문번호 처리 로직 필요 ***********
         if(updated == 1){

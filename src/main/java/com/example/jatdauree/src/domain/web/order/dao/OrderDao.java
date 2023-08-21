@@ -71,9 +71,19 @@ public class OrderDao {
     }// 현재 orderIdx의 status 값을 확인해준다.
 
 
-    public int updateOrderStatus(int storeIdx,int orderIdx, String status){
-        String updateQuery = "UPDATE Orders SET status = ? WHERE storeIdx = ? AND orderIdx = ?";
+    public int orderDenied(int storeIdx, int orderIdx, String status){
+        String updateQuery = "UPDATE Orders SET " +
+                "status = ? " +
+                "WHERE storeIdx = ? AND orderIdx = ?";
         return jdbcTemplate.update(updateQuery, status, storeIdx, orderIdx);
+    }
+
+    public int orderAccepted(int storeIdx, int orderIdx, String status, int orderSequence){
+        String updateQuery = "UPDATE Orders SET " +
+                "status = ? " +
+                "order_sequence = ? " +
+                "WHERE storeIdx = ? AND orderIdx = ?";
+        return jdbcTemplate.update(updateQuery, status, orderSequence, storeIdx, orderIdx);
     }
 
 
@@ -130,4 +140,19 @@ public class OrderDao {
         return jdbcTemplate.update(updatequery, orderIdx);
     }
 
+    public int getOrderSequence(int storeIdx, String date) {
+        String query = "SELECT\n" +
+                "    orderIdx,\n" +
+                "    order_sequence\n" +
+                "FROM Orders\n" +
+                "WHERE storeIdx = ?\n" +
+                "  AND DATE_FORMAT(order_time, '%Y-%m-%d') = ?\n" +
+                "  AND (status = 'P' OR status = 'A')\n" +
+                "ORDER BY order_sequence DESC LIMIT 1";
+
+        Object[] params = new Object[]{storeIdx, date};
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> rs.getInt("order_sequence"), params);
+    }
 }
