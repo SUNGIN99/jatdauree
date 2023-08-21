@@ -118,6 +118,7 @@ public class OrderService {
         int orderSequence;
         try{
             orderSequence = orderDao.getOrderSequence(storeIdx, date);
+            orderSequence += 1;
         }catch (IncorrectResultSizeDataAccessException error) { // 쿼리문에 해당하는 결과가 없거나 2개 이상일 때
             orderSequence = 1;
         }catch (Exception e){
@@ -139,7 +140,7 @@ public class OrderService {
 
         // *********** 주문번호 처리 로직 필요 ***********
         if(updated == 1){
-            return new PatchReceRes(storeIdx, 0);
+            return new PatchReceRes(storeIdx, orderSequence);
         }else{
             throw new BaseException(DATABASE_ERROR);
         }
