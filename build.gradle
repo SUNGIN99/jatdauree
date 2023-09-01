@@ -22,18 +22,50 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.jetbrains:annotations:19.0.0'
+
+	// DB
+	implementation group:'mysql', name:'mysql-connector-java', version:'8.0.32'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+	// authenticate
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-web-services'
-	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	testImplementation 'org.springframework.security:spring-security-test'
+	implementation "io.jsonwebtoken:jjwt:0.9.1"
+
+	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	// nurigo 문자인증
+	implementation 'net.nurigo:sdk:4.2.7'
+
+	// iamport 결제 연동
+	allprojects {
+		repositories {
+			//...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+	implementation 'com.github.iamport:iamport-rest-client-java:0.2.21'
+
+	// Retrofit2
+	//implementation 'com.squareup.retrofit2:retrofit:2.7.2'
+	//implementation 'com.squareup.retrofit2:converter-gson:2.7.2'
+	//implementation 'com.squareup.okhttp3:logging-interceptor:4.10.0'
+
+	// aws cloud s3
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	implementation 'org.springframework.cloud:spring-cloud-aws-context:2.2.6.RELEASE'
+	implementation 'org.springframework.cloud:spring-cloud-aws-autoconfigure:2.2.6.RELEASE'
+
+	// spring boot
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-web-services'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+
 }
 
 tasks.named('test') {
