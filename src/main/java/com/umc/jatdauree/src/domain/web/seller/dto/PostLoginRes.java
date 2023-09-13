@@ -1,0 +1,20 @@
+package com.umc.jatdauree.src.domain.web.seller.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class PostLoginRes {
+    private String jwt;
+    private int sellerIdx;
+    private String name;
+    private int first_login;
+    private int menu_register;
+    private String store_name;
+    private String store_status;
+}

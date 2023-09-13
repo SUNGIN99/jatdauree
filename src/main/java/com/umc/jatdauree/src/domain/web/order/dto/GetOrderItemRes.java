@@ -1,0 +1,26 @@
+package com.umc.jatdauree.src.domain.web.order.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.io.Serializable;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class GetOrderItemRes implements Serializable {
+
+    private int orderIdx;
+    private int orderSequence;
+    private String orderTime;
+    private String pickUpTime;
+    private String request;
+    private int totalPrice;
+    private String payStatus;
+    private String menuName;
+    private int menuCount;
+    private int discountedPrice;
+}
