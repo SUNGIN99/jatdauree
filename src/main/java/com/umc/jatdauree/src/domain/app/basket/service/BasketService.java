@@ -132,10 +132,12 @@ public class BasketService {
         }
 
         // 가게 url 가져오기
-        String storeUrl;
+        String storeUrl = "";
         try{
-            storeUrl = basketDao.getStoreUrl(basketItemsDao.get(0).getStoreIdx());
-            storeUrl = ""+s3Client.getUrl(bucketName, storeUrl);
+            if(basketItems.size() != 0) {
+                storeUrl = basketDao.getStoreUrl(basketItemsDao.get(0).getStoreIdx());
+                storeUrl = "" + s3Client.getUrl(bucketName, storeUrl);
+            }
         }catch (Exception e){
             throw new BaseException(DATABASE_ERROR); // 메뉴 사진 조회 실패
         }
@@ -232,6 +234,7 @@ public class BasketService {
         }
     }
 
+    @Transactional(rollbackFor = BaseException.class)
     public GetBasketRes patchBasket(int userIdx, PatchBasketReq basketReq) throws BaseException {
         try{
             if(basketReq.getPatchStatus().equals("count")){
