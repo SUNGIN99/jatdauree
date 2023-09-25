@@ -73,6 +73,7 @@ public class AppReviewService {
                 file = new File(absolutePath + fileName); // 업로드될 경로를 지정해 준다.
             }
         }catch (Exception e){
+            System.out.println("1");
             throw new BaseException(REQUEST_ERROR); // 리뷰 파일의 형태가 잘못됨
         }
 
@@ -82,6 +83,7 @@ public class AppReviewService {
                  postReviewReq.getReviewFile().transferTo(file); //postReviewReq.getReviewFile 메서드를 호출해서 file에 transferTo로 서버에 업로드
              }
         }catch (Exception e){
+            System.out.println("2");
             throw new BaseException(REQUEST_ERROR); // 리뷰 사진 파일이 잘못됐다.
         }
 
@@ -245,6 +247,5 @@ public class AppReviewService {
         }catch (Exception e){
             throw new BaseException(DATABASE_ERROR);
         }
-
     }
 }
